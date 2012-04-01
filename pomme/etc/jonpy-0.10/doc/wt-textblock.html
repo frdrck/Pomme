@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>wt.textblock module</title>
+<link href="style.css" rel="stylesheet" type="text/css" />
+</head><body>
+<h1>wt.textblock module</h1>
+<h2>Synopsis</h2>
+<p>The <code>wt.textblock</code> module provides a
+<code><a href="wt.html#templatecode">TemplateCode</a></code> sub-class which
+helps with dynamically creating paragraphs of text.</p>
+
+<h2>Usage</h2>
+<p>This class is used for creating paragraphs of HTML out of a text string.
+Double-newlines in the string (i.e. blank lines) are treated as paragraph
+separators. Single newlines are converted to <code>&lt;br&gt;</code> tags.
+Newlines of the form <code>\n</code> or <code>\r\n</code> are supported.</p>
+<p>Example:</p>
+<p class="html"><code>&lt;!--wt:body--&gt;<br />
+&lt;p&gt;$$=paragraph$$&lt;/p&gt;<br />
+&lt;!--wt:/body--&gt;</code></p>
+<p class="code"><code>import jon.wt.textblock as textblock<br />
+<br />
+class body(textblock.TextBlock):<br />
+&nbsp;&nbsp;def text(self):<br />
+&nbsp;&nbsp;&nbsp;&nbsp;return self.outer.article["body"]</code></p>
+<p>Note the use of the <code>=</code> literal encoding specifier, because
+the output is raw HTML (including <code>&lt;br&gt;</code> tags).</p>
+
+<h2><a name="textblock" id="textblock"></a>class: TextBlock(<a href="wt.html#templatecode">TemplateCode</a>)</h2>
+
+<h3>Public Instance Variables</h3>
+<h4><a name="textblock:paragraph" id="textblock:paragraph"><code><strong>paragraph</strong></code></a></h4>
+<p>This variable is set to the HTML code for each paragraph in turn by the
+<code><a href="#textblock:main">main()</a></code> method.</p>
+
+<h3>Public Methods</h3>
+<h4><a name="textblock:text" id="textblock:text"><code><strong>text(self)</strong></code></a></h4>
+<p><strong>Returns</strong>: string</p>
+<p>This method may be overridden by subclasses. It returns a string containing
+the text data to be turned into HTML paragraphs. The default implementation
+just returns the empty string.</p>
+
+<h4><a name="textblock:main" id="textblock:main"><code><strong>main(self, template)</strong></code></a></h4>
+<p><code><strong>template</strong></code>: string</p>
+<p>This method may be overridden by subclasses. It calls
+<code><a href="#textblock:text">text()</a></code> to fetch the text data
+and splits it into paragraphs. Each paragraph in turn is converted to HTML,
+placed into the <code><a href="#textblock:paragraph">paragraph</a></code>
+attribute, and <code><a href="wt.html#templatecode:process">process()</a></code>
+called.</p>
+
+<p class="cvsid">$Id: wt-textblock.html,v c0f5f983a7fc 2010/03/23 01:07:17 jon $</p>
+</body></html>

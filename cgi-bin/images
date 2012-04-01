@@ -1,0 +1,302 @@
+#!/usr/bin/python
+import os
+import sys
+import cgi
+
+REQUEST_URI = os.environ['REQUEST_URI']
+
+BASE_PATH = "/var/www/vhosts/pomme.us/httpdocs" + REQUEST_URI
+BASE_HREF = "http://pomme.us" + REQUEST_URI
+
+def is_image (img):
+	if "jpeg" in img:
+		return True
+	if "jpg" in img:
+		return True
+	if "gif" in img:
+		return True
+	if "png" in img:
+		return True
+	return False
+
+print "Content-type: text/html"
+print "Pragma: no-cache"
+print
+print """
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title> Take your pic! </title>
+<script type="text/javascript" src="/js/jquery.js"></script>
+<script type="text/javascript">
+window.onload = function(){
+        window.document.body.onload = Main.init();
+    };
+
+
+var Dump =
+	{
+	pick: function ()
+		{
+		Dump.pickUrl( $(this).attr("src") )
+		},
+	pickUrl: function (url)
+		{
+		$("#rebus").append ($ ("<img>").attr ("src", url))
+		$("#rebus").show()
+		$("#urlz").val( $("#urlz").val() + " " + url )
+		return false
+		},
+	clear: function ()
+		{
+		$("#rebus").html("")
+		$("#urlz").val("")
+		},
+	backspace: function ()
+		{
+		$("#rebus img:last").remove()
+		var urllist = $("#urlz").val().split(" ")
+		urllist.pop()
+		$("#urlz").val( urllist.join(" ") )
+		},
+	reverse: function ()
+		{
+		urllist = $("#urlz").val().split(" ")
+		Dump.clear()
+		for (i in urllist.reverse())
+			if (urllist[i])
+				Dump.pickUrl(urllist[i])
+		}
+	}
+var Main =
+	{
+	editing: false,
+	kp: function (event)
+		{
+		switch (event.keyCode)
+			{
+			// BS
+			case 8:
+				if (! Main.editing)
+					Dump.backspace()
+				return false
+			// C
+			case 67:
+				if (! Main.editing)
+					Dump.clear()
+				break
+			// R
+			case 82:
+				if (! Main.editing)
+					Dump.reverse()
+				break
+			// ESC
+			case 27:
+			// H
+			case 72:
+				if (! Main.editing)
+					$("#rebus").toggle()
+				break
+			}
+		return true
+		},
+	poll: function ()
+		{
+		},
+	pollCallback: function ()
+		{
+		},
+	init: function ()
+		{
+ $(document).keydown(Main.kp)
+    $("#urlz").focus(function(){ Main.editing = true })
+    $("#urlz").blur(function(){ Main.editing = false })
+    $("#clear").live("click", Dump.clear)
+    $("#help").click(function(){ $("#keys").toggle() })
+    $("div img").live("click", Dump.pick)
+    Dump.clear()
+		}
+	}
+//Main.init()
+</script>
+<style type="text/css">
+body
+	{
+	background-color: #eee;
+background-image: -webkit-gradient(
+    linear,
+    left bottom,
+    left top,
+    color-stop(0.02, rgb(238,238,238)),
+    color-stop(1, rgb(255,255,255))
+);
+background-image: -moz-linear-gradient(
+    center bottom,
+    rgb(238,238,238) 2%,
+    rgb(255,255,255) 100%
+);
+	background-attachment: fixed;
+	height: 100%; width: 100%;
+	margin: 0; padding: 0;
+
+	}
+html
+	{
+	margin: 0; padding: 0;
+	height: 100%; width: 100%;
+	padding-bottom: 400px;
+	}
+#images
+	{
+	padding-bottom: 200px;
+	margin-top: 5px;
+	margin-left: auto;
+	margin-right: auto;
+	}
+#images div
+	{
+	display: inline-block; 
+	text-align: center;
+	width: 220px;
+	height: 220px;
+	margin: 10px;
+	}
+div img
+	{
+	max-width: 200px;
+	max-height: 200px;
+	border: 10px solid white;
+	}
+#dump
+	{
+	position: fixed;
+	left: 0;
+	bottom: 10px;
+	padding: 10px;
+	width: 100%;
+	border-bottom: 2px solid #000;
+	background-color: #f8f8f8;
+	border-top: 1px solid #888;
+	}
+#dump #rebus
+	{
+	clear: right;
+	width: 90%;
+	max-height: 700px;
+	overflow-y: scroll;
+	background-color: #fff;
+	padding-bottom: 5px;
+	border-bottom: 1px solid #ddd;
+	margin-bottom: 5px;
+	}
+#dump #rebus img
+	{
+	display: inline;
+	max-width: 700px;
+	max-height: 450px;
+	margin-right: -4px;
+	}
+#dump #urlz
+	{
+	width: 90%;
+	font-size: 15px;
+	}
+#dump #clear
+	{
+	font-size: 15px;
+	}
+#help
+	{
+	position: fixed;
+	top: 10px;
+	right: 10px;
+	cursor: pointer;
+	text-align: right;
+	font-family: sans-serif;
+	}
+#help #bold
+	{
+	padding: 5px;
+	background-color: #f8f4fb;
+	display: block;
+	max-width: 160px;
+	text-align: right;
+	}
+#help #keys
+	{
+	clear: both;
+	background-color: #f8f8f8;
+	padding: 5px;
+	display: none;
+	width: 120px;
+	font-size: 12px;
+	}
+#center
+  {
+  text-align:center; 
+  margin:0 auto;
+  }
+#bold
+  {
+  font-weight:bold;
+  }
+</style>
+</head>
+<body>
+<div id="help"><!--section-->
+	<span id="bold">keys</span>
+	<div id="keys">ESC toggle<br>C clear<br>R reverse<br>BACKSPACE delete</div>
+</div><!--section-->
+<div id="dump"><!--section-->
+	<div id="rebus"></div>
+	<input id="urlz" type="text" />
+	<button id="clear">clear</button>
+</div><!--section-->
+
+<div id="center">
+
+<div id="images"><!--section-->
+
+"""
+
+form = cgi.FieldStorage()
+
+limit = 200
+if 'limit' in form:
+	print "LIMITED"
+	if limit == "all":
+		limit = 99999
+	limit = form['limit'], limit
+files = os.listdir( BASE_PATH )
+count = 0
+if 'sort' in form:
+	if form['sort'] == 'name':
+		sorted_files = sorted(files)
+	else:
+		sorted_files = reversed(sorted(files, key=lambda f: os.stat(BASE_PATH+f)[9]))
+else:
+	#sorted_files = reversed(sorted(files, key=lambda f: os.stat(BASE_PATH+f)[9]))
+	sorted_files = sorted(files)
+for f in sorted_files:
+	if os.path.isdir(BASE_PATH+f):
+		continue
+	if not is_image(f):
+		continue
+	url = BASE_HREF + f.replace(" ","%20")
+	# print "<div><a href='%s' target='_blank'><img src='%s'/></a></div>" % (url, url)
+	print "<div><img src='%s' alt='image'/></div>" % (url)
+	#count = count + 1
+	#if limit and count > limit:
+	#	break
+
+print """
+
+</div><!--section-->
+
+</div><!--center-->
+
+</body>
+</html>
+"""
+

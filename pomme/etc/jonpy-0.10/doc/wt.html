@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>wt module</title>
+<link href="style.css" rel="stylesheet" type="text/css" />
+</head><body>
+<h1>wt module</h1>
+<h2>Synopsis</h2>
+<p>The <code>wt</code> module provides an object-oriented HTML templating
+system. The design goals of the system were that it should be very simple, that
+it should involve very low overhead in terms of code repeated per page, that
+it should achieve as completely as possible the separation of code and data,
+and that it should promote modular code re-use.</p>
+
+<h2>Sub-modules</h2>
+<p>The <code>wt</code> package contains the following sub-modules:</p>
+<ul><li><code><a href="wt-rowaccess.html">rowaccess</a></code> - class to
+automatically create replacements from a dictionary</li>
+<li><code><a href="wt-textblock.html">textblock</a></code> - class to assist
+creation of text paragraphs</li>
+</ul>
+
+<h2>Usage</h2>
+<p>The <code>wt</code> system expects you to supply two files for each page
+that is to be served - an HTML file and a code file. The conventional layout
+for this is to have a directory named <code>wt</code> in the root of your
+web tree, the directory structure inside which mirrors the structure of the
+web site outside the <code>wt</code> directory. For each file in the web site,
+the corresponding code file is under the <code>wt</code> hierarchy, with the
+same name but with <code>.py</code> appended. e.g. if you have an HTML file
+named <code>sales/index.html</code>, its code file would be named
+<code>wt/sales/index.html.py</code>.</p>
+<p>The web server must be configured to pass requests through the
+<code><a href="#handler">wt.Handler</a></code> request handler. Instructions
+on how to do this with <a href="http://httpd.apache.org/">Apache</a> are
+included on the <a href="wt-examples.html#apache">wt examples page</a>.</p>
+<h2>Templates</h2>
+<p>Template files contain only two constructs of interest to the <code>wt</code>
+system - replacements, and sections. Replacements are used where generated
+output should be inserted, and sections are used to divide the template into
+logical blocks. Each replacement corresponds to a method in a class in the
+code file, and each section corresponds to a nested class.</p>
+<h3><a name="replacements" id="replacements">Replacements</a></h3>
+<p>Replacements consist of two dollar signs
+followed by an identifier name (which may contain alphanumerics and underscore)
+and another two dollar signs - for example, <code>$$title$$</code>. You then
+supply a variable or method of the same name in the current section class, the
+value or return value of which will be output instead of the literal text of
+the replacement. Names beinning with an underscore are reserved.</p>
+<p>By default, the value will be passed through
+<code><a href="cgi.html#html_encode">cgi.html_encode</a></code> before being
+output.  Doing this by default simplifies programming since it is almost always
+the correct option. It also means that your code is secure by default against
+<a href="http://www.cert.org/tech_tips/malicious_code_mitigation.html">cross-site scripting attacks</a>.
+(You must also make sure that the browser knows what character set you are
+using, but since
+<code><a href="cgi.html#request:__init__">cgi.Request.__init__</a></code>
+automatically specifies the character set for you in the
+<code>Content-Type</code> header, you are secure by default here as well.)</p>
+<p>To use another encoding, you can put an encoding specifier character before
+the identifier name. The two alternative encodings are <code>%</code> for
+<code><a href="cgi.html#url_encode">cgi.url_encode</a></code> (e.g.
+<code>$$%page$$</code>) and <code>=</code> to output the return value unchanged
+(e.g. <code>$$=html$$</code>). Care must be taken with the literal encoding to
+ensure that no unverified user input ends up being sent to the client's
+browser.</p>
+<p>Example:</p>
+<p class="html"><code>&lt;a href="article.html?id=$$%id$$"&gt;$$title$$&lt;/a&gt;</code></p>
+<p class="code"><code>class main(wt.TemplateCode):<br />
+&nbsp;&nbsp;def id(self): return 123<br />
+&nbsp;&nbsp;def title(self): return "this is the title"</code></p>
+
+<h3><a name="sections" id="sections">Sections</a></h3>
+<p>Sections begin with an HTML comment containing only <code>wt:</code> and
+an identifier name (which may contain alphanumerics and underscore) - for
+example, <code>&lt;!--wt:newsitem--&gt;</code>. The section is ended by
+a similar comment but with a <code>/</code> before the identifier name - for
+example, <code>&lt;!--wt:/newsitem--&gt;</code>. All the data between the
+start and end markers is the content of the section. Sections can be nested,
+but you cannot nest a section inside another with the same name. Names
+beginning with an underscore are reserved.</p>
+<p>The code corresponding to a section is a class subclassed from
+<code>wt.<a href="#templatecode">TemplateCode</a></code>. An instance of the
+class will be created and the section content passed to the
+<code>TemplateCode.<a href="#templatecode:main">main</a></code>. This new
+instance will be used to look for methods to satisfy
+<a href="#replacements">replacements</a>.</p>
+<p>If you do not need the section to have any content, a combined
+start-and-end marker in the same comment is achievable by placing a
+<code>/</code> character after the identifier name - e.g.,
+<code>&lt;!--wt:_page/--&gt;</code>. This is useful, for example, with
+<code>wt.<a href="#globaltemplate">GlobalTemplate</a></code> sections.</p>
+<p>Please note that the start and end markers must appear exactly as described
+- no white space is allowed at any point inside the marker.
+<code>&lt;!&nbsp;--wt:invalid--&gt;</code> is not valid, for example.</p>
+<p>For example:</p>
+<p class="html"><code>&lt;!--wt:newsitem--&gt;<br />
+&lt;a href="article.html?id=$$%id$$"&gt;$$title$$&lt;/a&gt;<br />
+&lt;!--wt:/newsitem--&gt;</code></p>
+<p class="code"><code>class main(wt.TemplateCode):<br />
+&nbsp;&nbsp;class newsitem(wt.TemplateCode):<br />
+&nbsp;&nbsp;&nbsp;&nbsp;def id(self): return 123<br />
+&nbsp;&nbsp;&nbsp;&nbsp;def title(self): return "this is the title"</code></p>
+
+<h2><a name="templatecode" id="templatecode">class: TemplateCode</a></h2>
+<p>The base class for all code corresponding to template
+<a href="#sections">sections</a>.</p>
+
+<h3>Public Instance Variables</h3>
+<h4><a name="templatecode:wt" id="templatecode:wt"><code><strong>wt</strong></code></a></h4>
+<p>A reference to the <code>wt.<a href="#handler">Handler</a></code> instance
+which is handling this request.</p>
+
+<h4><a name="templatecode:req" id="templatecode:req"><code><strong>req</strong></code></a></h4>
+<p>A reference to the <code><a href="cgi.html#request">cgi.Request</a></code>
+instance which contains information about this request.</p>
+
+<h4><a name="templatecode:outer" id="templatecode:outer"><code><strong>outer</strong></code></a></h4>
+<p>A reference to the <code>TemplateCode</code> instance which corresponds to
+the next outer-most <a href="#sections">section</a> in the template - i.e.
+an instance of the class that this class is nested within. This is
+<strong>not</strong> the same thing as <code>super</code>, which is the
+class this class is derived from. If there is no enclosing class then
+<code>outer</code> is <code>None</code>.</p>
+
+<h3>Public Methods</h3>
+<h4><a name="templatecode:process" id="templatecode:process"><code><strong>process(self, template, selected=None)</strong></code></a></h4>
+<p><code><strong>template</strong></code>: string<br />
+<code><strong>selected</strong></code>: <code>None</code>, or a string, or
+a sequence of strings</p>
+<p>This method is called to process a template string. The
+<code>template</code> parameter contents the template to be processed. Variables
+and methods to satisfy <a href="#replacements">replacements</a> and classes to
+satisfy <a href="#sections">sections</a> are looked for inside
+<code>self</code>.</p>
+<p>If <code>selected</code> is <code>None</code> then all top-level sections in
+the template string are executed. If it is a string or sequence of strings then
+only top-level sections with a name matching that string or in that sequence
+will be executed, and sections with other names will be ignored and no output
+produced for them.</p>
+<p>Template sections with the special name <code>_null</code> are ignored. The
+content of these sections is always discarded, regardless of the value of the
+<code>selected</code> parameter, and therefore no corresponding class is
+required in the code file.</p>
+
+<h4><a name="templatecode:main" id="templatecode:main"><code><strong>main(self, template)</strong></code></a></h4>
+<p><code><strong>template</strong></code>: string</p>
+<p>This method may be overridden by subclasses. The default implementation
+simply passes the <code>template</code> parameter, which is the contents of
+the <a href="#sections">section</a> which caused this object to be created,
+to the <code><a href="#templatecode:process">process</a></code> method.</p>
+<p>A lot of the power of the templating system is provided by overriding this
+method. By redefining it you can cause the template section to be output
+multiple times, or not at all, or indeed ignore the
+<code><a href="#templatecode:process">process</a></code> method altogether and
+do something entirely different with the <code>template</code> parameter. You
+can send output directly using the
+<code><a href="cgi.html#request:write">write</a></code> method of the
+<code>self.<a href="#templatecode:req">req</a></code> variable.</p>
+<p>Examples of the use of <code>TemplateCode</code> are given in the
+<a href="wt-examples.html#templatecode">wt examples page</a>.</p>
+
+<h2><a name="globaltemplate" id="globaltemplate">class</a>: GlobalTemplate(<a href="#templatecode">TemplateCode</a>)</h2>
+<p>A base class for template <a href="#sections">sections</a> where the template
+is to be fetched from another source rather than be found in-line in the HTML
+file. The normal HTML contents of any section derived from
+<code>GlobalTemplate</code> are temporarily suspended and used for a
+subsection named <code><a href="#globaltemplate:page">page</a></code> instead.
+A separate file is read to provide the HTML template for the
+<code>GlobalTemplate</code> section.</p>
+<p>Examples of the use of <code>GlobalTemplate</code> are given in the
+<a href="wt-examples.html#globaltemplate">wt examples page</a>.</p>
+
+<h3>Public Class Variables</h3>
+<h4><a name="globaltemplate:page" id="globaltemplate:page"><code><strong>page</strong></code></a></h4>
+<p>This variable may be overridden by subclasses. A
+<code><a href="#templatecode">TemplateCode</a></code> subclass which is
+called with the original template contents that would otherwise have been used
+for the <code>GlobalTemplate</code> class. The default value is
+<code><a href="#templatecode">TemplateCode</a></code>. Due to the extra
+processing which <code>GlobalTemplate</code> interposes, the corresponding
+HTML template section to this class should be named <code>_page</code>, not
+<code>page</code>.</p>
+
+<h3>Public Methods</h3>
+<h4><a name="globaltemplate:template_name" id="globaltemplate:template_name"><code><strong>template_name(self)</strong></code></a></h4>
+<p><strong>Returns</strong>: a string</p>
+<p>This method may be overridden by subclasses. This method returns the filename
+to read to fetch the template contents for this section. The default
+implementation returns
+<code>self.<a href="#wt:etc">wt.etc</a> + "/template.html"</code>.</p>
+
+<h2><a name="handler" id="handler">class</a>: Handler(<a href="cgi.html#handler">cgi.Handler</a>)</h2>
+<p>This <code>Handler</code> class should be called to process a request
+using the <code>wt</code> templating system. The default implementation uses
+various environment variables which will have been set up by the
+<a href="http://httpd.apache.org/">Apache</a> configuration shown on the
+<a href="wt-examples.html#apache">wt examples page</a> to determine the code
+and template names, but various methods are provided which may be overridden to
+make these choices in a different way (for example, if you are using a different
+web server). All <code>wt.<a
+href="#templatecode">TemplateCode</a></code>
+objects receive a reference to the current instance in their
+<code>self.<a href="#templatecode:wt">wt</a></code> instance variable.</p>
+
+<h3>Public Instance Variables</h3>
+<h4><a name="handler:req" id="handler:req"><code><strong>req</strong></code></a></h4>
+<p>A reference to the <code><a href="cgi.html#request">cgi.Request</a></code>
+instance which contains information about this request.</p>
+
+<h4><a name="handler:etc" id="handler:etc"><code><strong>etc</strong></code></a></h4>
+<p>The directory <code>DOCUMENT_ROOT + "../etc"</code>. This is used as a
+default location by
+<code><a href="#globaltemplate:template_name">GlobalTemplate.template_name</a></code>
+to locate templates. It is also a useful location to place miscellaneous files
+associated with a web site that should not be under the
+<code>DOCUMENT_ROOT</code>.</p>
+
+<h4><a name="handler:template" id="handler:template"><code><strong>template</strong></code></a></h4>
+<p>The full pathname of the template file.</p>
+
+<h3>Public Methods</h3>
+<h4><a name="handler:get_template_encoding" id="handler:get_template_encoding"><code><strong>get_template_encoding(self)</strong></code></a></h4>
+<p>This method may be overridden by subclasses. It returns the character
+encoding used for the template file, or <code>None</code> if no encoding
+conversion is to be done. If it is not <code>None</code> then the template
+file will be assumed to be using the specified character encoding and the
+<code>template</code> parameter to
+<code>TemplateCode.<a href="#templatecode:main">main</a></code> will be
+a <code>unicode</code> string instead of a normal string. The default
+implementation returns <code>None</code>.</p>
+
+<h4><a name="handler:pre_load" id="handler:pre_load"><code><strong>pre_load(self)</strong></code></a></h4>
+<p>This method may be overridden by subclasses. Its default implementation does
+nothing. It is called before the template is located or the page code loaded.
+<code>self.<a href="#handler:req">req</a></code> and
+<code>self.<a href="#handler:etc">etc</a></code> are available.</p>
+
+<h4><a name="handler:pre_request" id="handler:pre_request"><code><strong>pre_request(self, obj)</strong></code></a></h4>
+<p><code><strong>obj</strong></code>:
+<code>wt.<a href="#templatecode">TemplateCode</a></code> instance</p>
+<p>This method may be overridden by subclasses. Its default implementation does
+nothing. It is called just before
+<code>obj.<a href="#templatecode:main">main()</a></code> is called to process
+the request. All the instance variables of <code>self</code> have already been
+set up.</p>
+
+<h4><a name="handler:post_request" id="handler:post_request"><code><strong>post_request(self, obj)</strong></code></a></h4>
+<p><code><strong>obj</strong></code>:
+<code>wt.<a href="#templatecode">TemplateCode</a></code> instance</p>
+<p>This method may be overridden by subclasses. Its default implementation does
+nothing. It is called just after
+<code>obj.<a href="#templatecode:main">main()</a></code> has handled the
+request.</p>
+
+<h4><a name="handler:process" id="handler:process"><code><strong>process(self, req)</strong></code></a></h4>
+<p><code><strong>req</strong></code>:
+<code><a href="cgi.html#request">cgi.Request</a></code> instance</p>
+<p>This method may be overridden by subclasses. It calls
+<code>self.<a href="#handler:_get_template">_get_template()</a></code>,
+<code>self.<a href="#handler:_get_code">_get_code()</a></code> and
+<code>self.<a href="#handler:_get_etc">_get_etc()</a></code> to determine
+the various files and directories to use when handling the request. The code
+file should contain a subclass of
+<code>wt.<a href="#templatecode">TemplateCode</a></code> named
+<code>main</code>, which is passed the entire template file. The global
+namespace the code file is executed in is initialised to contain a reference
+to the <code>wt</code> module in the variable <code>wt</code>, thus avoiding
+the need to do <code>import jon.wt as wt</code> in every code file. See the
+<a href="wt-examples.html#apache">wt examples page</a> for how to set up
+<a href="http://httpd.apache.org/">Apache</a> so that <code>wt</code> knows
+what's going on.</p>
+<p>You can add code to run before and/or after every request by overriding
+this method and performing processing before and/or after calling the
+base <code>wt.Handler.process</code> base method.</p>
+<p>Example:</p>
+<p class="code"><code>class Handler(wt.Handler):<br />
+&nbsp;&nbsp;def process(self, req):<br />
+&nbsp;&nbsp;&nbsp;&nbsp;self.session = session.Session(req, url=0)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;wt.Handler.process(self, req)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;self.session.save()<br />
+fcgi.Request({fcgi.FCGI_RESPONDER: Handler}).run()</code></p>
+
+<h3>Protected Methods</h3>
+<h4><a name="handler:_get_template" id="handler:_get_template"><code><strong>_get_template(self)</strong></code></a></h4>
+<p><strong>Returns</strong>: string</p>
+<p>This method may be overridden by subclasses. It returns the full pathname of
+the template file to be used for this request.
+<code>self.<a href="#handler:req">req</a></code> has already been set up. The
+default implementation looks for an environment variable whose name matches
+<code>(REDIRECT_){0,4}WT_TEMPLATE_FILENAME</code>.</p>
+
+<h4><a name="handler:_get_code" id="handler:_get_code"><code><strong>_get_code(self)</strong></code></a></h4>
+<p><strong>Returns</strong>: string</p>
+<p>This method may be overridden by subclasses. It returns the full pathname of
+the code file to be used for this request.
+<code>self.<a href="#handler:req">req</a></code> and
+<code>self.<a href="#handler:template">template</a></code> have already been
+set up. The default implementation returns the environment variable
+<code>PATH_TRANSLATED</code>.</p>
+
+<h4><a name="handler:_get_etc" id="handler:_get_etc"><code><strong>_get_etc(self)</strong></code></a></h4>
+<p><strong>Returns</strong>: string</p>
+<p>This method may be overridden by subclasses. It returns the full pathname of
+the directory which <code>self.<a href="#handler:etc">etc</a></code> will be
+set to. <code>self.<a href="#handler:req">req</a></code> has already been set
+up. The pathname should not end with a <code>/</code> character. The default
+implementation returns the equivalent of <code>DOCUMENT_ROOT/../etc</code>.</p>
+
+<h2><a name="debughandler" id="debughandler">class</a>: DebugHandler(<a href="cgi.html#debughandlermixin">cgi.DebugHandlerMixIn</a>, <a href="#handler">Handler</a>)</h2>
+<p>This class is identical to <code><a href="#handler">Handler</a></code>,
+except that it uses
+<code>cgi.<a href="cgi.html#debughandlermixin">DebugHandlerMixIn</a></code> so
+that if an exception is thrown by a template page then a traceback will be
+sent to the browser. This class may be used during development to aid debugging
+but should never be used in a production environment since it will leak private
+information to the browser.</p>
+
+<p class="cvsid">$Id: wt.html,v c0f5f983a7fc 2010/03/23 01:07:17 jon $</p>
+</body></html>

@@ -1,0 +1,17 @@
+<html>
+<head>
+<link href="/css/staff.css" media="screen, projection" rel="stylesheet"
+type="text/css" />
+</head>
+<body>
+<header>
+<b><big>Pomme Admin</big></b> &nbsp;&nbsp;
+<a href="http://pomme.us:32123/stats">Stats</a> |
+<a href="http://pomme.us:32123/reload">Reload Packs</a> |
+<a href="/cgi-bin/staff/upload">Upload</a> |
+<a href="/cgi-bin/staff/index?pack=main&sort=name">Main Images (name)</a> |
+<a href="/cgi-bin/staff/index?pack=main&sort=date">Main Images (date)</a> |
+<a href="/cgi-bin/staff/index?pack=player&sort=name">Player Images (name)</a> |
+<a href="/cgi-bin/staff/index?pack=player&sort=date">Player Images (date)</a>
+</header>
+

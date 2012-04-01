@@ -1,0 +1,111 @@
+<!doctype html>
+<html> 
+<head> 
+<title>Pomme</title> 
+<link href="/css/screen2.css" media="screen, projection" rel="stylesheet" type="text/css" /> 
+<link rel="shortcut icon" href="http://pomme.us/favicon.ico" /> 
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+<meta property="og:title" content="Pomme"/> 
+<meta property="og:type" content="website"/> 
+<meta property="og:url" content="http://pomme.us/"/> 
+<meta property="og:image" content="http://pomme.us/img/pomme-apple.gif"/>
+<meta property="og:site_name" content="Pomme"/> 
+<meta property="og:description" content="Image pairing game"/> 
+<meta property="fb:admins" content="100001923956223,39607718"/> 
+<meta name="description" content="Image pairing game" /> 
+</head> 
+<body> 
+ 
+<div id="curtain"></div>
+<div id="loading">loading...</div>
+<div id="profile">
+	<div id="profile_curtain"></div>
+	<div id="profile_view">
+		<div id="profile_close">x</div>
+		<div id="profile_edit_open">edit</div>
+		<table id="profile_avatar_wrapper">
+			<tr><td><img src="" id="profile_avatar" /></td></tr>
+		</table>
+		<div id="profile_user_wrapper">
+			<span id="profile_username"></span>
+			<br/>
+			<span id="profile_score"></span>
+		</div>
+		<div id="profile_won_wrapper">
+			<span id="combos_won"><img src="/img/pommegavel.gif" />most popular wins</span>
+		</div>
+		<div id="profile_judged_wrapper">
+			<span id="combos_judged"><img src="/img/pommeheart.gif" />favorites</span>
+		</div>
+		<div id="profile_bio_wrapper">
+			<a id="profile_facebook" target="_blank"><img src="/img/facebook_16.png" width="16" height="16"></a>
+			<a id="profile_twitter" target="_blank"><img src="/img/twitter_16.png" width="16" height="16"></a>
+			<a id="profile_tumblr" target="_blank"><img src="/img/tumblr_16.png" width="16" height="16"></a>
+			<span id="profile_bio"></span>
+		</div>
+	</div>
+	<div id="profile_edit">
+		<div id="profile_edit_close">x</div>
+		<h2 id="profile_edit_header">Edit Your Profile</h2>
+		<label>Avatar URL</label><input type="text" id="profile_edit_avatar" class="url"/><br/>
+		<br/>
+		<label>Facebook URL</label><input type="text" id="profile_edit_facebook" class="url"/><br/>
+		<label>Twitter URL</label><input type="text" id="profile_edit_twitter" class="url"/><br/>
+		<label>Tumblr URL</label><input type="text" id="profile_edit_tumblr" class="url"/><br/>
+		<br/>
+		<label>bio / contact info<br/><small>you can also paste<br/>links and images</small></label>
+		<textarea id="profile_edit_bio"></textarea>
+		<br/>
+		<br/>
+		<label>change password</label><input type="password" id="profile_edit_password" /><br/>
+		<label>confirm</label><input type="password" id="profile_edit_password2" /><br/>
+		<label>email <small>(private)</small></label><input type="text" id="profile_edit_email" class="url" /><br/>
+		<br/>
+		<label>&nbsp;</label><button id="profile_edit_save">Save Profile</button>
+	</div>
+
+	<div id="combo_curtain">
+		<div id="combo_list_container">
+			<h2 id="combo_label"></h2>
+			<ul id="combo_list"></ul>
+			<div id="combos_loading">Loading...</div>
+			<div id="combos_load_more_wrapper">
+				<button id="combos_load_more">Load More Pommes</button>
+			</div>
+		</div>
+	</div>
+
+        <div id="buttons">
+		<a id="pomme" href="/"></a>
+                <span id="beta">beta</span>
+		<h1>Pomme</h1>
+                <div id="credits">Credits</div>
+                <div id="logout">Logout</div>
+		<a href="http://www.twitter.com/Pomme_us"><img src="http://twitter-badges.s3.amazonaws.com/t_mini-a.png" alt="Follow Pomme_us on Twitter"/></a>
+		<fb:like id="fblike" href="http://pomme.us/" send="false" layout="button_count" width="85" show_faces="false" action="like" font="lucida grande"></fb:like>
+        </div>
+
+        <div id="credits_curtain"></div>
+        <div id="credits_box">
+		<span id="credits_close">x</span>
+                <h2>Pomme</h2>
+                Conceptualized by <a href="mailto:pomme.game@gmail.com" target="_blank">Frederick Heydt</a><br/>
+                Programmed by <a href="http://asdf.us/" target="_blank">Jules Welter</a><br/>
+		Logo by <a href="http://cargocollective.com/hermesarriola" target="_blank">Hermes Arriola</a><br/>
+                Special thanks to <a href="http://lolz.biz/" target="_blank">Joel Cook</a> and <a href="http://bananaslug.tumblr.com/" target="_blank">Alli Crawford</a><br/>
+		Hosting generously provided by <a href="http://melanarchy.org/" target="_blank">melanarchy.org</a><br/>
+                With love to <a href="http://dump.fm/" target="_blank">dump.fm</a> and <a href="http://scannerjammer.com/" target="_blank">ScannerJammer</a><br/>
+                <small style="float: right"><a href="/static/terms" target="_blank">Terms</a></small>
+        </div>
+</div>
+
+<div id="fb-root"></div>
+
+</body> 
+<script type="text/javascript" src="/js/jquery.js"></script>
+<script async type="text/javascript" src="/js/jquery.md5.js"></script>
+<script type="text/javascript" src="/js/soundmanager2.js"></script>
+<script type="text/javascript" src="/js/profile2.js"></script>
+<script async src="http://connect.facebook.net/en_US/all.js#appId=159892437421208&amp;xfbml=1"></script>
+</html>
+

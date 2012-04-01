@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>dbpool module</title>
+<link href="style.css" rel="stylesheet" type="text/css" />
+</head><body>
+<h1>dbpool module</h1>
+<h2>Synopsis</h2>
+<p>The <code>dbpool</code> module is a wrapper for Python
+<a href="http://www.python.org/dev/peps/pep-0249/">DB-API 2.0-compliant</a>
+database modules to (a) keep a pool of physical connections available and (b)
+upgrade the modules to <code>threadsafety</code> level <code>2</code>, which
+means that threads can share logical database connections.</p>
+<h2>Usage</h2>
+<p>The module provides only one function not described by the
+<a href="http://wiki.python.org/moin/DatabaseProgramming/">DB-API 2.0
+spec</a>. The module is initialized by calling
+<code><a href="#set_database">set_database</a></code> with a reference to the
+underlying database module to be used and the number of physical database
+connections to keep in the pool. The <code>dbpool</code> module is then
+configured to act precisely like the underlying database module, except that
+physical database connections are not always closed when you have finished with
+them, and if you try to create more than one cursor on a single logical
+connection, a new physical connection is created for the new cursor.</p>
+<p>When a logical database connection is no longer being used (i.e. you call
+the <code>close</code> function or all references to the connection are
+deleted), the physical connection is returned to the pool to be used the next
+time a connection is requested. If the pool is full (i.e. the limit set in the
+call to <code><a href="#set_database">set_database</a></code> is reached) then
+the physical database connection is closed.</p>
+<p>Note that your code can either create one logical database connection, and
+then create many cursors from that, or create many logical database
+connections, and create one or more cursors from each of these. Either way the
+behaviour of the <code>dbpool</code> module will be the same - it will pool
+physical database connections, and only create one cursor per physical
+database connection.</p>
+<p>Example:</p>
+<p class="code"><code>import jon.dbpool as dbpool<br />
+import MySQLdb, MySQLdb.cursors<br />
+dbpool.set_database(MySQLdb, 5)<br />
+dbh = dbpool.connect(user="example", passwd="s3cr3t", db="example",<br />
+&nbsp;&nbsp;cursorclass=MySQLdb.cursors.DictCursor)<br />
+dbc1 = dbh.cursor()<br />
+dbc2 = dbh.cursor()</code></p>
+<p>Note that unfortunately, due to the way the DB-API works, once you have
+configured <code>dbpool</code> to act as a wrapper for a database module,
+you cannot re-configure with a different module.</p>
+
+<h2>Globals</h2>
+<h3>Variables</h3>
+<h4><a name="apilevel" id="apilevel"><code><strong>apilevel</strong></code></a></h4>
+<p>The string <code>2.0</code>, indicating the DB-API level.</p>
+
+<h4><a name="threadsafety" id="threadsafety"><code><strong>threadsafety</strong></code></a></h4>
+<p>The integer <code>2</code>, meaning that threads may share the module,
+and database connections.</p>
+
+<h4><a name="paramstyle" id="paramstyle"><code><strong>paramstyle</strong></code></a></h4>
+<p>This variable is only available after
+<code><a href="#set_database">set_database</a></code> has been called. It will
+contain the value from the underlying database module.</p>
+
+<h4><a name="Warning" id="Warning"><code><strong>Warning</strong></code></a></h4>
+<h4><a name="Error" id="Error"><code><strong>Error</strong></code></a></h4>
+<h4><a name="InterfaceError" id="InterfaceError"><code><strong>InterfaceError</strong></code></a></h4>
+<h4><a name="DatabaseError" id="DatabaseError"><code><strong>DatabaseError</strong></code></a></h4>
+<h4><a name="DataError" id="DataError"><code><strong>DataError</strong></code></a></h4>
+<h4><a name="OperationalError" id="OperationalError"><code><strong>OperationalError</strong></code></a></h4>
+<h4><a name="IntegrityError" id="IntegrityError"><code><strong>IntegrityError</strong></code></a></h4>
+<h4><a name="InternalError" id="InternalError"><code><strong>InternalError</strong></code></a></h4>
+<h4><a name="ProgrammingError" id="ProgrammingError"><code><strong>ProgrammingError</strong></code></a></h4>
+<h4><a name="NotSupportedError" id="NotSupportedError"><code><strong>NotSupportedError</strong></code></a></h4>
+<p>These exception classes are only available after
+<code><a href="#set_database">set_database</a></code> has been called. They
+are copied from the underlying database module.</p>
+
+<h3>Functions</h3>
+<h4><a name="set_database" id="set_database"><code><strong>set_database(dbmod, minconns, timeout=0)</strong></code></a></h4>
+<p><code><strong>dbmod</strong></code>: module<br />
+<code><strong>minconns</strong></code>: integer<br />
+<code><strong>timeout</strong></code>: integer</p>
+<p>Configures the <code>dbpool</code> module to act as a wrapper around the
+specified DB-API module. <code>dbmod</code> is a reference to the database
+module to use. <code>minconns</code> is an integer, which must be
+<code>1</code> or greater, which indicates the number of physical database
+connections of each 'type' to keep in the pool. Physical database connections
+are of the same 'type' if all the parameters to the DB-API <code>connect</code>
+function are the same (i.e.  they are connecting to the same database, on the
+same host, with the same username, with the same options).</p>
+<p><code>timeout</code> is an integer, which must be <code>0</code> or greater,
+which indicates the maximum time in seconds that a connection is allowed to
+have sat idle before it will not be re-used. A value of <code>0</code> means
+that no timeout will be applied. This timeout is intended to prevent
+<code>dbpool</code> from re-using connections that the database server will
+have closed due a timeout on the server side, so a value that is less than
+the server-side timeout should be chosen.</p>
+<p>The database module to be used must have a <code>threadsafety</code> level
+of at least <code>1</code>, i.e. if the database cannot cope at all with
+multi-threading then there is nothing <code>dbpool</code> can do to make it
+work.</p>
+<p>Note that you can only call this function once.</p>
+<p>Example:</p>
+<p class="code"><code>set_database(MySQLdb, 5)</code></p>
+
+<h4><a name="connect" id="connect"><code><strong>connect(...)</strong></code></a></h4>
+<p><code><strong>Returns</strong></code>: database connection instance</p>
+<p>This function may only be used after
+<code><a href="#set_database">set_database</a></code> has been called. The
+parameters are dependent on the underlying database module being used.
+A logical database connection from the pool corresponding to database
+connections with the parameters given is returned. If the pool is empty then a
+new physical connection is created.</p>
+<p>Example:</p>
+<p class="code"><code>dbh = dbpool.connect(user="example", passwd="s3cr3t", db="example")<br />
+dbc = dbh.cursor()</code></p>
+
+<p class="cvsid">$Id: dbpool.html,v c0f5f983a7fc 2010/03/23 01:07:17 jon $</p>
+</body></html>

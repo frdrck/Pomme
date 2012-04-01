@@ -1,0 +1,55 @@
+/*
+Syntax error: File to import not found or unreadable: compass/reset.
+              Load path: /var/www/vhosts/pomme.us/pomme/sass/src
+        on line 1 of screen.sass
+
+1: @import "compass/reset"
+2: img
+3: 	margin-bottom: -2px
+4: @mixin box-shadow ($x)
+5: 	-moz-box-shadow: $x
+6: 	-webkit-box-shadow: $x
+
+Backtrace:
+screen.sass:1
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/tree/import_node.rb:64:in `import'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/tree/import_node.rb:25:in `imported_file'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/tree/visitors/perform.rb:148:in `visit_import'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/tree/visitors/base.rb:37:in `send'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/tree/visitors/base.rb:37:in `visit'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/tree/visitors/perform.rb:18:in `visit'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/tree/visitors/base.rb:53:in `visit_children'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/tree/visitors/base.rb:53:in `map'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/tree/visitors/base.rb:53:in `visit_children'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/tree/visitors/perform.rb:27:in `visit_children'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/tree/visitors/perform.rb:39:in `with_environment'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/tree/visitors/perform.rb:26:in `visit_children'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/tree/visitors/base.rb:37:in `visit'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/tree/visitors/perform.rb:47:in `visit_root'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/tree/visitors/base.rb:37:in `send'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/tree/visitors/base.rb:37:in `visit'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/tree/visitors/perform.rb:18:in `visit'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/tree/visitors/perform.rb:7:in `send'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/tree/visitors/perform.rb:7:in `visit'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/tree/root_node.rb:20:in `render'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/engine.rb:293:in `_render'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/engine.rb:240:in `render'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/plugin/compiler.rb:319:in `update_stylesheet'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/plugin/compiler.rb:169:in `update_stylesheets'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/plugin/compiler.rb:167:in `each'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/plugin/compiler.rb:167:in `update_stylesheets'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/plugin/compiler.rb:214:in `watch'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/plugin.rb:111:in `send'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/plugin.rb:111:in `method_missing'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/exec.rb:408:in `watch_or_update'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/exec.rb:294:in `process_result'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/exec.rb:41:in `parse'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/../lib/sass/../sass/exec.rb:21:in `parse!'
+/usr/local/lib/ruby/gems/1.8/gems/sass-3.1.7/bin/sass:8
+/usr/local/bin/sass:19:in `load'
+/usr/local/bin/sass:19
+*/
+body:before {
+  white-space: pre;
+  font-family: monospace;
+  content: "Syntax error: File to import not found or unreadable: compass/reset.\A               Load path: /var/www/vhosts/pomme.us/pomme/sass/src\A         on line 1 of screen.sass\A \A 1: @import \"compass/reset\"\A 2: img\A 3: 	margin-bottom: -2px\A 4: @mixin box-shadow ($x)\A 5: 	-moz-box-shadow: $x\A 6: 	-webkit-box-shadow: $x"; }

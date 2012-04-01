@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>wt module examples</title>
+<link href="style.css" rel="stylesheet" type="text/css" />
+</head><body>
+<h1>wt module examples</h1>
+<h2>Synopsis</h2>
+<p>The <code><a href="wt.html">wt</a></code> module provides an object-oriented
+HTML templating system. This page contains examples of how to perform various
+common operations using <code>wt</code>.</p>
+
+<h2><a name="apache" id="apache">Apache Configuration</a></h2>
+<h3><a name="apache:httpd.conf" id="apache:httpd.conf">Using <code>httpd.conf</code></a></h3>
+<p><code>wt</code> uses a dual-hierarchy system to separate and identify data
+(HTML) files and associated code files. This requires some configuration of the
+web server in order to allow it to provide the correct information to
+<code>wt</code>. An example configuration for
+<a href="http://httpd.apache.org/">Apache</a> using
+<a href="http://httpd.apache.org/docs/1.3/mod/mod_rewrite.html">mod_rewrite</a>
+is shown below:</p>
+<p class="code"><code>&lt;VirtualHost 192.168.0.1&gt;<br />
+&nbsp;&nbsp;ServerName www.example.com<br />
+&nbsp;&nbsp;&nbsp;...<br />
+&nbsp;&nbsp;RewriteEngine on<br />
+&nbsp;&nbsp;RewriteCond %{DOCUMENT_ROOT}/wt/$1.py -f<br />
+&nbsp;&nbsp;RewriteRule ^/(.*)$ /wt/$1.py [PT,E=WT_TEMPLATE_URL:/$1,E=WT_TEMPLATE_FILENAME:%{DOCUMENT_ROOT}/$1]<br />
+&nbsp;&nbsp;&lt;Location /wt/&gt;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;Action wt-handler /cgi-bin/wt.py<br />
+&nbsp;&nbsp;&nbsp;&nbsp;SetHandler wt-handler<br />
+&nbsp;&nbsp;&lt;/Location&gt;<br />
+&lt;/VirtualHost&gt;</code></p>
+<p>The <code>RewriteCond</code> line means that the <code>RewriteRule</code>
+only takes effect if a code file corresponding to the currently-requested data
+file exists in the code directory hierarchy. This means that you can put
+ordinary static data files in the data directory hierarchy and they will be
+served to the user by the web server as usual without any intervention by
+<code>wt</code>.</p>
+<p>The <code>RewriteRule</code> line rewrites the request URL, which originally
+identified the data file, to point to the code file instead. As it does this it
+stores information about the data file into environment variables for
+<code><a href="wt.html#handler:process">wt.Handler.process</a></code> to
+retrieve later.</p>
+<p>Finally the <code>&lt;Location&gt;</code> block uses normal Apache directives
+to tell the web server to execute the code files using
+<code>/cgi-bin/wt.py</code>, which is effectively the central despatch point
+for all <code>wt</code> pages within the site. The simplest possible version
+of this file would look as follows:</p>
+<p class="code"><code>#!/usr/local/bin/python<br />
+import jon.wt as wt<br />
+import jon.cgi as cgi<br />
+<br />
+cgi.CGIRequest(wt.Handler).process()</code></p>
+<p>You can also perform global setup actions in this file, for example
+altering <code>sys.path[0]</code> to point to a directory where you place
+site-specific modules.</p>
+
+<h3><a name="apache:.htaccess" id="apache:.htaccess">Using <code>.htaccess</code></a></h3>
+<p>If you do not have access to edit <code>httpd.conf</code> on your web server,
+you can set up the server for use with <code>wt</code> using
+<code>.htaccess</code> files instead. The way it works and your
+<code>/cgi-bin/wt.py</code> file are exactly the same as the
+<code><a href="#apache:httpd.conf">httpd.conf</a></code> case shown above, but
+the <code>mod_rewrite</code> commands are very slightly different.</p>
+<p>You will need two <code>.htaccess</code> files. The first goes in the web
+root directory:</p>
+<p class="code"><code>RewriteEngine on<br />
+RewriteBase /<br />
+RewriteCond %{DOCUMENT_ROOT}/wt/$1.py -f<br />
+RewriteRule ^(.*)$ /wt/$1.py [E=WT_TEMPLATE_URL:/$1,E=WT_TEMPLATE_FILENAME:%{DOCUMENT_ROOT}/$1]</code></p>
+<p>The second <code>.htaccess</code> file goes in the <code>/wt/</code>
+subdirectory of the web root:</p>
+<p class="code"><code>Action wt-handler /cgi-bin/wt.py<br />
+SetHandler wt-handler</code></p>
+
+<h3><a name="apache:session" id="apache:session">Using the <code>wt</code> and <code>session</code> modules together</a></h3>
+<p>See the <code><a href="session.html#apache">session</a></code> module
+documentation for how to configure Apache when using both the
+<code><a href="wt.html">wt</a></code> and
+<code><a href="session.html">session</a></code> modules together.</p>
+
+<h2><a name="templatecode" id="templatecode"></a><code><a href="wt.html#templatecode">TemplateCode</a></code> examples</h2>
+<h3>Simple replacements</h3>
+<p>This example simply displays the form variable <code>foo</code> as part of
+the output HTML. Note that it does not attempt to check whether or not a form
+variable called <code>foo</code> was actually passed to the server by the
+user's web browser, and Python will throw an exception if it wasn't. This is
+deliberate - if something "shouldn't happen" (e.g. if this page should never
+be called without a <code>foo</code> parameter unless the user has been
+inventing URLs) then just let an exception be thrown and caught by the
+top-level handler. If you do wish to check whether or not the parameter was
+passed then you can use <code>self.req.params.has_key</code> or
+<code>self.req.params.get</code>.</p>
+<p class="html"><code>&lt;p&gt;The 'foo' parameter is: $$foo$$.&lt;/p&gt;</code></p>
+<p class="code"><code>class main(wt.TemplateCode):<br />
+&nbsp;&nbsp;def foo(self):<br />
+&nbsp;&nbsp;&nbsp;&nbsp;return self.req.params["foo"]</code></p>
+
+<h3>Simple sections</h3>
+<p>This example mostly demonstrates just the syntax of a section. The
+section name in the HTML file corresponds to a nested class name in the code
+file. Obviously in a real world situation the <code>id</code> and
+<code>title</code> would not be static but would be calculated or fetched,
+e.g. from a database. Note also the way that the replacement inside a URL is
+done using the <code>%</code> encoding modifier so that the replacement text
+has any characters that would be special to URLs encoded.</p>
+<p class="html"><code>&lt;!--wt:newsitem--&gt;<br />
+&lt;a href="article.html?id=$$%id$$"&gt;$$title$$&lt;/a&gt;<br />
+&lt;!--wt:/newsitem--&gt;</code></p>
+<p class="code"><code>class main(wt.TemplateCode):<br />
+&nbsp;&nbsp;class newsitem(wt.TemplateCode):<br />
+&nbsp;&nbsp;&nbsp;&nbsp;def id(self): return 123<br />
+&nbsp;&nbsp;&nbsp;&nbsp;def title(self): return "this is the title"</code></p>
+
+<h3>Overriding <code>main</code></h3>
+<p>This example demonstrates overriding the <code>main</code> method of a
+section. In this case it simply decides whether or not to output the
+contents of the section depending on whether or not a form variable
+<code>show</code> was present in the request. The section could contain
+replacements and sub-sections as usual, although in this simple example it
+contains only text.</p>
+<p class="html"><code>&lt;!--wt:section--&gt;<br />
+...content goes here...<br />
+&lt;!--wt:/section--&gt;</code></p>
+<p class="code"><code>class main(wt.TemplateCode):<br />
+&nbsp;&nbsp;class section(wt.TemplateCode):<br />
+&nbsp;&nbsp;&nbsp;&nbsp;def main(self, template):<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if self.req.params.has_key("show"):<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.process(template)</code></p>
+
+<h3>Repeating sections</h3>
+<p>This example builds on the last to show how you can output a section
+multiple times, with different replacements each time. Again, in the real world
+you would presumably be fetching values from a database to display to the
+user.</p>
+<p class="html"><code>&lt;!--wt:section--&gt;<br />
+&lt;p&gt;This is paragraph number $$num$$.&lt;/p&gt;<br />
+&lt;!--wt:/section--&gt;</code></p>
+<p class="code"><code>class main(wt.TemplateCode):<br />
+&nbsp;&nbsp;class section(wt.TemplateCode):<br />
+&nbsp;&nbsp;&nbsp;&nbsp;def main(self, template):<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for self.num in xrange(1, 11):<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.process(template)</code></p>
+
+<h3>Alternating sections</h3>
+<p>This example demonstrates the <code>selected</code> parameter to
+<code><a href="wt.html#templatecode:process">wt.TemplateCode.process</a></code>.
+It also demonstrates subsections, and using inheritance to share code between
+sections. The main section is output ten times with incrementing values of
+<code>num</code>, but different subsections are used depending on whether the
+number is odd or even. When <code>self.process(template, "odd")</code> is
+called, only subsections called <code>odd</code> are output, all other sections
+are ignored completely (and their associated code classes are not called).</p>
+<p>The other interesting point about this example is that, while the HTML for
+the <code>odd</code> and <code>even</code> sections are different, the code is
+similar. We save on duplication by defining a class called <code>subsec</code>
+which <code>odd</code> and <code>even</code> then subclass. The <code>num</code>
+method is thus shared between both while the <code>colour</code> class variable
+is overridden by <code>odd</code>.</p>
+<p class="html"><code>&lt;!--wt:section--&gt;<br />
+&lt;!--wt:odd--&gt;<br />
+&lt;p style="border: solid $$colour$$"&gt;This is paragraph number $$num$$,<br />
+which is an odd number.&lt;/p&gt;<br />
+&lt;!--wt:/odd--&gt;<br />
+&lt;!--wt:even--&gt;<br />
+&lt;p style="border: solid $$colour$$"&gt;This is paragraph number $$num$$,<br />
+which is an even number.&lt;/p&gt;<br />
+&lt;!--wt:/even--&gt;<br />
+&lt;!--wt:/section--&gt;</code></p>
+<p class="code"><code>class main(wt.TemplateCode):<br />
+&nbsp;&nbsp;class section(wt.TemplateCode):<br />
+&nbsp;&nbsp;&nbsp;&nbsp;class subsec(wt.TemplateCode):<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;colour = "black"<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;def num(self):<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return self.outer.num<br />
+&nbsp;&nbsp;&nbsp;&nbsp;class odd(subsec):<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;colour = "blue"<br />
+&nbsp;&nbsp;&nbsp;&nbsp;class even(subsec):<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pass<br />
+&nbsp;&nbsp;&nbsp;&nbsp;def main(self, template):<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for self.num in xrange(1, 11):<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if self.num &amp; 1:<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.process(template, "odd")<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else:<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.process(template, "even")</code></p>
+
+<h2><a name="globaltemplate" id="globaltemplate"></a><code><a href="wt.html#globaltemplate">GlobalTemplate</a></code> examples</h2>
+<h3>Simple template</h3>
+<p>This example shows the simplest use of a
+<code><a href="wt.html#globaltemplate">GlobalTemplate</a></code>. The first
+HTML file shown is placed in the <code>template.html</code> file in the
+<code><a href="wt.html#handler:etc">etc</a></code> directory. This HTML
+then does not need to be repeated for each individual page on the site,
+<code>wt</code> automatically outputs the template HTML with the individual
+page HTML inserted at the appropriate point. Therefore the individual page HTML
+files are not complete HTML files (i.e. they do not start with
+<code>&lt;html&gt;</code>), they are just the fragments required to complete
+the global template.</p>
+<p class="html"><code>&lt;html&gt;&lt;head&gt;<br />
+&lt;title&gt;Title for every page&lt;/title&gt;&lt;/head&gt;<br />
+&lt;body&gt;&lt;h1&gt;Heading for every page&lt;/h1&gt;<br />
+&lt;!--wt:_page/--&gt;<br />
+&lt;/body&gt;&lt;/html&gt;</code></p>
+<p class="html"><code>&lt;p&gt;This is an individual page.&lt;/p&gt;</code></p>
+<p class="code"><code>class main(wt.GlobalTemplate):<br />
+&nbsp;&nbsp;class page(wt.TemplateCode):<br />
+&nbsp;&nbsp;&nbsp;&nbsp;pass</code></p>
+
+<h3>Overriding <code>GlobalTemplate</code></h3>
+<p>This example is a bit more interesting. The global HTML template contains
+a dynamic replacement. In the individual page code, the template class can be
+used unchanged, or <code>title</code> can be overridden to change the template
+on this page. In this way you simultaneously get the benefits of shared code
+for the global template, and the ability to override particular properties of
+the template on individual pages.</p>
+<p class="html"><code>&lt;html&gt;&lt;head&gt;<br />
+&lt;title&gt;$$title$$&lt;/title&gt;&lt;/head&gt;<br />
+&lt;body&gt;&lt;h1&gt;Heading for every page&lt;/h1&gt;<br />
+&lt;!--wt:_page/--&gt;<br />
+&lt;/body&gt;&lt;/html&gt;</code></p>
+<p class="html"><code>&lt;p&gt;This page is $$description$$.&lt;/p&gt;</code></p>
+<p class="code"><code>class template(wt.GlobalTemplate):<br />
+&nbsp;&nbsp;title = "Default title"<br />
+&nbsp;&nbsp;def template_name(self):<br />
+&nbsp;&nbsp;&nbsp;&nbsp;return self.wt.etc + "/our_template.html"<br />
+<br />
+class main(template):<br />
+&nbsp;&nbsp;title = "Title for this page"<br />
+&nbsp;&nbsp;class page(wt.TemplateCode):<br />
+&nbsp;&nbsp;&nbsp;&nbsp;def description(self):<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return "super"</code></p>
+
+<p class="cvsid">$Id: wt-examples.html,v c0f5f983a7fc 2010/03/23 01:07:17 jon $</p>
+</body></html>

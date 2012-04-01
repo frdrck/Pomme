@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>session module</title>
+<link href="style.css" rel="stylesheet" type="text/css" />
+</head><body>
+<h1>session module</h1>
+<h2>Synopsis</h2>
+<p>The <code>session</code> module provides way to group HTTP requests into
+"sessions" so that information can be maintained between an individual user's
+requests to various parts of a web site - for example, so that a user can
+"log in" to the web site and their username remembered as they navigate the
+site.</p>
+<h2>Usage</h2>
+<p>The base <code><a href="#session">Session</a></code> class is not used
+directly, since it has no way of storing the data associated with a session.
+Instead, one of the classes derived from it are used. The choice of subclass
+determines what storage method is used - the module provides
+<code><a href="#filesession">FileSession</a></code> and
+<code><a href="#genericsqlsession">GenericSQLSession</a></code>, or you can
+write your own.</p>
+<p>To store data in the session, you simply use it as a mapping.
+For example:</p>
+<p class="code"><code>if "basket" in self.session:<br />
+&nbsp;&nbsp;self.session["basket"].append(newitem)<br />
+else:<br />
+&nbsp;&nbsp;self.session["basket"] = [newitem]</code></p>
+<p>Sessions are identified by a unique 8-character hexadecimal string, which
+is usually generated randomly. This is paired with another 8-character
+hexadecimal string which is a keyed hash generated using the identifier and a
+secret key unique to the individual web site. The hash simply makes it a bit
+more difficult for an attacker to guess a valid session identifier. The id
+and hash are stored in the session under the keys <code>id</code> and
+<code>hash</code>, so don't try to use these keys for storing your own
+data.</p>
+<p>The session identifier and hash are passed from request to request either
+using cookies or by embedding the data at the start of the path in the URL.
+Which method to use depends on the situation - cookies are better, but some
+users disable cookies in their browsers. An especially important point to note
+is that if session identifiers are stored in URLs, any external links must go
+through a doorway page which forwards the user (using something like
+<code>&lt;meta http-equiv="refresh"...&gt;</code> rather than HTTP redirects)
+to the external page, because otherwise the session information may get passed
+to the external site in the HTTP <code>Referer</code> header.</p>
+<p>To create and maintain the session, a session class should be instantiated
+at the start of processing a request, and its
+<code><a href="#session:save">save</a></code> method called at the end of
+processing.</p>
+<p>Example:</p>
+<p class="code"><code>class Handler(wt.Handler):<br />
+&nbsp;&nbsp;def process(self, req):<br />
+&nbsp;&nbsp;&nbsp;&nbsp;self.session = session.FileSession(req, "s3cr3t")<br />
+&nbsp;&nbsp;&nbsp;&nbsp;if not self.session.relocated:<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;wt.Handler.process(self, req)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.session.save()</code></p>
+
+<h2><a name="apache" id="apache">Apache Configuration</a></h2>
+<p>If you are passing the session identifier in the URL, then you will need to
+configure your web server so that it knows what to do with this identifier.
+If you are not embedding the session identifier in the URL, then no extra
+configuration of the web server is required.</p>
+<p>Using <a href="http://httpd.apache.org/">Apache</a>, you should use
+<a href="http://httpd.apache.org/docs/1.3/mod/mod_rewrite.html">mod_rewrite</a>
+to extract the session identifier from the URL and pass it in the
+<code>SESSION</code> environment variable. The URL is then modified to remove
+the identifier so that the web server can find the requested page.</p>
+<p>Example using <code>httpd.conf</code>:</p>
+<p class="code"><code>&lt;VirtualHost 192.168.0.1&gt;<br />
+&nbsp;&nbsp;ServerName www.example.com<br />
+&nbsp;&nbsp;&nbsp;...<br />
+&nbsp;&nbsp;RewriteEngine on<br />
+&nbsp;&nbsp;RewriteRule ^/([A-Fa-f0-9]{16})(/.*)$ $2 [E=SESSION:$1]<br />
+&lt;VirtualHost&gt;</code></p>
+<p>Example using an <code>.htaccesss</code> file in the web root directory:</p>
+<p class="code"><code>RewriteEngine on<br />
+RewriteBase /<br />
+RewriteRule ^([A-Fa-f0-9]{16})(/.*)$ $2 [E=SESSION:$1]</code></p>
+<p>If you are using the <code><a href="wt.html">wt</a></code> templating module
+in conjunction with the <code>session</code> module, you should simply put the
+single <code>session</code> <code>RewriteRule</code> line before the
+<code>wt</code> <code>RewriteCond</code> line, e.g.:</p>
+<p class="code"><code>RewriteEngine on<br />
+RewriteBase /<br />
+<strong>RewriteRule ^([A-Fa-f0-9]{16})(/.*)$ $2 [E=SESSION:$1]</strong><br />
+RewriteCond %{DOCUMENT_ROOT}/wt/$1.py -f<br />
+RewriteRule ^(.*)$ /wt/$1.py [E=WT_TEMPLATE_URL:/$1,E=WT_TEMPLATE_FILENAME:%{DOCUMENT_ROOT}/$1]</code></p>
+
+<h2><a name="error" id="error">class: Error(Exception)</a></h2>
+<p>The base class for all exceptions defined by the <code>session</code>
+module.</p>
+
+<h2><a name="session" id="session">class: Session(dict)</a></h2>
+<p><code>Session</code> objects manage the session as well as providing
+a container to store data associated with the session. This class is not used
+directly, but is subclassed depending on what method is being used to store the
+session data.</p>
+
+<h3>Public Instance Variables</h3>
+<h4><a name="session:relocated" id="session:relocated"><code><strong>relocated</strong></code></a></h4>
+<p>The <code>relocated</code> map references a true value if URL-based sessions
+are being used and a <code>Location</code> header has been set to redirect the
+user's browser to a new URL.</p>
+
+<h4><a name="session:created" id="session:created"><code><strong>created</strong></code></a></h4>
+<p>The number of seconds since the epoch (i.e. <code>time.time()</code> value)
+when this session was created.</p>
+
+<h4><a name="session:new" id="session:new"><code><strong>new</strong></code></a></h4>
+<p><code>new</code> references a true value if the session was created during
+this request (i.e. there was no pre-existing session).</p>
+
+<h4><a name="session:surl" id="session:surl"><code><strong>surl</strong></code></a></h4>
+<p>This variable is only present if session identifiers are being
+embedded in URLs for the current session. If it is present, it is the URL
+prefix that is used for this purpose - e.g. <code>/0a33817bc823781f/</code>.</p>
+
+<h3>Public Methods</h3>
+<h4><a name="session:__init__" id="session:__init__"><code><strong>__init__(self, req, secret, cookie="jonsid", url=0, root="",<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;referer=None, sid=None, shash=None, secure=0, domain=None)</strong></code></a></h4>
+<p><code><strong>req</strong></code>:
+<code><a href="cgi.html#request">cgi.Request</a></code> instance<br />
+<code><strong>secret</strong></code>: string<br />
+<code><strong>cookie</strong></code>: string<br />
+<code><strong>url</strong></code>: true or false value<br />
+<code><strong>root</strong></code>: string<br />
+<code><strong>referer</strong></code>: string<br />
+<code><strong>sid</strong></code>: string<br />
+<code><strong>shash</strong></code>: string<br />
+<code><strong>secure</strong></code>: true or false value<br />
+<code><strong>domain</strong></code>: string</p>
+<p>This method may be overridden by subclasses. It creates a new
+<code>Session</code> instance. <code>secret</code> is a secret key (i.e. any
+arbitrary string that you do not disclose) which is used for keying the hash
+used to verify session identifiers (see
+<a href="#session:_make_hash">_make_hash</a>). This value should be unique for
+each web site, unless you are deliberately trying to share session identifiers
+between sites.</p>
+<p><code>cookie</code> is the name of the session cookie which is used to store
+the session identifier. There is usually no need to change this from the default
+of <code>jonsid</code>. If you do not wish to use cookies to identify the
+session then set this parameter to <code>None</code>. If <code>secure</code>
+is true then the 'secure' flag of the cookie will be set, which tells browsers
+not to send the cookie if the connection is not encrypted. If
+<code>domain</code> is set then this will be used as the 'domain' parameter for
+the cookie.</p>
+<p>If you wish to use session identifiers embedded in URLs then set
+<code>url</code> to a true value. You may then optionally also set
+<code>root</code> to be the web root at which sessions are anchored (i.e.
+a string to put before the session identifier in the url). <code>root</code>
+should begin with a <code>/</code> character but should not end in one. When
+using session identifiers in URLs, the session identifier will be looked for
+in environment variables matching <code>(REDIRECT_){1,4}SESSION</code>.
+Instructions on how to configure Apache to provide this variable are shown
+<a href="#apache">above</a>.</p>
+<p>You can optionally use the HTTP <code>Referer</code> header to help with
+session verification when using session identifiers in urls. If you set the
+<code>referer</code> parameter to a non-empty string (for example, the host
+name of your web site) and the user's browser sends a <code>Referer</code>
+header which does not contain that string, then the session is invalidated.
+This helps avoid unwanted session sharing in the situation where a user emails
+a URL to a friend. Note that this is <strong>not a security measure</strong>
+but just a helpful heuristic, since the contents of this header are under user
+control.</p>
+<p>Finally, if you wish to identify the session in some other way, you can set
+<code>cookie</code> to <code>None</code> and <code>url</code> to <code>0</code>
+and then pass in the session identifier in <code>sid</code>. You may optionally
+also pass in the identifier hash in <code>shash</code> - if you do then the
+session identifier will be ignored and a new session created if the hash does
+not match the identifier. If you omit the <code>shash</code> parameter then the
+identifier will be assumed correct.</p>
+<p>After initialisation has completed, the session dictionary contains the
+session identifier under key <code>id</code>, the identifier hash under key
+<code>hash</code>, and if the session was not new, any stored information from
+previous requests.</p>
+
+<h4><a name="session:save" id="session:save"><code><strong>save(self)</strong></code></a></h4>
+<p>This method may be overridden by subclasses. It stores the information from
+the current session's dictionary so that it may be retrieved in later requests.
+The default implementation does nothing.</p>
+
+<h3>Public Static Methods</h3>
+<h4><a name="session:tidy" id="session:tidy"><code><strong>tidy()</strong></code></a></h4>
+<p>This method may be overridden by subclasses. It is used to delete session
+information that has expired, and should therefore be called periodically,
+perhaps from a <code>cron</code> job. Subclass versions of this method may
+require different parameters to the function - you cannot call this method
+without knowing the particulars of the particular subclass being used. The
+default implementation does nothing.</p>
+
+<h3>Protected Instance Variables</h3>
+<h4><a name="session:_req" id="session:_req"><code><strong>_req</strong></code></a></h4>
+<p>The <code><a href="cgi.html#request">cgi.Request</a></code> instance passed
+to the session's <code><a href="#session:__init__">__init__</a></code>
+method.</p>
+
+<h3>Protected Methods</h3>
+<h4><a name="session:_make_hash" id="session:_make_hash"><code><strong>_make_hash(self, sid, secret)</strong></code></a></h4>
+<p><code><strong>sid</strong></code>: string<br />
+<code><strong>secret</strong></code>: string<br />
+<strong>Returns</strong>: string</p>
+<p>This method may be overridden by subclasses. It returns the 8-character
+hexadecimal string which is a keyed hash of the session identifier
+<code>sid</code> and the secret key <code>secret</code>. The default
+implementation uses HMAC-SHA, and should not usually need to be overridden.</p>
+
+<h4><a name="session:_create" id="session:_create"><code><strong>_create(self, secret)</strong></code></a></h4>
+<p><code><strong>secret</strong></code>: string</p>
+<p>This method may be overridden by subclasses. It creates a new unique
+8-character hexadecimal session identifier and initialises it in whatever
+storage system is being used. <code>self["id"]</code> should be set to the
+session identifier. Optionally, <code>self["hash"]</code> may also be set to the
+identifier hash. If the hash is not set then
+<code><a href="#session:_make_hash">_make_hash</a></code> will be called
+subsequently to determine it. The default implementation simply sets
+<code>self["id"]</code> to a random identifier.</p>
+
+<h4><a name="session:_load" id="session:_load"><code><strong>_load(self)</strong></code></a></h4>
+<p>This method may be overridden by subclasses. It updates the session's
+dictionary with whatever information the storage system has recorded about the
+session with identifier <code>self["id"]</code>. It should return <code>1</code>
+if the session identifier was located in the storage system, or <code>0</code>
+if it was not (in which case a new session will be created). The default
+implementation simply returns <code>1</code>.</p>
+<p>Note that this method should only return <code>0</code> if the session
+information could not be located because it did not exist. If any other error
+occurs (e.g. an I/O error while searching for the session), then an exception
+should be raised as usual.</p>
+
+<h2><a name="filesession" id="filesession"></a>class: FileSession(<a href="#session">Session</a>)</h2>
+<p>The <code>FileSession</code> class is a subclass of
+<code><a href="#session">Session</a></code> that uses the filesystem to store
+session data.</p>
+
+<h3>Public Methods</h3>
+<h4><a name="filesession:__init__" id="filesession:__init__"><code><strong>__init__(self, req, secret, basedir=None, **kwargs)</strong></code></a></h4>
+<p><code><strong>req</strong></code>:
+<code><a href="cgi.html#request">cgi.Request</a></code> instance<br />
+<code><strong>secret</strong></code>: string<br />
+<code><strong>basedir</strong></code>: string</p>
+<p>Creates a new FileSession instance. Session data will be stored using
+individual files in the filesystem, under the <code>basedir</code> directory.
+If <code>basedir</code> is not specified then the environment variable
+<code>TMPDIR</code> is used instead, or if there is no such environment
+variable then <code>/tmp</code> is used. A directory is created under this
+named <code>jon-sessions-%d</code> where <code>%d</code> is the current
+user id. If this directory already exists then it must be owned by the current
+user. <code>req</code>, <code>secret</code>, and <code>kwargs</code> are passed
+to the base class's <code><a href="#session:__init__">__init__</a></code>
+method.</p>
+
+<h4><a name="filesession:save" id="filesession:save"><code><strong>save(self)</strong></code></a></h4>
+<p>The session's dictionary is written to the filesystem.</p>
+
+<h3>Public Static Methods</h3>
+<h4><a name="filesession:tidy" id="filesession:tidy"><code><strong>tidy(max_idle=0, max_age=0, basedir=None)</strong></code></a></h4>
+<p><code><strong>max_idle</strong></code>: integer<br />
+<code><strong>max_age</strong></code>: integer<br />
+<code><strong>basedir</strong></code>: string</p>
+<p>Deletes session files that have expired. If <code>max_idle</code> is
+non-zero then it is the maximum number of seconds old a file's modification
+time may be before it is deleted. If <code>max_age</code> is non-zero then it
+is the maximum number of seconds old a session may be (since it was created)
+before it is deleted.</p>
+
+<h3>Protected Methods</h3>
+<h4><a name="filesession:_create" id="filesession:_create"><code><strong>_create(self, secret)</strong></code></a></h4>
+<p><code><strong>secret</strong></code>: string</p>
+<p>Creates the session identifier and its associated file.</p>
+
+<h4><a name="filesession:_load" id="filesession:_load"><code><strong>_load(self)</strong></code></a></h4>
+<p>Updates the session's dictionary with the stored information from the
+session's file. Returns <code>0</code> if the file did not exist, otherwise
+<code>1</code>.</p>
+
+<h2><a name="genericsqlsession" id="genericsqlsession"></a>class: GenericSQLSession(<a href="#session">Session</a>)</h2>
+<p>The <code>GenericSQLSession</code> class is a subclass of
+<code><a href="#session">Session</a></code> that uses an SQL database to store
+session data.</p>
+
+<h3>Public Methods</h3>
+<h4><a name="genericsqlsession:__init__" id="genericsqlsession:__init__"><code><strong>__init__(self, req, secret, dbc, table="sessions", **kwargs)</strong></code></a></h4>
+<p><code><strong>req</strong></code>:
+<code><a href="cgi.html#request">cgi.Request</a></code> instance<br />
+<code><strong>secret</strong></code>: string<br />
+<code><strong>dbc</strong></code>: Python DB API <code>Cursor</code>
+instance<br />
+<code><strong>table</strong></code>: string</p>
+<p>Creates a new GenericSQLSession instance. Session data will be stored using
+rows in an SQL table. The database is accessed via the <code>Cursor</code>
+instance <code>dbc</code> and the table name <code>table</code>.
+<code>req</code>, <code>secret</code>, and <code>kwargs</code> are passed to
+the base class's <code><a href="#session:__init__">__init__</a></code>
+method.</p>
+<p>The table must have at least the following fields:</p>
+<p class="code"><code>CREATE TABLE sessions (<br />
+&nbsp;&nbsp;ID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CHAR(8) NOT NULL,<br />
+&nbsp;&nbsp;hash&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CHAR(8) NOT NULL,<br />
+&nbsp;&nbsp;data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BLOB NOT NULL,<br />
+&nbsp;&nbsp;created&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;INT NOT NULL,<br />
+&nbsp;&nbsp;updated&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;INT NOT NULL,<br />
+&nbsp;&nbsp;PRIMARY KEY (ID)<br />
+);</code></p>
+<p>This class has only been tested with
+<a href="http://www.mysql.com/">MySQL</a>, although the intention is that it
+should work with any DB API database.</p>
+
+<h4><a name="genericsqlsession:save" id="genericsqlsession:save"><code><strong>save(self)</strong></code></a></h4>
+<p>The session's dictionary is written to the database.</p>
+
+<h3>Public Static Methods</h3>
+<h4><a name="genericsqlsession:tidy" id="genericsqlsession:tidy"><code><strong>tidy(dbc, table="sessions", max_idle=0, max_age=0)</strong></code></a></h4>
+<p><strong><code>dbc</code></strong>: Python DB API <code>Cursor</code>
+instance<br />
+<strong><code>table</code></strong>: string<br />
+<strong><code>max_idle</code></strong>: integer<br />
+<strong><code>max_age</code></strong>: integer</p>
+<p>Deletes session rows that have expired. If <code>max_idle</code> is
+non-zero then it is the maximum number of seconds old a session's
+<code>updated</code> time may be before it is deleted. If <code>max_age</code>
+is non-zero then it is the maximum number of seconds old a session's
+<code>created</code> time may be before it is deleted.</p>
+
+<h3>Protected Methods</h3>
+<h4><a name="genericsqlsession:_create" id="genericsqlsession:_create"><code><strong>_create(self, secret)</strong></code></a></h4>
+<p><code><strong>secret</strong></code>: string</p>
+<p>Creates the session identifier and its associated table row.</p>
+
+<h4><a name="genericsqlsession:_load" id="genericsqlsession:_load"><code><strong>_load(self)</strong></code></a></h4>
+<p>Updates the session's dictionary with the stored information from the
+session's database row. Returns <code>0</code> if the row was not found,
+otherwise <code>1</code>.</p>
+
+<p class="cvsid">$Id: session.html,v c0f5f983a7fc 2010/03/23 01:07:17 jon $</p>
+</body></html>

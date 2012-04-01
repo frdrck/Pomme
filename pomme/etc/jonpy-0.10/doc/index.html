@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>Jon's Python modules</title>
+<meta name="description" content="Simple yet powerful multi-threaded object-oriented CGI/FastCGI/mod_python/html-templating modules for Python." />
+<meta name="keywords" content="jonpy, python, cgi, fastcgi, mod_python, modpython, templates, templating, servlet, html" />
+<link href="style.css" rel="stylesheet" type="text/css" />
+</head><body>
+<h1>Jon's Python modules</h1>
+<h2>Synopsis</h2>
+<p>These Python modules provide simple yet powerful multi-threaded
+object-oriented CGI/FastCGI/mod_python/html-templating facilities for the Python
+programming language.</p>
+<p>The home page for this project is at
+<a href="http://jonpy.sourceforge.net/">http://jonpy.sourceforge.net/</a>,
+and its <a href="http://sourceforge.net/">SourceForge</a> project page
+is at <a href="http://sourceforge.net/projects/jonpy">http://sourceforge.net/projects/jonpy</a>.</p>
+<p>See the <a href="wt-examples.html#templatecode">wt examples</a> page for a
+quick look at how the templating system works.</p>
+<p>If you have questions or need support, please mail the
+<a href="http://lists.sourceforge.net/lists/listinfo/jonpy-users">jonpy-users@lists.sourceforge.net</a>
+mailing list. If you need to contact me personally, please use
+<code>jon+jonpy</code> at <code>unequivocal.co.uk</code>.</p>
+
+<h2>Modules</h2>
+<p>The modules provided are:</p>
+<ul><li><a href="cgi.html">cgi</a> - abstraction layer for CGI-style
+applications</li>
+<li><a href="modpy.html">modpy</a> - a connector to use the abstraction layer
+with mod_python</li>
+<li><a href="fcgi.html">fcgi</a> - a connector to use the abstraction layer
+with the FastCGI protocol</li>
+<li><a href="wsgi.html">wsgi</a> - a connector to use the abstraction layer
+with the WSGI protocol</li>
+<li><a href="mime.html">mime</a> - a simple MIME parser for reading
+<code>multipart/form-data</code> HTTP requests</li>
+<li><a href="wt.html">wt</a> - a simple yet extremely powerful web templating
+system</li>
+<li><a href="session.html">session</a> - session management for HTTP
+requests</li>
+<li><a href="dbpool.html">dbpool</a> - a database connection pool</li>
+</ul>
+
+<h2>Installation</h2>
+<p><strong>Please note that these modules require Python 2.2 or later.</strong></p>
+<p>Release packages can be downloaded from the
+<a href="http://sourceforge.net/projects/jonpy">SourceForge project
+page</a>.</p>
+<p>All the modules are implemented entirely in pure Python, so installation is
+very simple. The Python <code>distutils</code> system has been used, so all
+you need to do is type:</p>
+<p class="code"><code>python setup.py install</code></p>
+<p>The modules are installed under the package name <code>jon</code>, so an
+example of how to import one would be as follows:</p>
+<p class="code"><code>import jon.cgi as cgi</code></p>
+
+<p style="text-align: right"><a href="http://sourceforge.net/"><img src="http://sourceforge.net/sflogo.php?group_id=45477&amp;type=1" width="88" height="31" alt="SourceForge.net Logo" style="border: none" /></a></p>
+
+<p class="cvsid">$Id: index.html,v c0f5f983a7fc 2010/03/23 01:07:17 jon $</p>
+</body></html>

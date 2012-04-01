@@ -1,0 +1,991 @@
+@import "compass/reset"
+img
+	margin-bottom: -2px
+@mixin box-shadow ($x)
+	-moz-box-shadow: $x
+	-webkit-box-shadow: $x
+	box-shadow: $x
+@mixin no-select
+	-webkit-user-select: none
+	-moz-user-select: none
+	-ms-user-select: none
+	-o-user-select: none
+	user-select: none
+	*
+		-webkit-user-select: none
+		-moz-user-select: none
+		-ms-user-select: none
+		-o-user-select: none
+		user-select: none
+@mixin card
+	div
+		overflow: visible
+		background-color: #fff
+		@include box-shadow (0 3px 5px #666)
+		margin: 0 5px
+		img
+			display: inline-block
+	&.live
+		div
+			cursor: pointer
+			&:hover
+				@include box-shadow (0 5px 10px #333)
+				position: relative
+				top: -20px
+@mixin chat-white
+	background: rgb(255,255,255)
+	background: rgba(255,255,255,0.8)
+@mixin curtain
+	position: absolute
+	top: 0
+	left: 0
+	width: 100%
+	height: 100%
+@mixin rounded($width)
+	-moz-border-radius: $width
+	-webkit-border-radius: $width
+	-o-border-radius: $width
+	border-radius: $width
+
+html,body
+	width: 0
+	height: 0
+body
+	font-family: Lucida Sans Unicode, Lucida Grande, sans-serif
+	overflow: hidden
+#login
+	position: absolute
+	top: 10%
+	left: 50%
+	margin-left: -300px
+	width: 600px
+	padding: 40px
+	background: #fff
+	font-size: 32px
+	p
+		margin-bottom: 20px
+	input
+		font-size: 24px
+	button
+		font-size: 24px
+	#password-info
+		display: none
+	#login-back
+		color: #00f
+		margin-top: 30px
+		font-size: 16px
+	display: none
+#curtain
+	position: absolute
+	top: 0
+	left: 0
+	width: 100%
+	height: 100%
+	background-image: -webkit-gradient( linear, left bottom, left top, color-stop(0.01, rgb(235,214,234)), color-stop(0.51, rgb(240,253,255)))
+	background-image: -moz-linear-gradient( center bottom, rgb(235,214,234) 1%, rgb(240,253,255) 51%)
+	// background-image: -moz-linear-gradient(bottom, rgb(64,5,52) 0%, rgb(9,11,61) 54%, rgb(9,1,36) 100%)
+	// background-image: -webkit-linear-gradient(bottom, rgb(64,5,52) 0%, rgb(9,11,61) 54%, rgb(9,1,36) 100%)
+
+#game
+	position: absolute
+	top: 0
+	left: 0
+	width: 100%
+	height: 100%
+	display: none
+#chat_container
+	overflow-y: scroll
+	overflow-x: hidden
+	position: absolute
+	z-index: 2
+	#chat
+		font-size: 13px
+		line-height: 18px
+		padding-left: 10px
+		padding-right: 10px
+		padding-bottom: 5px
+		p
+			span.user
+				color: #38c
+				display: inline-block
+				width: 75px
+				margin-right: 5px
+				border-bottom: 1px solid transparent
+				float: left
+				clear: left
+				position: absolute
+				left: 10px
+				overflow: hidden
+				vertical-align: bottom
+			span.you
+				color: #e3b
+			span.msg
+				display: block
+				margin-left: 80px
+		img
+			max-width: 200px
+			max-height: 200px
+#chat_bg
+	z-index: 1
+	position: absolute
+	@include chat-white
+	@include box-shadow (0 1px 3px #ddd)
+#form
+	z-index: 3
+	position: absolute
+	// padding-left: 10px
+	input
+		outline: 0
+		border: 1px solid #ccc
+		padding: 2px
+		width: 100%
+		font-size: 13px
+	button
+		display: none
+		border: 0
+#champion
+	display: none
+	z-index: 5
+	position: absolute
+	padding: 30px 10px 20px 10px
+	text-align: center
+	background: rgb(255,255,255)
+	background: rgba(255,255,255, 0.7)
+	@include box-shadow (0 3px 5px #666)
+	p
+		text-align: center
+		font-size: 18px
+		line-height: 28px
+		margin-bottom: 10px
+		color: #555
+		span
+			font-weight: bold
+			color: #000
+		span#champion-waiting
+			font-style: italic
+	button
+		font-size: 24px
+		margin: 10px
+
+#player_curtain
+	display: none
+	background: #454545
+	background: rgba(69, 69, 69, 0.5)
+	width: 100%
+	height: 100%
+	position: fixed
+	top: 0
+	left: 0
+	z-index: 80
+	cursor:pointer
+
+#player_container 
+	display: none
+	position:relative
+	-moz-box-shadow: 0 1px 3px #ddd
+	-webkit-box-shadow: 0 1px 3px #ddd
+	box-shadow: 0 1px 3px #ddd
+	background-color: white
+	padding: 10px
+	z-index: 100
+	width: 640px
+	margin: 0 auto
+
+#player_close
+	margin-left: 99%
+	z-index: 200
+	cursor: pointer
+
+#how_to_play
+	background-color: white
+	width: 100px
+	cursor: pointer
+	text-align: center
+	margin: 0 auto
+
+#votes, #hand, #banner
+	z-index: 5
+	position: absolute
+	vertical-align: middle
+	padding: 0 0 0 0
+	opacity: 0.2
+	overflow-x: visible
+	overflow-y: visible
+	text-align: center
+	white-space: nowrap
+	@include card
+	div
+		min-width: 20px
+		display: block
+		float: left
+		span
+			position: absolute
+			top: 0
+			left: 0
+			color: #f00
+#banner
+	font-size: 114px
+	color: #b3d
+	text-align: center
+	pointer-events: none
+#loading
+	position: absolute
+	top: 25%
+	left: 50%
+	width: 800px
+	color: #3bd
+	margin-left: -400px
+	font-size: 160px
+	text-align: center
+	pointer-events: none
+	opacity: 0.20
+#whose
+	position: absolute
+	font-size: 32px
+	color: #3bd
+	opacity: 0.5
+	pointer-events: none
+#match
+	z-index: 5
+	position: absolute
+	div
+		display: inline-block
+		padding: 10px
+		background-color: #fff
+		@include box-shadow (0 3px 5px #666)
+#win
+	z-index: 5
+	@include box-shadow (0 3px 5px #333)
+	background-color: white
+	position: absolute
+	padding: 10px 10px 10px 10px
+	z-index: 30
+	div
+		display: inline-block
+		padding: 0 10px 0 0
+	h5
+		margin-bottom: 10px
+		font-size: 14px
+#status
+	z-index: 10
+	position: absolute
+	background-color: white
+	z-index: 30
+	padding: 10px
+	font-size: 13px
+	overflow-y: scroll
+	@include box-shadow (0 1px 3px #ddd)
+	color: #333
+	line-height: 19px
+	h2
+		font-size: 18px
+		padding-bottom: 5px
+		width: 100%
+		text-align: left
+	#countdown
+		position: absolute
+		top: 10px
+		right: 10px
+		&.close
+			color: red
+	span
+		display: inline-block
+		float: left
+	p
+		display: block
+		height: 19px
+		clear: right
+	.username
+		width: 110px
+		overflow: hidden
+	.score
+		margin-right: 8px
+		min-width: 15px
+		text-align: right
+	.state
+		min-width: 70px
+		text-align: right
+		margin-right: 10px
+		line-height: 19px
+		font-size: 10px
+	.winner
+		color: #40d
+	.you
+		color: #f00
+	.idle
+		color: #bbb
+		font-style: italic
+	.skip
+		min-width: 60px
+		font-size: 12px
+		font-style: italic
+		color: #aaa
+		cursor: pointer
+		text-align: right
+		&:hover
+			color: #336
+			text-decoration: underline
+			cursor: pointer
+	.skipvote
+		min-width: 60px
+		font-size: 12px
+		color: #888
+		text-align: right
+		pointer-events: none
+	.skipped
+		font-style: italic
+		min-width: 60px
+		font-size: 12px
+		text-align: right
+		color: #aaa
+		pointer-events: none
+	.ignore
+		font-style: italic
+		text-align: right
+		min-width: 50px
+		font-size: 12px
+		color: #aaa
+		&:hover
+			color: #336
+			text-decoration: underline
+			cursor: pointer
+	.skip, .skipvote, .skipped, .ignore
+		color: #bbb
+	p:hover
+		.skip, .skipvote, .skipped, .ignore
+			color: #aaa
+#instructions
+	display: block
+	clear: both
+	width: 100%
+	// position: absolute
+	color: #333
+	font-size: 14px
+	padding-top: 5px
+	padding-bottom: 5px
+#orders
+	display: none
+	position: absolute
+	width: 400px
+	text-align: center
+	left: 50%
+	font-size: 14px
+	color: #666
+	margin-left: -200px
+	pointer-events: none
+#welcome
+	z-index: 3
+	position: absolute
+	top: 10px
+	left: 0px
+	// @include box-shadow (0 1px 3px #ddd)
+	@include box-shadow (0 5px 10px 5px rgba(228,228,250,0.5))
+	padding: 5px 5px 5px 10px
+	min-width: 375px
+	background-color: #fff
+	text-align: left
+	h1
+		display: inline-block
+		font-size: 18px
+		color: #333
+		padding: 7px 20px 13px 10px
+		margin-right: 0px
+	#scorecontainer
+		background: transparent
+		display: block
+		color: #b3d
+		position: absolute
+		top: 28px
+		left: 15px
+		font-size: 10px
+		text-transform: uppercase
+	div
+		text-decoration: none
+		display: inline-block
+		margin-right: 5px
+		padding: 5px
+		z-index: 20
+		cursor: pointer
+		font-size: 12px
+		// @include box-shadow (0 1px 3px #bbb)
+		background-color: white
+		color: #888
+		&:hover
+			color: #000
+#buttons
+	z-index: 10
+	position: absolute
+	top: 10px
+	right: 0
+	@include box-shadow (0 1px 3px #ddd)
+	padding: 0 5px 5px 5px
+	min-width: 360px
+	background-color: #fff
+	text-align: left
+	#pomme
+		background-image: url('/img/pomme-apple.gif')
+		background-repeat: no-repeat
+		position: absolute
+		top: -5px
+		left: 0
+		width: 50px
+		height: 50px
+		display: block
+		text-decoration: none
+		border: 0
+	h1
+		font-size: 18px
+		color: #333
+		display: inline-block
+		padding: 10px
+		margin-left: 40px
+		a
+			color: #333
+			text-decoration: none
+	#beta
+		display: block
+		color: #b3d
+		position: absolute
+		top: 28px
+		left: 95px
+		font-size: 10px
+		text-transform: uppercase
+	div, a#lobby
+		text-decoration: none
+		display: inline-block
+		margin-right: 5px
+		padding: 5px
+		z-index: 20
+		cursor: pointer
+		font-size: 12px
+		// @include box-shadow (0 1px 3px #bbb)
+		background-color: white
+		color: #888
+		&:hover
+			color: #000
+	#fblike
+		position: relative
+		top: 3px
+#rejoin
+	display: none
+	color: #333
+#chat_shim
+	height: 200px
+	display: block
+#credits_curtain
+	display: none
+	background: rgb(69,69,69)
+	background: rgba(69,69,69,0.8)
+	width: 100%
+	height: 100%
+	position: fixed
+	top: 0
+	left: 0
+	z-index: 99
+#credits_box
+	display: none
+	@include box-shadow (0 1px 3px #ddd)
+	position: absolute
+	overflow: hidden
+	white-space: nowrap
+	top: 30%
+	left: 50%
+	margin-left: -160px
+	background-color: #fff
+	width: 375px
+	padding: 10px
+	font-size: 13px
+	line-height: 21px
+	z-index: 100
+	color: #666
+	cursor: pointer
+	#credits_close
+		float: right
+		color: #888
+		margin-top: -5px
+		cursor: pointer
+	h2
+		font-size: 18px
+		padding-bottom: 5px
+		color: #333
+	small
+		font-size: 11px
+		color: #666
+	a
+		color: #48d
+		text-decoration: none
+		&:hover
+			color: #84b
+			text-decoration: underline
+
+
+
+
+#construction
+	width: 356px
+	height: 105px
+	position: absolute
+	top: 10px
+	left: 50%
+	margin-left: -178px
+	z-index: 20
+	display: none
+
+#newgame-curtain
+	@include curtain
+	background-color: #333
+	opacity: 0.3
+	z-index: 5
+	display: none
+#newgame
+	@include box-shadow (0 1px 3px #333)
+	padding: 20px 20px 20px 20px
+	background-color: #fff
+	text-align: left
+	position: absolute
+	top: 50px
+	left: 100px
+	font-size: 13px
+	z-index: 8
+	display: none
+	h2
+		color: #333
+		font-size: 24px
+		margin-bottom: 20px
+	label
+		display: inline-block
+		text-align: right
+		margin-right: 5px
+		width: 150px
+		color: #666
+	#newgame-url-base
+		color: #888
+	#newgame-url
+		color: #333
+	#newgame-name
+		font-size: 24px
+		width: 300px
+		margin-bottom: 5px
+	#newgame-password-container
+		display: none
+	button
+		padding: 5px
+		font-size: 24px
+#chat_active_container
+	z-index: 5
+	position: absolute
+	top: 5px
+	// @include box-shadow (0 1px 2px #ddd)
+	padding: 2px
+	#chat_count
+		font-size: 11px
+		color: #666
+		display: inline-block
+		min-width: 10px
+		text-align: right
+		margin-top: -2px
+		margin-right: 4px
+		pointer-events: none
+		background-color: rgb(255,255,255)
+		background-color: rgba(255,255,255,0.8)
+		@include rounded (12px)
+		padding: 2px
+		text-align: center
+	#chat_active
+		@include rounded(8px)
+		background: #bbb
+		display: inline-block
+		width: 8px
+		height: 8px
+		pointer-events: none
+		&.active
+			background: #5c5
+#chat_active_list
+	z-index: 9
+	position: absolute
+	top: 5px
+	background-color: #fff
+	@include box-shadow (0 1px 2px #ddd)
+	padding: 2px
+	font-size: 11px
+	line-height: 15px
+	color: #666
+	display: none
+		
+#games
+	@include box-shadow (0 5px 10px 5px rgba(228,228,250,0.5))
+	padding: 0 5px 5px 5px
+	background-color: #fff
+	font-size: 13px
+	text-align: left
+	position: fixed
+	right: 50px
+	opacity: 1
+	top: 70px
+	padding: 0 0 30px 0
+	width: 300px
+	overflow-y: auto
+	overflow-x: hidden
+	z-index: 3
+	h2
+		font-size: 24px
+		margin: 0
+		width: 100% 
+		text-align: center
+		padding: 20px 0px 5px 0px
+		margin-left: 10px
+	h3
+		font-size: 12px
+		color: #888
+		width: 100% 
+		text-align: center
+		margin: 0
+		padding: 0px 0px 5px 0px
+		margin-left: 10px
+	ul
+		width: 100%
+		li
+			padding: 10px 20px 10px 20px
+			&:hover
+				background-color: #333
+				color: #fff
+				cursor: pointer
+			span.name
+				font-size: 16px
+			span.size
+				color: #888
+				float: right
+				font-size: 12px
+			&.full
+				pointer: wait
+				span.size
+					color: red
+				&:hover
+					background-color: #888
+					span.size
+						color: #fbb
+			&.private
+				pointer: wait
+				span.size
+					color: #b3d
+				&:hover
+					background-color: #888
+					span.size
+						color: #ebf
+#options
+	position: absolute
+	top: 90px
+	left: 50%
+	width: 460px
+	margin-left: -230px
+	text-align: center
+	div
+		@include box-shadow (0 5px 10px 5px rgba(228,228,250,0.5))
+		background: rgba(255,255,255,0.8)
+		padding: 10px 20px
+		display: inline
+		margin: 10px
+		font-size: 32px
+		&:hover
+			@include box-shadow (0 5px 5px 3px rgba(228,228,250,0.8))
+			background: rgb(255,255,255)
+			cursor: pointer
+			cursor: hand
+	#joingame-open
+		cursor: pointer
+	#newgame-open
+		clear: both
+		cursor: pointer
+		&:hover
+#game-manifest
+	@include box-shadow (0 1px 3px #ddd)
+	background-color: #fff
+	color: #333
+	font-size: 13px
+	text-align: left
+	position: fixed
+	opacity: 0.8
+	padding: 10px 10px 20px 10px
+	top: 90px
+	left: 50%
+	margin-left: 60px
+	width: 200px
+	overflow-y: auto
+	overflow-x: hidden
+	z-index: 3
+	span.full
+		display: none
+		color: red
+		float: right
+		margin: 12px 10px 0 0
+	span.private
+		display: none
+		color: #b3d
+		float: right
+		margin: 12px 10px 0 0
+	h2
+		font-size: 18px
+		padding: 10px 10px 10px 10px
+	ul
+		overflow-y: auto
+		li
+			color: #333
+			padding: 5px 10px
+			span.name
+			span.score
+				float: right
+#howto
+	display: block
+	position: absolute
+	top: 64px
+	right: 10px
+	width: 250px
+	@include box-shadow (0 1px 3px #ddd)
+	background-color: #fff
+	color: #111
+	opacity: 1.0
+	font-size: 12px
+	line-height: 17px
+	text-align: left
+	position: fixed
+	padding: 10px 10px 10px 10px
+	h2
+		font-size: 16px
+		font-weight: bold
+	p
+		padding: 10px 0 0 0
+#combo-wrapper
+	@include no-select
+	display: block
+	h2
+		width: 100%
+		text-align: center
+		font-size: 24px
+		padding: 10px 0px 10px 0px
+		margin-bottom: 10px
+		b
+			color: #333
+			padding: 10px
+	position: absolute
+	padding: 10px
+	left: 400px
+	@include box-shadow (0 1px 3px #ddd)
+	background-color: #fff
+	color: #333
+	font-size: 13px
+	text-align: left
+	#combo
+		margin: auto
+		white-space: nowrap
+		img
+			max-width: 400px
+			max-height: 400px
+#lobby
+	display: none
+div.overlay
+	z-index: 100
+	position: fixed
+	display: block
+	pointer-events: none
+	overflow: visible
+	background-color: #fff
+	@include box-shadow (0 3px 5px #666)
+	margin: 0 5px
+	img
+		display: inline-block
+#profile_triangle
+	width: 0
+	height: 0
+	border-left: 8px solid transparent
+	border-right: 8px solid transparent
+	border-bottom: 8px solid #fff
+	position: absolute
+	top: 60px
+	left: 23px
+	z-index: 4
+#profile_welcome
+	position: absolute
+	top: 68px
+	left: 8px
+	z-index: 3
+	@include box-shadow (0 2px 1px #ddd)
+	@include rounded (10px)
+	padding: 5px
+	background-color: #fff
+	text-align: left
+	font-size: 13px
+	color: #888
+	cursor: pointer
+	&:hover
+		@include box-shadow (0 2px 1px #666)
+		color: #000
+#profile_curtain
+	@include curtain
+	background: rgb(128,128,128)
+	background: rgba(128,128,128,0.1)
+	display: none
+#profile_view
+	position: fixed
+	top: 20%
+	left: 50%
+	width: 400px
+	margin-left: -210px
+	padding: 10px
+	display: none
+	background-color: #fff
+	font-size: 13px
+	@include box-shadow (0 1px 3px #555)
+	color: #333
+	line-height: 19px
+	h2
+		font-size: 24px
+		margin: 20px
+		width: 100%
+		text-align: left
+	#profile_score
+		margin-top: 20px
+		font-size: 14px
+		float: right
+	img
+		max-width: 150px
+		max-height: 150px
+	#profile_avatar
+		margin-right: 10px
+		float: left
+#profile_edit
+	display: none
+	position: fixed
+	top: 15%
+	left: 50%
+	width: 500px
+	margin-left: -230px
+	padding: 10px
+	display: none
+	background-color: #fff
+	font-size: 13px
+	z-index: 2
+	@include box-shadow (0 1px 3px #555)
+	color: #333
+	line-height: 19px
+	h2
+		color: #333
+		font-size: 24px
+		margin-bottom: 20px
+	label
+		display: inline-block
+		text-align: right
+		margin-right: 10px
+		width: 150px
+		vertical-align: top
+		color: #666
+	input
+		border: 1px solid #ccc
+		padding: 2px
+		width: 100px
+	.url
+		width: 200px
+	textarea
+		margin: 0
+		margin-left: -4px
+		border: 1px solid #bbb
+		height: 120px
+		width: 260px
+	button
+		padding: 5px
+		font-size: 24px
+
+#profile_menu_container
+	display: none
+	position: fixed
+	top: 20%
+	left: 50%
+	background-color: #fff
+	@include box-shadow (0 1px 3px #555)
+	text-decoration: none
+	display: inline-block
+	margin-left: 220px
+	padding: 5px 10px
+	#profile_menu
+		z-index: 5
+		font-size: 13px
+		line-height: 23px
+		color: #888
+		#profile_edit_open
+			display: none
+		li
+			cursor: pointer
+			&:hover
+				color: #000
+#combo_curtain
+	@include curtain
+	background: rgb(255,255,255)
+	background: rgba(255,255,255,0.5)
+	z-index: 20
+	display: none
+	position: fixed
+	left: 0
+	z-index: 30
+	width: 102%
+	height: 100%
+	overflow-y: scroll
+	#combo_list_container
+		margin: 80px auto
+		padding: 20px 50px 20px 20px
+		width: 780px
+		h2
+			color: #333
+			font-size: 24px
+			margin-bottom: 20px
+		ul
+			width: 100%
+		li
+			margin: 20px auto
+			padding: 5px
+			@include box-shadow (0 3px 5px #666)
+			clear: both
+			background-color: #fff
+			text-align: center
+			img
+				max-width: 350px
+				max-height: 350px
+				margin: 5px
+			padding: 10px 0
+		#combos_loading
+			width: 100%
+			padding: 20px
+			font-size: 32px
+			color: #d4f
+		#combos_load_more_wrapper
+			width: 100%
+			padding: 20px
+			text-align: center
+			button
+				font-size: 32px
+#ie-warning
+	position: fixed
+	top: 10%
+	left: 50%
+	width: 600px
+	margin-left: -310px
+	background-color: #fff
+	z-index: 200
+	font-size: 32px
+	color: #333
+	display: none
+
+#howto
+	position: fixed
+	top: 10px
+	left: 400px
+	width: 135px
+	color: #444
+	padding: 5px
+	z-index: 1001
+	cursor: pointer
+	background: rgba(255,255,255,0.95)
+	box-shadow: 0px 1px 2px #ddd
+	text-align: center
+	
+		color: #268bd2
+		text-decoration: underline
+

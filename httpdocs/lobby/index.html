@@ -1,0 +1,283 @@
+<!doctype html>
+<html> 
+<head> 
+<title>Pomme</title> 
+<link href="/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css" />
+<link href="/lobby/how_to_play.css" rel="stylesheet" type="text/css" /> 
+<link href="/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css" /> 
+<link rel="shortcut icon" href="http://pomme.us/favicon.ico" /> 
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+<meta property="og:title" content="Pomme"/> 
+<meta property="og:type" content="website"/> 
+<meta property="og:url" content="http://pomme.us/"/> 
+<meta property="og:image" content="http://pomme.us/img/pomme-apple.gif"/>
+<meta property="og:site_name" content="Pomme"/> 
+<meta property="og:description" content="Image pairing game"/> 
+<meta property="fb:admins" content="100001923956223,39607718"/> 
+<meta name="description" content="Pomme is a fun image pairing game you can play with your friends!" />
+</head> 
+<body> 
+ 
+<div id="curtain"></div> 
+<div id="login"> 
+	<div id="login-info">
+		<p> 
+		Enter your name to get started:
+		</p> 
+		<p> 
+		<input type="text" id="login-name" maxlength="16"> 
+		</p> 
+		<button id="login-go">LET'S PLAY</button> 
+	</div>
+	<div id="password-info">
+		<p id="password-error"> 
+		Hey! The name <span id="login-altname">Frederick</span> has been claimed. Do you have the password?
+		</p> 
+		<p> 
+		<input type="password" id="login-password" maxlength="16"> 
+		</p> 
+		<button id="password-go">IT'S ME</button> 
+		<p>
+		<a id="login-back" href="#">&larr; Or pick a different name</a>
+		</p>
+	</div>
+</div> 
+
+<div id="loading">loading...</div>
+<div id="lobby">
+	<div id="newgame-curtain"></div>
+	<div id="newgame">
+		<h2>Start A New Room</h2>
+
+		<label>room name</label>
+		<input type="text" id="newgame-name" maxlength="12" />
+		<br/>
+
+		<label>&nbsp;</label>
+		<span id="newgame-url-base">http://pomme.us/</span><span id="newgame-url"></span>
+		<br/>
+		<br/>
+
+		<label>capacity</label>
+		<select id="newgame-capacity">
+			<option value="4">4 players</option>
+			<option value="8" selected>8 players</option>
+			<option value="10">10 players</option>
+<!--
+			<option value="16">16 players</option>
+			<option value="24">24 players</option>
+-->
+		</select>
+		<br/>
+		<br/>
+
+		<label>play to</label>
+		<select id="newgame-goal">
+			<option value="10" selected>10 points</option>
+			<option value="20">20 points</option>
+			<option value="30">30 points</option>
+		</select>
+		<br/>
+		<br/>
+
+		<label>timer speed</label>
+		<select id="newgame-timer">
+			<option value="5">5 seconds</option>
+			<option value="10">10 seconds</option>
+			<option value="20" selected>20 seconds</option>
+			<option value="30">30 seconds</option>
+		</select>
+		<br/>
+		<br/>
+		<label>private game?</label>
+		<input type="checkbox" id="newgame-private" value="true" />
+		<br/>
+		<br/>
+
+<!--
+		<div id="newgame-password-container">
+			<label>room password</label>
+			<input type="text" id="newgame-password" maxlength="12" />
+			<br/>
+		</div>
+		<br/>
+-->
+
+		<label>&nbsp;</label>
+		<button id="newgame-go">Okay!</button>
+	</div>
+
+	<div id="games">
+		<h2>Now Playing</h2>
+<!--
+		<h2><a style="color: #d24;" href="http://www.howcouldyoudothisto.us/" target="_blank">Stop SOPA!</a></h2>
+		<h3>Join a game or start a new one</h3>
+-->
+		<ul id="game-list">
+		</ul>
+	</div>
+
+	<div id="options">
+		<div id="joingame-open">Join Game</div>
+		<div id="newgame-open">New Game</div>
+	</div>
+
+   <div id="howto">
+<a href="mailto:pomme.game@gmail.com" target="_blank">We're Hiring Coders!</a>
+</div>
+
+<div id="how_to_play">How To Play</div>
+<div id="player_curtain"></div>
+<div id="player_container">
+		<div id="player_close">x</div>
+<object>
+<param name="movie" value="https://www.youtube.com/v/Y8H2vsiwfjs?version=3&feature=player_embedded&autohide=1&autoplay=1&playerapiid=pommeVid&feature=player_embedded&rel=0&vq=hd1080">
+<param name="allowFullScreen" value="true">
+<param name="allowScriptAccess" value="always">
+<embed src="https://www.youtube.com/v/Y8H2vsiwfjs?version=3&feature=player_embedded&autohide=1&autoplay=1&playerapiid=pommeVid&feature=player_embedded&rel=0&vq=hd1080" type="application/x-shockwave-flash" allowfullscreen="true" allowScriptAccess="always" width="640" height="360"></object>
+</div>
+
+
+<!--
+	<div id="game-manifest">
+		<span class="private">PRIVATE</span>
+		<span class="full">FULL</span>
+		<h2 id="game-name"></h2>
+		<ul id="game-occupants"></ul>
+	</div>
+-->
+
+	<div id="chat_active_container"><span id="chat_count"></span><span id="chat_active"></span></div>
+	<div id="combo-wrapper">
+		<h2><b>Recent Winner</b></h2>
+		<div id="combo">
+		</div>
+	</div>
+
+	<div id="welcome">
+		<h1>Welcome, <span id="profile-username">name</span>!</h1>
+		<div id="scorecontainer"><span id="score">669</span> points</div>
+	</div>
+	<div id="profile_triangle"></div>
+	<div id="profile_welcome">
+		<div id="profile">Edit Your Profile</div>
+	</div>
+
+        <div id="buttons">
+		<a id="pomme" href="/"></a>
+                <span id="beta">beta</span>
+		<h1>Pomme</h1>
+                <div id="credits">Credits</div>
+                <div id="logout">Logout</div>
+		<form action="https://www.paypal.com/cgi-bin/webscr" method="post" style="float: right; padding-top: 9px; display: inline-block;">
+			<input type="hidden" name="cmd" value="_donations">
+			<input type="hidden" name="business" value="pomme.game@gmail.com">
+			<input type="hidden" name="lc" value="US">
+			<input type="hidden" name="item_name" value="Pomme.us">
+			<input type="hidden" name="no_note" value="0">
+			<input type="hidden" name="currency_code" value="USD">
+			<input type="hidden" name="bn" value="PP-DonationsBF:btn_donate_SM.gif:NonHostedGuest">
+			<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+			<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+		</form>
+<a href="http://www.tumblr.com/follow/pommeus"><img src="http://i.imgur.com/eaRCy.gif"/></a>
+
+		<a href="https://twitter.com/pomme_us" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pomme_us</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+		<fb:like id="fblike" href="http://pomme.us/" send="false" layout="button_count" width="85" show_faces="false" action="like" font="lucida grande"></fb:like>
+        </div>
+
+        <div id="credits_curtain"></div>
+        <div id="credits_box">
+		<span id="credits_close">x</span>
+               <h2>Pomme</h2>
+		
+
+
+		<font size="2">
+		<ul style="float:left;text-align:left;margin-left:5%;padding:10px;">
+		</br>
+		<li>Created by</li>
+		<li><a href="mailto:pomme.game@gmail.com" target="_blank">Frederick Heydt</a></li>
+ 		<li>Programmed by</li>
+                <li><a href="http://asdf.us/" target="_blank">Jules Welter</a></li>
+		<li><a href="http://scannerjammer.com" target="_blank">pepper</a></li>
+		<li>PR by</li>
+		<li><a href="http://www.facebook.com/kmeizner" target="_blank">Kate Meizner</a></li>
+		<li>Logo by</li>
+		<li><a href="http://cargocollective.com/hermesarriola" target="_blank">Hermes Arriola</a></li>
+		<li>Sound by</li>
+		<li><a href="http://lolz.biz/" target="_blank">Joel Cook</a></li>
+		</ul>
+		</font>
+		<br/>
+		
+		<ul style="float:top;text-align:left;margin-left:45%;">
+                Special Thanks
+                </br>
+                <a href="https://twitter.com/#!/brettcm82" target="_blank">Brett Mounce</a>/<a href="http://solikeiguesstheresno.us/" target="_blank">James Mckain</a>
+                </br> 
+                <a href="https://twitter.com/#!/mggimcg" target="_blank">Maggie McGee</a>/<a href="http://tightartists.com/" target="_blank">Tight Artists</a>
+                </br>
+                <a href="http://youtu.be/PW902InP424" target="_blank">Randumb Productions</a>/<a href="http://youtu.be/pC83w-NeYOI" target="_blank">Mac</a>
+		 </br>
+                <a href="http://scannerjammer.com" target="_blank">Scannerjammer</a>/<a href="http://dump.fm/" target="_blank">Dump.fm</a>
+                </br>
+                <a href="http://www.deannahavas.com/" target="_blank">Deanna Havas</a>/<a href="http://www.nahchill.com/" target="_blank">Samuel Howe</a>
+                </br>
+                <a href="http://i.imgur.com/YdNBl.jpg" target="_blank">Lauren Aimsell</a>/<a href="http://www.youtube.com/user/ZackScottGames" target="_blank">Zack Scott</a>
+                </br>
+                <a href="http://facebook.com/bhideas" target="_blank">Bill Hitchert</a>/<a href="http://www.lulinternet.com" target="_blank">Lacey Micallef</a>
+                </br>
+                <a href="https://twitter.com/#!/flourides" target="_blank">Dayton Castleman</a>/<a href="http://www.youtube.com/watch?v=Z0-Wo3LstZw" target="_blank">Chris Moes</a>
+                </br>
+                <a href="http://bananaslug.tumblr.com" target="_blank">Alli Crawford</a>/<a href="http://www.youtube.com/user/SwimmingBird941?ob=0&feature=results_main" target="_blank">Adam Holley</a>
+                </br>
+                <a href="http://www.youtube.com/watch?v=jHhrej-vm_A" target="_blank">Tyler Aitchkay</a>/<a href="http://www.familylobby.com/common/tt8372685fltt.gif" target="_blank">Mary Burford</a>
+                </br>
+                <a href="http://anamanaguchi.com" target="_blank">Anamanaguchi</a>
+               	</br>
+                </br>
+		</ul>
+
+                <small style="float: right"><a href="/static/terms" target="_blank">Terms</a></small>
+        </div>
+</div>
+
+<div id="fb-root"></div>
+
+<div id="ie-warning">Sorry! Pomme only works in Firefox and Chrome.</div>
+</body> 
+<script type="text/javascript">if (navigator.userAgent.indexOf("MSIE") !== -1) { document.getElementById("ie-warning").style.display="block" }</script>
+<script type="text/javascript" src="/js/jquery-1.7.1.min.js"></script>
+<script async type="text/javascript" src="/js/jquery.md5.js"></script>
+<script type="text/javascript" src="/js/soundmanager2.js"></script>
+<script type="text/javascript" src="/js/lobby2.js"></script>
+<script type="text/javascript" src="/lobby/how_to_play.js"></script>
+<!--
+<script type="text/javascript"> 
+	var sj = document.createElement('script')
+	sj.type = 'text/javascript'
+	sj.async = 'true'
+	sj.src = '/js/lobby2.js?t=' + new Date().getTime().toString()
+
+	var scripts = document.getElementsByTagName('script')
+	scripts[scripts.length-1].parentNode.insertBefore(sj, scripts[scripts.length-1])
+</script> 
+-->
+<script async src="http://connect.facebook.net/en_US/all.js#appId=159892437421208&amp;xfbml=1"></script>
+<script type="text/javascript">
+
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-11942437-2']);
+_gaq.push(['_trackPageview']);
+
+(function() {
+var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+
+</script>
+</html>

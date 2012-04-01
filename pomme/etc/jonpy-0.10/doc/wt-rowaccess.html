@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>wt.rowaccess module</title>
+<link href="style.css" rel="stylesheet" type="text/css" />
+</head><body>
+<h1>wt.rowaccess module</h1>
+<h2>Synopsis</h2>
+<p>The <code>wt.rowaccess</code> module provides a
+<code><a href="wt.html#templatecode">TemplateCode</a></code> sub-class which
+provides an automatic way of creating replacements from values in a
+dictionary.</p>
+
+<h2>Usage</h2>
+<p>This class is very simple to use. Simply ensure that the attribute named
+by <code><a href="#rowaccess:rowaccess_attrib">rowaccess_attrib</a></code>
+contains a dictionary with the keys and values you wish to have available as
+attributes. This can, for example, be done in
+<code><a href="wt.html#templatecode:main">main</a></code>.</p>
+<p>The module works by defining a <code>__getattr__</code> method that
+consults the named dictionary, so the dictionary keys can be used as
+attributes of the instance.</p>
+<p>Example:</p>
+<p class="html"><code>&lt;!--wt:item--&gt;<br />
+&lt;a href="item.html?id=$$%ID$$"&gt;$$title$$&lt;/a&gt;<br />
+&lt;!--wt:/item--&gt;</code></p>
+<p class="code"><code>import jon.wt.rowaccess as rowaccess<br />
+<br />
+class item(rowaccess.RowAccess):<br />
+&nbsp;&nbsp;def main(self, template):<br />
+&nbsp;&nbsp;&nbsp;&nbsp;website.dbc.execute("SELECT ID,title FROM items")<br />
+&nbsp;&nbsp;&nbsp;&nbsp;for self.row in dbc.fetchall():<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.process(template)</code></p>
+<p>(Please note this example assumes your database connector can provide
+results as dictionaries.)</p>
+
+<h2><a name="rowaccess" id="rowaccess"></a>class: RowAccess(<a href="wt.html#templatecode">TemplateCode</a>)</h2>
+
+<h3>Public Class Variables</h3>
+<h4><a name="rowaccess:rowaccess_attrib" id="rowaccess:rowaccess_attrib"><code><strong>rowaccess_attrib</strong></code></a></h4>
+<p>This variable may be overridden by subclasses. It is a string naming the
+attribute which contains the dictionary to be consulted to find replacements.
+The default value is <code>"row"</code>.</p>
+
+<p class="cvsid">$Id: wt-rowaccess.html,v c0f5f983a7fc 2010/03/23 01:07:17 jon $</p>
+</body></html>

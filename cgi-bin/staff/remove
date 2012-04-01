@@ -1,0 +1,24 @@
+#!/usr/bin/env python
+import cgi, os
+import cgitb; cgitb.enable()
+
+print "Content-type: text/html\n\n"
+
+form = cgi.FieldStorage()
+message = ""
+
+try:
+	url = form['url'].value.replace("http://pomme.us/img/", "")
+	valid_packs = "main player".split()
+
+	# http://pomme.us/img/player/tumblr_ljwaimhJcK1qa4ebfo1_500.gif
+	partz = url.split("/")
+	pack = partz[0]
+	fn = partz[1]
+	path = "/var/www/vhosts/pomme.us/docs/img/" + pack + "/" + fn
+	if fn[0] != "." and pack in valid_packs and os.path.exists(path):
+		os.system("/bin/rm '" + path + "'")
+except:
+	pass
+print "OK"
+

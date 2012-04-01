@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>wsgi module</title>
+<link href="style.css" rel="stylesheet" type="text/css" />
+</head><body>
+<h1>wsgi module</h1>
+<h2>Synopsis</h2>
+<p>The <code>wsgi</code> module builds upon the classes defined in the
+<code><a href="">cgi</a></code> module to allow code originally
+written with the <a href="http://www.python.org/dev/peps/pep-0333/">WSGI</a>
+protocol in mind to be used unchanged with the jonpy modules.</p>
+<p><em>Note: This module is currently experimental.</em></p>
+
+<h2>Usage: WSGI server connectors with jonpy applications</h2>
+<p>To use existing jonpy code with WSGI a server connector, simply use
+<code>wsgi.<a href="#application">Application</a></code> to convert your
+<code><a href="cgi.html#handler">cgi.Handler</a></code> class into a
+WSGI "application".</p>
+<p>Example:</p>
+<p class="code"><code>import jon.cgi as cgi<br />
+import jon.wsgi as wsgi<br />
+class Handler(cgi.Handler):<br />
+&nbsp;&nbsp;def process(self, req):<br />
+&nbsp;&nbsp;&nbsp;&nbsp;req.set_header("Content-Type", "text/plain")<br />
+&nbsp;&nbsp;&nbsp;&nbsp;req.write("Hello, world!\n")<br />
+application = wsgi.Application(Handler)</code></p>
+
+<h2>Usage: jonpy server connectors with WSGI applications</h2>
+<p>To use jonpy server connectors with WSGI applications, simply use
+<code>wsgi.<a href="#create_handler">create_handler</a></code> to convert
+your WSGI application into a
+<code><a href="cgi.html#handler">cgi.Handler</a></code> class.</p>
+<p>Example:</p>
+<p class="code"><code>import jon.cgi as cgi<br />
+import jon.wsgi as wsgi<br />
+def simple_app(environ, start_response):<br />
+&nbsp;&nbsp;status = "200 OK"<br />
+&nbsp;&nbsp;response_headers = [("Content-type", "text/plain")]<br />
+&nbsp;&nbsp;start_response(status, response_headers)<br />
+&nbsp;&nbsp;return ["Hello world!\n"]<br />
+cgi.CGIRequest(wsgi.create_handler(simple_app)).process()</code></p>
+
+<h2><a name="application" id="application"></a>class: Application</h2>
+<p><code>Application</code> implements a WSGI application that responds to
+requests by calling the specified jonpy handler.</p>
+
+<h3>Public Methods</h3>
+<h4><a name="application:__init__" id="application:__init__"><code><strong>__init__(self, handler_type, request_type=Request)</strong></code></a></h4>
+<p><code><strong>handler_type</strong></code>: <code><a href="cgi.html#handler">cgi.Handler</a></code> subclass<br />
+<code><strong>request_type</strong></code>: <code>wsgi.<a href="#request">Request</a></code> subclass</p>
+<p>Creates a new WSGI application object that responds to requests by calling
+the provided jonpy handler. The optional <code>request_type</code> parameter
+can be used to specify alternative <code>Request</code> classes to use - for
+example, <code>wsgi.<a href="#gziprequest">GZipRequest</a></code>.</p>
+
+<h2><a name="request" id="request"></a>class: Request(<a href="cgi.html#request">cgi.Request</a>)</h2>
+<p><code>Request</code> subclasses the
+<code><a href="cgi.html#request">cgi.Request</a></code> class and implements
+the methods using WSGI's interface.</p>
+
+<h2><a name="gziprequest" id="gziprequest"></a>class: GZipRequest(<a href="cgi.html#gzipmixin">GZipMixIn</a>, <a href="#request">Request</a>)</h2>
+<p>For convenience, this class provides the standard
+<code><a href="#request">Request</a></code> class with the
+<code><a href="cgi.html#gzipmixin">cgi.GZipMixIn</a></code> already mixed
+in.</p>
+<p>Example:</p>
+<p class="code"><code>cgi.CGIRequest(wsgi.create_handler(simple_app, wsgi.GZipRequest)).process()</code></p>
+
+<h2><a name="handler" id="handler"></a>class: Handler(<a href="cgi.html#handler">cgi.Handler</a>)</h2>
+<p><code>Handler</code> subclasses the
+<code><a href="cgi.html#handler">cgi.Handler</a></code> class and implements
+the methods using WSGI's interface.</p>
+
+<h2><a name="debughandler" id="debughandler">class</a>: DebugHandler(<a href="cgi.html#debughandlermixin">cgi.DebugHandlerMixIn</a>, <a href="#handler">Handler</a>)</h2>
+<p>This class is identical to <code><a href="#handler">Handler</a></code>,
+except that it uses
+<code>cgi.<a href="cgi.html#debughandlermixin">DebugHandlerMixIn</a></code> so
+that if an exception is thrown by a template page then a traceback will be
+sent to the browser. This class may be used during development to aid debugging
+but should never be used in a production environment since it will leak private
+information to the browser.</p>
+
+<h2>Globals</h2>
+<h3>Functions</h3>
+<h4><code><a name="create_handler" id="create_handler"></a>create_handler(application, handler_type=Handler)</code></h4>
+<p><code>create_handler</code> creates a
+<code><a href="cgi.html#handler">cgi.Handler</a></code> type that responds to
+requests by calling the specified WSGI application. The optional
+<code>handler_type</code> can be used to specify alternate parent classes
+for the handler - for example,
+<code><a href="cgi.html#debughandler">cgi.DebugHandler</a></code>.</p>
+
+<p class="cvsid">$Id: wsgi.html,v c0f5f983a7fc 2010/03/23 01:07:17 jon $</p>
+</body></html>

@@ -1,0 +1,171 @@
+#!/usr/bin/python
+import re
+import os
+import sys
+import cgi
+
+print "Content-type: text/html"
+print "Pragma: no-cache"
+print
+
+PARAMLIST = "sort pack start limit"
+
+def get_params (paramlist):
+	paramkeys = paramlist.split()
+	form = {}
+	qs = os.environ['QUERY_STRING'] or ""
+	if len(qs):
+		pairs = qs.replace("&amp;", "&").split("&")
+		for pair in pairs:
+			k,v = pair.split("=", 1)
+			form[k] = v
+	params = {}
+	for key in paramkeys:
+		if key in form:
+			params[key] = sanitize(form[key])
+		else:   
+			params[key] = None
+	return params
+def sanitize (str):
+	return re.sub(r'\W+', '', str)
+def is_image (img):
+	if "jpeg" in img:
+		return True
+	if "jpg" in img:
+		return True
+	if "gif" in img:
+		return True
+	if "png" in img:
+		return True
+	return False
+def get_files (params):
+	files = os.listdir( BASE_PATH )
+	if params['sort'] is not None:
+		if params['sort'] == 'name':
+			return sorted(files)
+		else:
+			return reversed(sorted(files, key=lambda f: os.stat(BASE_PATH+"/"+f)[9]))
+	params['sort'] = 'name'
+	return sorted(files)
+
+print file("menu.txt").read()
+
+params = get_params(PARAMLIST)
+if params['pack'] is None:
+	params['pack'] = "player"
+
+if params['limit'] is None:
+	limit = 100
+else:
+	limit = int(params['limit'])
+if params['start'] is None:
+	start = 0
+else:
+	start = int(params['start'])
+end = start + limit
+
+BASE_PATH = "/var/www/vhosts/pomme.us/docs/img/" + params['pack']
+BASE_HREF = "http://pomme.us/img/" + params['pack'] + "/"
+
+count = -1 
+files = get_files(params)
+
+print "<hr>"
+print params['pack'] + ":"
+for i in range(len(files) / limit):
+	print "<a href='/cgi-bin/staff/index?pack=" + params['pack'] + "&sort=" + params['sort'] + "&limit=" + str(limit) + "&start=" + str(i*limit) + "'>" + str(i*limit) + "</a> "
+print "<hr>"
+
+for f in files:
+	count += 1
+	if count < start or count >= end:
+		continue
+	if os.path.isdir(BASE_PATH + f):
+		continue
+	if not is_image(f):
+		continue
+	print "<div>%s%s</div>" % (BASE_HREF, f)
+
+print """
+<script type="text/javascript" src="/js/jquery.js"></script>
+<script type="text/javascript">
+$(function(){
+var maxWidth = 200;
+var maxHeight = 200;
+$("div").each(function(){
+	var base = this;
+	var url = this.innerHTML.replace("&amp;", "&").replace("&quot;", "\\\"");
+
+	var img = new Image();
+	img.onload = function () {
+
+	var width = this.width
+	var height = this.height
+
+	if (width > maxWidth) {
+	  scaleFactor = maxWidth / width
+	  width = maxWidth
+	  height = Math.floor(height * scaleFactor)
+	}
+	if (height > maxHeight) {
+	  scaleFactor = maxHeight / height
+	  height = maxHeight
+	  width = Math.floor(width * scaleFactor)
+	}
+	img.adjWidth = width
+	img.adjHeight = height
+	img.width = width;
+	img.height = height;
+	img.style.display = "none";
+
+	var c = document.createElement("canvas")
+	c.width = width
+	c.height = height
+	var ctx = c.getContext('2d');
+	ctx.drawImage(img, 0, 0, c.width, c.height)
+
+	var a = document.createElement("a")
+	a.style.display = "block";
+	a.appendChild(img)
+	a.appendChild(c)
+	a.onmouseover = function(){
+		img.style.display = "block";
+		c.style.display = "none";
+	};
+	a.onmouseout = function(){
+		img.style.display = "none";
+		c.style.display = "block";
+	};
+
+	var x = document.createElement("a")
+	x.innerHTML = "x"
+	x.onclick = function(){ 
+		if (confirm("Delete this?")) {
+			base.style.visibility = "hidden";
+			$.post('/cgi-bin/staff/remove', { 'url': url });
+		}
+	};
+
+	base.innerHTML = ""
+	base.appendChild(a);
+	base.appendChild(x);
+    }    
+	img.onerror = function(){
+	var x = document.createElement("a")
+	x.innerHTML = "x"
+	x.onclick = function(){ 
+		if (confirm("Delete this?")) {
+			base.style.visibility = "hidden";
+			$.post('/cgi-bin/staff/remove', { 'url': url });
+		}
+	};
+
+	base.innerHTML = "error loading: " + url + "<br>"
+	base.appendChild(x);
+	};
+	img.src = url;
+});
+});
+</script>
+"""
+

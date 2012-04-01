@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>wt.multiform module</title>
+<link href="style.css" rel="stylesheet" type="text/css" />
+</head><body>
+<h1>wt.multiform module</h1>
+<h2>Synopsis</h2>
+<p>The <code>wt.multiform</code> module provides a
+<code><a href="wt.html#templatecode">TemplateCode</a></code> sub-class which
+helps with creating multiple-page input forms ("multiforms"). Pages with errors
+are redisplayed so that the user can correct the errors, and all the input from
+the different pages is collected together into one mapping.</p>
+
+<h2>Usage</h2>
+
+<h2><a name="multiform" id="multiform"></a>class: MultiForm(<a href="wt.html#templatecode">TemplateCode</a>)</h2>
+
+<h3>Public Class Variables</h3>
+<h4><a name="multiform:name" id="multiform:name"><code><strong>name</strong></code></a></h4>
+<p>This variable may be overridden by subclasses. It specifies the name of the
+key in the current <code><a href="session.html#session">Session</a></code>
+object which will be used to store the input container. The name is prepended
+with <code>multiform_</code> before being used. The default value is <code>standard</code>. If this variable is set to <code>None</code> then no session is
+required and hidden form fields are used to store input values instead - see
+<code><a href="#stage:form">Stage.form</a></code> for details.</p>
+
+<h4><a name="multiform:stages" id="multiform:stages"><code><strong>stages</strong></code></a></h4>
+<p>This variable must be overridden by subclasses. It specifies how many stages
+make up the current multiform.</p>
+
+<h4><a name="multiform:keys" id="multiform:keys"><code><strong>keys</strong></code></a></h4>
+<p>This variable may be overridden by subclasses. It specifies container keys
+that are not associated with any individual stage - for example, container keys
+that are initialised by form variables passed in to the start of the
+multiform.</p>
+
+<h4><a name="multiform:filename" id="multiform:filename"><code><strong>filename</strong></code></a></h4>
+<p>This variable must be overridden by subclasses. It specifies the filename
+relative to the template file directory of the stage templates. The filename
+should contain the sequence <code>%d</code>, which will be replaced by the
+stage number required. If a literal <code>%</code> is required in the filename,
+<code>%%</code> should be used.</p>
+
+<h4><a name="multiform:stagen" id="multiform:stagen"><code><strong>stage<em>n</em></strong></code></a></h4>
+<p>Subclasses of <code><a href="#multiform">MultiForm</a></code> should provide
+subclasses of <code><a href="#stage">Stage</a></code> named <code>stage0</code>,
+<code>stage1</code>, <code>stage2</code> etc, which provide the code for the
+pages for the 1st, 2nd, 3rd, etc stages respectively.</p>
+
+<h3>Public Instance Variables</h3>
+<h4><a name="multiform:container" id="multiform:container"><code><strong>container</strong></code></a></h4>
+<p>A dictionary which contains the input values for the multiform.</p>
+
+<h4><a name="multiform:stage" id="multiform:stage"><code><strong>stage</strong></code></a></h4>
+<p>The current stage number.</p>
+
+<h4><a name="multiform:errors" id="multiform:errors"><code><strong>errors</strong></code></a></h4>
+<p>A list containing the current input validation errors. If there are no
+errors then the list is empty.</p>
+
+<h3>Public Methods</h3>
+<h4><a name="multiform:init" id="multiform:init"><code><strong>init(self)</strong></code></a></h4>
+<p>This method may be overridden by subclasses. It is called when a new
+multiform is started. It should set up initial values in
+<code>self.<a href="#session:container">container</a></code> for all inputs,
+even those whose default value should be the empty string. The default
+implementation does nothing.</p>
+
+<h4><a name="multiform:update" id="multiform:update"><code><strong>update(self)</strong></code></a></h4>
+<p>This method may be overridden by subclasses. It is called on every stage just
+before the individual stages' <code><a href="#stage:check">update</a></code>
+methods are called. It can perform any global updating that may be
+necessary.</p>
+
+<h4><a name="multiform:check" id="multiform:check"><code><strong>check(self)</strong></code></a></h4>
+<p>This method may be overridden by subclasses. It is called on every stage just
+before the individual stages' <code><a href="#stage:check">check</a></code>
+methods are called. It can perform any global checking that may be necessary,
+and update <code>self.<a href="#multiform:errors">errors</a></code> as it sees
+fit. Note that it is up to this method to alter
+<code>self.<a href="#multiform:stage">stage</a></code> manually if required.</p>
+
+<h4><a name="multiform:delete" id="multiform:delete"><code><strong>delete(self)</strong></code></a></h4>
+<p>If this multiform's input container is being stored in a session, deletes the
+relevant session key. Otherwise, does nothing.</p>
+
+<h4><a name="textblock:main" id="textblock:main"><code><strong>main(self, template)</strong></code></a></h4>
+<p><code><strong>template</strong></code>: string</p>
+<p></p>
+
+<h2><a name="stage" id="stage"></a>class: Stage(<a href="wt.html#templatecode">TemplateCode</a>)</h2>
+
+<h3>Public Class Variables</h3>
+<h4><a name="stage:keys" id="stage:keys"><code><strong>keys</strong></code></a></h4>
+<p></p>
+
+<h3>Public Methods</h3>
+<h4><a name="stage:form" id="stage:form"><code><strong>form(self)</strong></code></a></h4>
+<p></p>
+
+<h4><a name="stage:update" id="stage:update"><code><strong>update(self)</strong></code></a></h4>
+<p></p>
+
+<h4><a name="stage:check" id="stage:check"><code><strong>check(self)</strong></code></a></h4>
+<p></p>
+
+<p class="cvsid">$Id: wt-multiform.html,v c0f5f983a7fc 2010/03/23 01:07:17 jon $</p>
+</body></html>

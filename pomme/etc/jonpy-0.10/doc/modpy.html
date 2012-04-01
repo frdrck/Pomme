@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>modpy module</title>
+<link href="style.css" rel="stylesheet" type="text/css" />
+</head><body>
+<h1>modpy module</h1>
+<h2>Synopsis</h2>
+<p>The <code>modpy</code> module builds upon the classes defined in the
+<code><a href="cgi.html">cgi</a></code> module to allow code originally
+written with the CGI protocol in mind to be used unchanged with the
+<a href="http://www.modpython.org/">mod_python</a> module.</p>
+
+<h2>Usage</h2>
+<p>See the documentation for the <code><a href="cgi.html">cgi</a></code>
+module for information on how to use the CGI abstraction layer. The only
+difference with the <code>modpy</code> module is that instead of using
+<code><a href="cgi.html#request">cgi.Request</a></code> to call your handler
+code, you use <code>modpy.<a href="#request">Request</a></code>.</p>
+<p>Example:</p>
+<p class="code"><code>import jon.cgi as cgi<br />
+import jon.modpy as modpy<br />
+class Handler(cgi.Handler):<br />
+&nbsp;&nbsp;def process(self, req):<br />
+&nbsp;&nbsp;&nbsp;&nbsp;req.set_header("Content-Type", "text/plain")<br />
+&nbsp;&nbsp;&nbsp;&nbsp;req.write("Hello, world!\n")<br />
+def handler(modpy_req):<br />
+&nbsp;&nbsp;return modpy.Request(Handler).process(modpy_req)</code></p>
+
+<h2>Usage with <code><a href="wt.html">wt</a></code></h2>
+<p>When using <code>modpy</code> with the <code><a href="wt.html">wt</a></code>
+templating system, the Apache setup is slightly different (although all your
+templates and page code will be identical).</p>
+<p>Most of the setup is the same as <a href="wt-examples.html#apache">usual</a>,
+however the configuration for the <code>/wt/</code> directory is different.
+Instead of using a CGI script as the handler, a mod_python handler is used
+instead:</p>
+<p class="code"><code>SetHandler python-program<br />
+PythonHandler handler</code></p>
+<p>You then place the code that you would usually put in
+<code>/cgi-bin/wt.py</code> into <code>/wt/handler.py</code>. The global
+function <code>handler</code> in this file will be called by mod_python to
+handle requests, so you should also add this function, which should use
+<code><a href="wt.html#handler">wt.Handler</a></code> or your subclass of it
+to handle the request:</p>
+<p class="code"><code>def handler(modpy_req):<br />
+&nbsp;&nbsp;return modpy.Request(wt.Handler).process(modpy_req)</code></p>
+
+<h2><a name="error" id="error">class: Error(Exception)</a></h2>
+<p>The base class for all exceptions defined by the <code>modpy</code>
+module.</p>
+
+<h2><a name="request" id="request"></a>class: Request(<a href="cgi.html#request">cgi.Request</a>)</h2>
+<p><code>Request</code> subclasses the
+<code><a href="cgi.html#request">cgi.Request</a></code> class and implements
+the methods using mod_python's request class.</p>
+
+<h3>Public Methods</h3>
+<h4><a name="request:process" id="request:process"><code><strong>process(self, modpy_req)</strong></code></a></h4>
+<p><code><strong>modpy_req</strong></code>: mod_python request instance<br />
+<strong>Returns</strong>: Apache reason code</p>
+<p>Initialises the instance ready for a new request by calling the
+<code><a href="cgi.html#request:_init">_init</a></code> method, then reads the
+user input and sets up the various instance variables.
+A <code><a href="cgi.html#handler">cgi.Handler</a></code> object of the type
+passed to the
+<code>Request.<a href="cgi.html#request:__init__">__init__</a></code> method
+is then instantiated and its
+<code><a href="cgi.html#handler:process">process</a></code> method is called.
+If an exception is thrown by this method then the
+<code><a href="cgi.html#request:traceback">traceback</a></code> method is called
+to display it.</p>
+<p>The value returned by this method is the value that the mod_python
+<code>handler</code> function should return.</p>
+<p>Note that there is a difference in how 
+<code>modpy.<a href="#request">Request</a></code> and
+<code><a href="cgi.html#cgirequest">cgi.CGIRequest</a></code> handle the case
+where the handler outputs a <code>Location</code> header without a hostname. 
+When using the CGI protocol, the Apache web server will issue an 
+<em>internal</em> redirect to handle the new URL. When using mod_python, this
+is not possible and you should not output <code>Location</code> headers which
+do not contain absolute URLs.</p>
+<p>Example:</p>
+<p class="code"><code>def handler(modpy_req):<br />
+&nbsp;&nbsp;return modpy.Request(wt.Handler).process(modpy_req)</code></p>
+
+<h2><a name="gziprequest" id="gziprequest"></a>class: GZipRequest(<a href="cgi.html#gzipmixin">GZipMixIn</a>, <a href="#request">Request</a>)</h2>
+<p>For convenience, this class provides the standard
+<code><a href="#request">Request</a></code> class with the
+<code><a href="cgi.html#gzipmixin">cgi.GZipMixIn</a></code> already mixed
+in.</p>
+<p>Example:</p>
+<p class="code"><code>def handler(modpy_req):<br />
+&nbsp;&nbsp;return modpy.GZipRequest(wt.Handler).process(modpy_req)</code></p>
+
+<p class="cvsid">$Id: modpy.html,v c0f5f983a7fc 2010/03/23 01:07:17 jon $</p>
+</body></html>

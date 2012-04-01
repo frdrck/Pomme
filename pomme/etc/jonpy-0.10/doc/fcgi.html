@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>fcgi module</title>
+<link href="style.css" rel="stylesheet" type="text/css" />
+</head><body>
+<h1>fcgi module</h1>
+<h2>Synopsis</h2>
+<p>The <code>fcgi</code> module builds upon the classes defined in the
+<code><a href="cgi.html">cgi</a></code> module to provide an implementation
+of the <a href="http://www.fastcgi.com/">FastCGI</a> protocol. Code originally
+written with the CGI protocol in mind can be used unchanged with the FastCGI
+protocol by using this module. The module implements the entire
+<a href="http://www.fastcgi.com/devkit/doc/fcgi-spec.html">FastCGI
+specification</a> version 1.0, including multiple simultaneous connections per
+process and multiple simultaneous requests per connection. Requests are
+executed using Python's threading facilities, although it can be configured to
+run without using threading.</p>
+<h2>Usage</h2>
+<p>See the documentation for the <code><a href="cgi.html">cgi</a></code>
+module for information on how to use the CGI abstraction layer. The only
+difference with the <code>fcgi</code> module is that instead of using
+<code><a href="cgi.html#request">cgi.Request</a></code> to call your handler
+code, you use <code>fcgi.<a href="#server">Server</a></code>. In addition,
+if you are willing to tie your code in to using the FastCGI protocol, you can
+make use of its facilities for providing authorization and filter code.</p>
+<p>Example:</p>
+<p class="code"><code>import jon.cgi as cgi<br />
+import jon.fcgi as fcgi<br />
+class Handler(cgi.Handler):<br />
+&nbsp;&nbsp;def process(self, req):<br />
+&nbsp;&nbsp;&nbsp;&nbsp;req.set_header("Content-Type", "text/plain")<br />
+&nbsp;&nbsp;&nbsp;&nbsp;req.write("Hello, world!\n")<br />
+fcgi.Server({fcgi.FCGI_RESPONDER: Handler}).run()
+</code></p>
+
+<h2><a name="server" id="server">class: Server</a></h2>
+<p><code>Server</code> provides the 'main loop' required by a FastCGI
+application. It accepts connections from the web server and uses
+instances of <code><a href="cgi.html#handler">cgi.Handler</a></code> subclasses 
+to handle the requests.</p>
+
+<h3>Public Methods</h3>
+<h4><a name="server:__init__" id="server:__init__"><code><strong>__init__(self, handler_types, max_requests=0, params=None, request_type=Request, threading_level=1)</strong></code></a></h4>
+<p><code><strong>handler_types</strong></code>: map from FastCGI request types
+to subclasses of <code><a href="cgi.html#handler">cgi.Handler</a></code><br />
+<code><strong>max_requests</strong></code>: integer<br />
+<code><strong>params</strong></code>: map from strings to strings<br />
+<code><strong>request_type</strong></code>: subclass of <code><a href="#request">Request</a></code><br />
+<code><strong>threading_level</strong></code>: integer</p>
+<p>Create new <code>Server</code> instance. Instances of the appropriate type
+as indicated by <code>handler_types</code> are created to handle the requests.
+The valid keys for the <code>handler_types</code> map are
+<code>fcgi.FCGI_RESPONDER</code>, <code>fcgi.FCGI_AUTHORIZER</code> and
+<code>fcgi.FCGI_FILTER</code>. These types are described in the
+<a href="http://www.fastcgi.com/devkit/doc/fcgi-spec.html#S6">FastCGI
+specification</a>. The usual one to use (that corresponds to the usual
+function of a CGI application) is <code>fcgi.FCGI_RESPONDER</code>.</p>
+<p>Normally, once started, the server will loop forever accepting connections.
+However, if you specify a non-zero value for <code>max_requests</code> then it
+will exit after that many requests have been initiated. Note that when control
+returns to the caller, requests that have been initiated but not yet completed
+may still be in progress in other threads.</p>
+<p>You can alter the values that are returned to the web server if it sends a
+<code><a href="http://www.fastcgi.com/devkit/doc/fcgi-spec.html#S4.1">FCGI_GET_VALUES</a></code>
+request by using the optional <code>params</code> parameter, which is a map
+from requested variable names to their value. The following default values are
+used unless explicitly specified:</p>
+<table>
+<tr><th><code>threading_level</code></th><th style="padding-left: 10px"><code>FCGI_MAX_CONNS</code></th><th style="padding-left: 10px"><code>FCGI_MAX_REQS</code></th><th style="padding-left: 10px"><code>FCGI_MPXS_CONNS</code></th></tr>
+<tr><th><code>0</code></th><td style="padding-left: 10px"><code>1</code></td><td style="padding-left: 10px"><code>1</code></td><td style="padding-left: 10px"><code>0</code></td></tr>
+<tr><th><code>1</code></th><td style="padding-left: 10px"><code>10</code></td><td style="padding-left: 10px"><code>10</code></td><td style="padding-left: 10px"><code>0</code></td></tr>
+<tr><th><code>2</code></th><td style="padding-left: 10px"><code>10</code></td><td style="padding-left: 10px"><code>10</code></td><td style="padding-left: 10px"><code>1</code></td></tr>
+</table>
+<p>You can alter the class used to provide request information using
+<code>request_type</code>. The class provided must always be a subclass of
+<code>fcgi.<a href="#request">Request</a></code>. For instance, you might
+wish to use <code>fcgi.<a href="#gziprequest">GZipRequest</a></code>
+instead.</p>
+<p>By default, <code>fcgi</code> uses threading to handle requests. It creates
+one thread per connection. However, on some platforms threading is either not
+available, or the operating system support for it is buggy. You can alter the
+use of threading with the <code>threading_level</code> parameter. The valid
+<code>threading_level</code> values are:</p>
+<table>
+<tr><th><code>threading_level</code></th><th>Meaning</th></tr>
+<tr><th><code>0</code></th><td>Threading is not used at all.<br />
+Only one connection can be handled at once, and multiple requests cannot be
+multiplexed onto that connection, so only one request can be handled at
+once.</td></tr>
+<tr><th><code>1</code></th><td>One thread is created per connection.<br />
+Multiple connections can be handled simultaneously, but multiple requests
+cannot be multiplexed onto a connection.</td></tr>
+<tr><th><code>2</code></th><td>One thread is created per connection, and one thread is created per request.<br />
+Multiple connections can be handled simultaneously, and multiple requests
+can be multiplexed onto a connection.</td></tr>
+</table>
+<p>The default <code>threading_level</code> is <code>1</code>. If your web
+server supports multiplexing of connections then you may wish to use level
+<code>2</code>, however Apache mod_fastcgi does not support multiplexing and
+the <code>fcgi</code> module makes less efficient use of threads if
+multiplexing is not used so it is not the default.</p>
+<p>If threading is requested (i.e. a <code>threading_level</code> greater than
+zero is specified, or <code>threading_level</code> is left unspecified), but
+the Python <code>thread</code> module cannot be imported (i.e. threading support
+is not available) then <code>fcgi</code> will automatically downgrade to
+<code>threading_level = 0</code>.</p>
+
+
+<h4><a name="server:exit" id="server:exit"><code><strong>exit(self):</strong></code></a></h4>
+<p>This method will cause the
+<code><a href="#server:run">Server.run()</a></code> loop to exit. This can be
+used to exit the FastCGI application.</p>
+
+<h4><a name="server:run" id="server:run"><code><strong>run(self)</strong></code></a></h4>
+<p>The 'main loop' for the FastCGI application. Listens for connections and
+handles them appropriately.</p>
+<p>If the program does not appear to be running in a FastCGI environment
+(i.e. <code>stdin</code> is not a socket) then this method will automatically
+fall back to the CGI protocol and attempt to execute the
+<code>fcgi.FCGI_RESPONDER</code> handler using
+<code><a href="cgi.html#cgirequest">cgi.CGIRequest</a></code>. This means that
+you can write your applications using the <code>fcgi</code> module and you can
+switch between using FastCGI and ordinary CGI simply by changing your web
+server configuration, with no changes required to your code.</p>
+<p>Example:</p>
+<p class="code"><code>fcgi.Server({fcgi.FCGI_RESPONDER: Handler}).run()</code></p>
+
+<h2><a name="request" id="request"></a>class: Request(<a href="cgi.html#request">cgi.Request</a>)</h2>
+<p><code>Request</code> is a subclass of
+<code><a href="cgi.html#request">cgi.Request</a></code> that provides the same
+public interface but uses the FastCGI protocol behind the scenes.</p>
+<h3>Public Instance Variables</h3>
+<h4><a name="request:fastcgi_data" id="request:fastcgi_data"><code><strong>fastcgi_data</strong></code></a></h4>
+<p>A file-like object that provides the <code>FASTCGI_DATA</code> stream as
+provided by the FastCGI protocol. This is not used by ordinary CGI applications,
+but may be used by <code>FCGI_FILTER</code> code.</p>
+
+<h2><a name="gziprequest" id="gziprequest"></a>class: GZipRequest(<a href="cgi.html#gzipmixin">GZipMixIn</a>, <a href="#request">Request</a>)</h2>
+<p>For convenience, this class provides the standard
+<code><a href="#request">Request</a></code> class with the
+<code><a href="cgi.html#gzipmixin">cgi.GZipMixIn</a></code> already mixed
+in. To use this class, specify it as the value of the
+<code>request_type</code> parameter when creating your
+<code><a href="#server">Server</a></code> object.</p>
+<p>Example:</p>
+<p class="code"><code>fcgi.Server({fcgi.FCGI_RESPONDER: Handler}, request_type=fcgi.GZipRequest).run()</code></p>
+
+<p class="cvsid">$Id: fcgi.html,v c0f5f983a7fc 2010/03/23 01:07:17 jon $</p>
+</body></html>

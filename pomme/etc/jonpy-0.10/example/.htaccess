@@ -1,0 +1,6 @@
+# $Id: .htaccess,v 12cd26f9cc8c 2002/05/02 00:11:56 jribbens $
+
+RewriteEngine on
+RewriteBase /
+RewriteCond %{DOCUMENT_ROOT}/wt/$1.py -f
+RewriteRule ^(.*)$ /wt/$1.py [E=WT_TEMPLATE_URL:/$1,E=WT_TEMPLATE_FILENAME:%{DOCUMENT_ROOT}/$1]

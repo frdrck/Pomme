@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>mime module</title>
+<link href="style.css" rel="stylesheet" type="text/css" />
+</head><body>
+<h1>mime module</h1>
+<h2>Synopsis</h2>
+<p>The <code>mime</code> module provides a simple MIME-parsing class. It is
+only included because the standard Python
+<code>mimetools</code>/<code>multifile</code> libraries are too buggy to use
+for parsing <code>multipart/form-data</code> HTTP requests.</p>
+
+<h2><a name="error" id="error">class: Error(Exception)</a></h2>
+<p>The base class for all exceptions defined by the <code>mime</code>
+module.</p>
+
+<h2><a name="entity" id="entity">class: Entity(rfc822.Message)</a></h2>
+<p><code>Entity</code> objects provide information about a MIME entity.
+You are not expected to create objects of this class yourself, but you will
+encounter them in the <code><a
+href="cgi.html#request:params">cgi.Request.params</a></code> map if you use
+<code>multipart/form-data</code> HTTP requests.</p>
+
+<h3>Public Instance Variables</h3>
+<h4><a name="entity:mime" id="entity:mime"><code><strong>mime</strong></code></a></h4>
+<p><code>mime</code> will reference a true value if this entity is a MIME
+entity (as opposed to a standard RFC822 entity) - i.e. if it has a
+<code>MIME-Version</code> header or it is a MIME <code>multipart</code>
+section.</p>
+
+<h4><a name="entity:content_type" id="entity:content_type"><code><strong>content_type</strong></code></a></h4>
+<p>This variable is only present if <code><a href="#entity:mime">mime</a></code>
+is true. If it is present, and the entity had no <code>Content-Type</code>
+header, it will be <code>None</code>. Otherwise, it will be a sequence
+containing two values. The first is the type of the entity, and the second is a
+map containing any additional parameters specified. Parameter names (but not
+values) are converted to lower-case before being entered into the map.</p>
+<p>Example:</p>
+<p class="code"><code>&gt;&gt;&gt; e.content_type<br />
+('multipart/form-data', {'boundary': 'AaB03x'})</code></p>
+
+<h4><a name="entity:content_disposition" id="entity:content_disposition"><code><strong>content_disposition</strong></code></a></h4>
+<p>This variable is only present if <code><a href="#entity:mime">mime</a></code>
+is true. If it is present, and the entity had no
+<code>Content-Disposition</code> header, it will be <code>None</code>.
+Otherwise, it will be a sequence
+containing two values. The first is the disposition of the entity, and the
+second is a map containing any additional parameters specified. Parameter names
+(but not values) are converted to lower-case before being entered into the
+map.</p>
+<p>Example:</p>
+<p class="code"><code>&gt;&gt;&gt; e.entities[0].content_disposition<br />
+('form-data', {'name': 'pics', 'filename': 'file1.txt'})</code></p>
+
+<h4><a name="entity:entities" id="entity:entities"><code><strong>entities</strong></code></a></h4>
+<p>This variable is only present if <code><a href="#entity:mime">mime</a></code>
+is true. If it is present, it will be a sequence of zero or more
+<code>mime.Entity</code> objects representing the MIME entities contained
+directly within this one. If this MIME entity cannot or does not contain any
+other MIME entities (i.e. if it is not a <code>multipart</code> message) then
+the sequence will be empty.</p>
+<p>Note that this sequence only lists entities contained directly within this
+one, not entities contained within those entities. Thus to find all the
+entities contained within an entity you need to recursively scan the
+<code>entities</code> sequence in each entity found.</p>
+
+<h4><a name="entity:body" id="entity:body"><code><strong>body</strong></code></a></h4>
+<p>This contains the body of the entity. If a
+<code>Content-Transfer-Encoding</code> was used then it will have been decoded.
+If this entity is a MIME <code>multipart</code> then <code>body</code> will only
+contain the data preceding the first boundary.</p>
+<p>Example:</p>
+<p class="code"><code>&gt;&gt;&gt; e.entities[0].body<br />
+'foo'</code></p>
+
+<p class="cvsid">$Id: mime.html,v c0f5f983a7fc 2010/03/23 01:07:17 jon $</p>
+</body></html>

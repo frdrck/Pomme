@@ -1,0 +1,4 @@
+# $Id: .htaccess,v 12cd26f9cc8c 2002/05/02 00:11:56 jribbens $
+
+Action wt-handler /cgi-bin/wt.py
+SetHandler wt-handler

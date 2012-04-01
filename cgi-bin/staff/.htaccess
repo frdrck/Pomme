@@ -1,0 +1,5 @@
+AuthType Basic
+AuthName "Pomme"
+AuthUserFile /var/www/vhosts/pomme.us/pomme.htpasswd
+Require user pomme
+

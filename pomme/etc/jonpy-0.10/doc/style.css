@@ -1,0 +1,13 @@
+/* $Id: style.css,v dc45395ef86f 2002/04/26 17:29:43 jribbens $ */
+
+body { font-family: sans-serif }
+p, ul { margin-left: 75px }
+table { margin-left: 100px }
+h1 { text-align: center }
+h2 { text-align: left }
+h3 { text-align: left; margin-left: 25px }
+h4 { text-align: left; margin-left: 50px }
+code { white-space: nowrap }
+.html { border: solid blue }
+.code { border: solid green }
+.cvsid { margin-left: auto; font-size: xx-small }
