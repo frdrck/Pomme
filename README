@@ -1,0 +1,37 @@
+      _____                                                                 
+ _.--~_..__ ~~-._               HEY WHAT'S UP LADIES WANT SOME HORRIBLE VENOM
+:..____~         ~~--.._                                                     
+ ~~-.. ~ ._             ~~----__________                                     
+      `-._ `.    __                     ~~~~~~-----...__                     
+           ~~\.     ~-.                    .------..    ~~~---__             
+              `.   . .- ~~-----_________ ,'         ~== __      ~~--__       
+                \   \=_                  |           ___   ~  -       ~-.    
+                 \.  ) ~--__             |   `._     ;:~~:---__          `.  
+                  `._ \     \~-.-------~~ \   \ ~~~~~_::. )    ~~--__     |`.
+                   |  |   ,=:__)           \   \     `----'          `-. /  |
+                   |  |                __...=-. )                      ;'   |
+               ,-=~~_,'               '~~.==----'                  _,-'    / 
+                 ~~~                          _______.......----~~~     _,'  
+                                       --~~""""---......._________...--' 
+
+
+
+Hey, a new git!
+
+Just some things to remember:
+
+basically do everything from ~/pomme , start your screen session there etc. does she use screen?
+the html is ~/pomme/docs
+the css is ~/pomme/sass/src
+the js is ~/pomme/js
+
+
+if you change the css you need to have compass running in its own screen so it recompiles..
+
+compass watch --output-style compressed sass/
+
+if you change the javascript you need to regenerate the built copies on the live site
+
+./rebuild.sh
+
+Remember Jules is kind enough to answer any questions you guys might have.
