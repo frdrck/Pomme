@@ -35,3 +35,21 @@ if you change the javascript you need to regenerate the built copies on the live
 ./rebuild.sh
 
 Remember Jules is kind enough to answer any questions you guys might have.
+
+Python requirements:
+
+  1. install python libraries
+
+    $ pip install simplejson
+    $ pip install jonpy
+
+  2. Configure MySQL. Detailed instructions found here:
+
+    http://www.agapow.net/programming/python/installing-mysqldb
+
+  3. Point the database connection to "pomme.us" or "http://pomme.us" instead of "localhost"
+     in pomme/db.py
+
+  4. execute the server. 
+    
+    $ python pomme/pomme_server.py
