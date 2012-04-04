@@ -47,9 +47,22 @@ Python requirements:
 
     http://www.agapow.net/programming/python/installing-mysqldb
 
-  3. Point the database connection to "pomme.us" or "http://pomme.us" instead of "localhost"
-     in pomme/db.py
+  3. Edit pomme/config.py to match local settings
+     
+    SERVER_HOST = "localhost"
+    BASE_PATH = "/Users/username/Code/pomme/"
 
-  4. execute the server. 
+    Note that you will have to create directories pointing to BASE_PATH and 
+    following the route of PLAYER_CARDS and MAIN_CARDS within config.py. Throw
+    a few images in each of the directories.
+
+  4. Obtain pychecker and run it on pomme_server.py to make sure there are no
+     terrifying errors. Warnings are ok.
+
+    http://pychecker.sourceforge.net/
+
+    $ pychecker pomme_server.py
+
+  5. execute the server. 
     
     $ python pomme/pomme_server.py
