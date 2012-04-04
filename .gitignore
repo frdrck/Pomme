@@ -1,0 +1,5 @@
+.gitignore
+config.py
+*.pyc
+pid_*
+.DS_Store
