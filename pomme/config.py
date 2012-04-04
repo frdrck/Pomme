@@ -1,5 +1,5 @@
 # Server settings.
-SERVER_HOST = "http://pomme.us"
+SERVER_HOST = "localhost"
 SERVER_PORT = 32123
 FRUIT_URI_BASE	= "%s/img/fruit/" % (SERVER_HOST)
 
@@ -10,7 +10,7 @@ MYSQL_PASSWORD = "3v3rcl34r"
 MYSQL_DATABASE = "asdfus"
 
 # Image path settings
-BASE_PATH	= "/var/www/vhosts/pomme.us/pomme/"
+BASE_PATH	= "/Users/moonmayoriii/Desktop/"
 PLAYER_CARDS	= "docs/img/player/"
-MAIN_CARDS	= "docs/img/main/"
+MAIN_CARDS = "docs/img/main/"
 
