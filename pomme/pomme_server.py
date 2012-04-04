@@ -714,6 +714,7 @@ if __name__ == '__main__':
     pomme = PommeDatabase(database)
     #lobby = Lobby(pomme)
 
+    #TODO(geluso): ask Jules why we are writing process IDs?
     f = open('pid_' + str(config.SERVER_PORT), 'w')
     f.write(str(os.getpid()))
     f.close()
