@@ -2,6 +2,8 @@ import jon.dbpool as dbpool
 import MySQLdb, MySQLdb.cursors
 import time
 
+import config
+
 dbpool.set_database(MySQLdb, 5)
 
 COMBO_LIMIT = 30
@@ -26,12 +28,11 @@ class db:
                 self.connect()
 
         def connect (self):
-                # self.conn = MySQLdb.connect (host = "localhost",
-                self.conn = dbpool.connect (host = "localhost",
-                                        #read_default_file = "~/.my.cnf",
-					user = "asdfus",
-					passwd = "3v3rcl34r",
-                                        db = "asdfus")
+          self.conn = dbpool.connect (
+              host = config.MYSQL_HOST,
+					    user = config.MYSQL_USER,
+					    passwd = config.MYSQL_PASSWORD,
+              db = config.MYSQL_DATABASE)
 
         def execute (self,sql,args=()):
                 try:

@@ -15,17 +15,9 @@ import simplejson as json
 from collections import deque
 from fruits import FRUITS
 
-import db
+import db, config
 
 DB = db.db ()
-
-BASE_PATH	= "/var/www/vhosts/pomme.us/pomme/"
-PLAYER_CARDS	= "docs/img/player/"
-MAIN_CARDS	= "docs/img/main/"
-FRUIT_URI_BASE	= "http://pomme.us/img/fruit/"
-
-SERVER_HOST = "pomme.us"
-SERVER_PORT = 32123
 
 BAN_TIME = 5 * 60
 GAME_IDLE_TIME = 10
@@ -108,10 +100,10 @@ class Cards:
 	def __init__ (self):
 		self.load ()
 	def load (self):
-		self.player = self.load_dir (PLAYER_CARDS)
-		self.main = self.load_dir (MAIN_CARDS)
+		self.player = self.load_dir (config.PLAYER_CARDS)
+		self.main = self.load_dir (config.MAIN_CARDS)
 	def load_dir (self, path):
-		files = os.listdir (BASE_PATH+path)
+		files = os.listdir (config.BASE_PATH+path)
 		cards = []
 		for file in files:
 			if is_image (file):
@@ -680,7 +672,7 @@ class Lobby:
 		game = {
 			'name': fruit,
 			'path': fruit,
-			'avatar': FRUIT_URI_BASE + fruit + ".png",
+			'avatar': config.FRUIT_URI_BASE + fruit + ".png",
 			'capacity': 10,
 			'goal': 10,
 			'timer': 20,
@@ -988,7 +980,7 @@ class PommeDatabase:
 		argz = {
 			'name': fruit,
 			'path': path,
-			'avatar': FRUIT_URI_BASE + fruit + ".png",
+			'avatar': config.FRUIT_URI_BASE + fruit + ".png",
 			'capacity': 10,
 			'goal': 20,
 			'timer': 20,
@@ -1319,7 +1311,7 @@ class PommeHandler (BaseHTTPRequestHandler):
 			if len(game.active) < 2:
 				continue
 			games.append(name)
-			self.wfile.write('<a href="http://pomme.us/%s">%s</a> ' % (name, name))
+			self.wfile.write('<a href="%s/%s">%s</a> ' % (config.SERVER_HOST, name, name))
 			if game.private:
 				self.wfile.write('(%d, private) ' % len(game.active))
 			else:
@@ -1329,7 +1321,7 @@ class PommeHandler (BaseHTTPRequestHandler):
 		self.wfile.write ("\n\n")
 
 		self.wfile.write ("<b>online now</b> (" + str(len(users)) + " users)\n")
-		self.wfile.write (" ".join(['<a href="http://pomme.us/profile/%s">%s</a>' % (x,x) for x in sorted(users.keys(), key=str.lower)]))
+		self.wfile.write (" ".join(['<a href="%s/profile/%s">%s</a>' % (config.SERVER_HOST, x, x) for x in sorted(users.keys(), key=str.lower)]))
 		self.wfile.write ("\n\n")
 
 		#if newUsersToday:
@@ -1355,7 +1347,7 @@ class PommeHandler (BaseHTTPRequestHandler):
 		self.json ({ 'error': error })
 
 
-f = open ('pid_' + str(SERVER_PORT), 'w')
+f = open ('pid_' + str(config.SERVER_PORT), 'w')
 f.write(str(os.getpid()))
 f.close()
 
@@ -1363,15 +1355,12 @@ class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
 	pass
 
 if __name__ == '__main__':
-	while True:
-		try:
-			server = ThreadedHTTPServer((SERVER_HOST, SERVER_PORT), PommeHandler)
-			print 'Listening on', SERVER_HOST, SERVER_PORT, '...'
-			print 'PID', os.getpid()
-			server.serve_forever()
-		except KeyboardInterrupt:
-			print '^C'
-			server.socket.close()
-		except:
-			pass
+  try:
+    server = ThreadedHTTPServer((config.SERVER_HOST, config.SERVER_PORT), PommeHandler)
+    print 'Listening on', config.SERVER_HOST, config.SERVER_PORT, '...'
+    print 'PID', os.getpid()
+    server.serve_forever()
+  except KeyboardInterrupt:
+    print '^C'
+    server.socket.close()
 
