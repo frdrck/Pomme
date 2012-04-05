@@ -451,7 +451,7 @@ class Game:
 			return False
 		return False
 	def api_join (self, args):
-		if len(self.active) == self.capacity and args['username'] not in self.active:
+		if len(self.active) >= self.capacity and args['username'] not in self.active:
 			return {"error": "capacity"}
 		if self.check_if_room_is_inactive():
 			active_game = Pomme.find_an_active_game()
