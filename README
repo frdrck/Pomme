@@ -66,3 +66,7 @@ Python requirements:
   5. execute the server. 
     
     $ python pomme/pomme_server.py
+
+blog
+----
+This was written to change something so I could make a new commit.
