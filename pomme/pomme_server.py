@@ -646,13 +646,13 @@ class PommeHandler(BaseHTTPRequestHandler):
 
     self.wfile.write("<b>uptime</b> %s\n\n" % ts)
 
-    pommeCount = self.server.pomme.combo_count()
-    pommesToday = self.server.pomme.combos_today()
-    userCount = self.server.pomme.user_count()
-    usersToday = self.server.pomme.users_today()
-    newUsersTodayCount = self.server.pomme.users_new_today_count()
-    #newUsersToday = self.server.pomme.users_new_today()
-    gameCount = self.server.pomme.game_count()
+    pommeCount = self.server.pomme.db.combo_count()
+    pommesToday = self.server.pomme.db.combos_today()
+    userCount = self.server.pomme.db.user_count()
+    usersToday = self.server.pomme.db.users_today()
+    newUsersTodayCount = self.server.pomme.db.users_new_today_count()
+    #newUsersToday = self.server.pomme.db.users_new_today()
+    gameCount = self.server.pomme.db.game_count()
 
     self.wfile.write("<b>pommes</b> %d (%d today)\n" % (pommeCount, pommesToday))
     #self.wfile.write("<b>users</b> %d (%d today, %d new)\n" % (userCount, usersToday, len(newUsersToday)))
