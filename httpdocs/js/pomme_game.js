@@ -1642,7 +1642,7 @@ var Game =
 		Game.setupCards (data)
 		Game.updateStatus (data)
 		Game.updateScores (data)
-	//	Chat.add (data['chat'])
+		Chat.add (data['chat'])
 		self.timeout = setTimeout (Game.poll, 1000)
 		if (! Webcam.loaded)
 			{

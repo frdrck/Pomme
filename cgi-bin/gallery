@@ -6,7 +6,9 @@ import re
 import db
 db = db.db()
 
-BASE_HREF = "http://asdf.us/im/"
+# BASE_HREF = "http://asdf.us/im/"
+BASE_HREF = ""
+
 PARAMLIST = "addr start limit name interface random"
 LIMIT = 24
 

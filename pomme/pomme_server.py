@@ -3,6 +3,7 @@
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from SocketServer import ThreadingMixIn
 import os
+import _mysql_exceptions
 import cgi
 import random
 import operator

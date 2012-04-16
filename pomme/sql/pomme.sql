@@ -1,5 +1,3 @@
-FDJLSFKJDSKLFJDS;
-
 DROP TABLE IF EXISTS `pomme_user`;
 CREATE TABLE `pomme_user` (
   `id` int(11) NOT NULL auto_increment,

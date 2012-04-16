@@ -41,7 +41,7 @@ class db:
       cursor = self.conn.cursor()
       cursor.execute(sql,args)
       return cursor
-    except OperationalError, e:
+    except MySQLdb.OperationalError, e:
       print "Error %d: %s" % (e.args[0], e.args[1])
       # sys.exit(1)
       self.connect()
@@ -54,7 +54,7 @@ class db:
       dict_cursor = self.conn.cursor(MySQLdb.cursors.DictCursor)
       dict_cursor.execute(sql,args)
       return dict_cursor
-    except OperationalError, e:
+    except MySQLdb.OperationalError, e:
       print "Error %d: %s" % (e.args[0], e.args[1])
       # sys.exit(1)
       self.connect()

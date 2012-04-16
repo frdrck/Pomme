@@ -5,8 +5,8 @@ import cgi
 
 REQUEST_URI = os.environ['REQUEST_URI']
 
-BASE_PATH = "/var/www/vhosts/pomme.us/httpdocs" + REQUEST_URI
-BASE_HREF = "http://pomme.us" + REQUEST_URI
+# BASE_PATH = "/var/www/vhosts/pomme.us/httpdocs" + REQUEST_URI
+# BASE_HREF = "http://pomme.us" + REQUEST_URI
 
 def is_image (img):
 	if "jpeg" in img:

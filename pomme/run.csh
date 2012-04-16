@@ -1,4 +1,4 @@
 #!/bin/csh
 while (1)
-  ./pomme_server.py
+  pomme_server.py
 end
