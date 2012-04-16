@@ -18,12 +18,13 @@ class User:
     self.email = row[10]
     self.avatar = row[11]
     self.bio = row[12]
-    self.admin = row[13]
-    self.remote_addr = row[14]
-    self.facebook = row[15]
-    self.twitter = row[16]
-    self.tumblr = row[17]
-    self.last_ip = None
+    if len(row) > 13:
+      self.admin = row[13]
+      self.remote_addr = row[14]
+      self.facebook = row[15]
+      self.twitter = row[16]
+      self.tumblr = row[17]
+      self.last_ip = None
 
   def is_confirmed(self):
     try:
@@ -38,11 +39,14 @@ class User:
       return False
 
   def check_ip(self, client_address):
-    curtime = now ()
-    if int(self.seendate) > curtime - 1200:
-      if self.last_ip is not None and self.last_ip[0] != client_address[0]:
-        return False
-    self.seendate = curtime
-    self.last_ip = client_address
-    return True
+    try:
+      curtime = now ()
+      if int(self.seendate) > curtime - 1200:
+        if self.last_ip is not None and self.last_ip[0] != client_address[0]:
+          return False
+      self.seendate = curtime
+      self.last_ip = client_address
+      return True
+    except:
+      return False
 
