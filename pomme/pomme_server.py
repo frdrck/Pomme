@@ -3,7 +3,7 @@
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from SocketServer import ThreadingMixIn
 import os
-import _mysql_exceptions
+#import _mysql_exceptions
 import cgi
 import random
 import operator
@@ -614,7 +614,9 @@ class PommeHandler(BaseHTTPRequestHandler):
     elif self.path == "/stats":
       self.stats()
     else:
-      return self.do_OPTIONS()
+      self.sendStaticFile()
+#    else:
+#      return self.do_OPTIONS()
 
   def reload(self):
     self.send_response(200)
@@ -623,6 +625,41 @@ class PommeHandler(BaseHTTPRequestHandler):
     self.end_headers()
     self.wfile.write("RELOADING DECKS")
     self.server.pomme.reload_decks()
+
+  def sendStaticFile(self):
+    mime_types = {
+      "jpg": "image/jpeg",
+      "jpeg": "image/jpeg",
+      "gif": "image/gif",
+      "png": "image/png",
+      "html": "text/html; charset=utf-8",
+      "txt": "text/plain",
+      "css": "text/plain",
+    }
+    if self.path == "/":
+      path = "../httpdocs/lobby/index.html"
+      ct = mime_types["html"]
+    elif self.path == "/bigapple":
+      path = "../httpdocs/game2/index.html"
+      ct = mime_types["html"]
+    elif os.path.exists("../httpdocs/" + self.path):
+      path = "../httpdocs/" + self.path
+      try:
+        ct = mime_types[self.path.split(".")[-1]]
+      except:
+        self.sendNotFound()
+        return
+    else:
+      self.sendNotFound()
+    self.send_response(200)
+    self.send_cors_headers()
+    self.send_header('Content-type', ct)
+    self.end_headers()
+    with open(file) as x: self.wfile.write(x.read())
+
+  def sendNotFound():
+    self.send_response(404)
+    self.send_cors_headers()
 
   def stats(self):
     self.send_response(200)
@@ -715,7 +752,6 @@ if __name__ == '__main__':
     pomme = PommeDatabase(database)
     #lobby = Lobby(pomme)
 
-    #TODO(geluso): ask Jules why we are writing process IDs?
     f = open('pid_' + str(config.SERVER_PORT), 'w')
     f.write(str(os.getpid()))
     f.close()
