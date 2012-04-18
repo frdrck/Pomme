@@ -270,7 +270,6 @@ var Auth =
 			}
 		Auth.session = data.session
 		document.cookie = "session="+Auth.session+";path=/;domain=." + BROWSER + ";max-age=1086400";
-    console.log(document.cookie);
 		Auth.loginCallback ()
 		},
 	passwordForm: function ()
@@ -766,6 +765,7 @@ var Lobby =
 		},
 	load: function ()
 		{
+		$("#login").fadeOut(100)
 		$("#loading").fadeIn(100)
 		var params =
 			{
@@ -867,7 +867,7 @@ var Lobby =
 				continue
 			game_list.push (Lobby.gameRow(game))
 			}
-		if (game_list.length < 2)
+		if (game_list.length < 2 && AUTOJOIN)
 			{
 			if (!(first_key in Lobby.games) || Lobby.games[first_key].players.length < 4)
 				document.location = BROWSER + first_key
@@ -909,6 +909,9 @@ var Lobby =
 	manifestUpdatePath: function (path)
 		{
 		var game = Lobby.games[path]
+    if (!game) {
+      return;
+    }
 		if (game.players.length >= game.capacity)
 			{
 			$("#game-manifest span.full").show()
