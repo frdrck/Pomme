@@ -1,37 +1,35 @@
-BASE_URL = "http://pomme.us:32123"
-
 var API =
 	{
 	URL:
 		{
-		"list":        BASE_URL + "/game/list",
-		"active":      BASE_URL + "/game/active",
-		"newgame":     BASE_URL + "/game/newgame",
-		"create":      BASE_URL + "/game/new",
-		"edit":        BASE_URL + "/game/edit",
-		"view":        BASE_URL + "/game/view",
-		"join":        BASE_URL + "/game/join",
-		"join":        BASE_URL + "/game/join",
-		"poll":        BASE_URL + "/game/poll",
-		"send":        BASE_URL + "/game/send",
-		"bet":         BASE_URL + "/game/bet",
-		"judge":       BASE_URL + "/game/judge",
-		"vote":        BASE_URL + "/game/vote",
-		"skip":        BASE_URL + "/game/skip",
-		"rejoin":      BASE_URL + "/game/rejoin",
-		"pass":        BASE_URL + "/game/pass",
-		"restart":     BASE_URL + "/game/restart",
-		"deal":        BASE_URL + "/game/deal",
-		"login":       BASE_URL + "/user/login",
-		"checkin":     BASE_URL + "/game/list",
-		"user_view":   BASE_URL + "/user/view",
-		"user_edit":   BASE_URL + "/user/edit",
-		"combo_user":  BASE_URL + "/combo/user",
-		"combo_judge": BASE_URL + "/combo/judge",
-		"combo_game":  BASE_URL + "/combo/game",
-		"like_add":    BASE_URL + "/like/add",
-		"like_remove": BASE_URL + "/like/remove",
-		"pomme_count": BASE_URL + "/pomme/count",
+		"list":        SERVER + "game/list",
+		"active":      SERVER + "game/active",
+		"newgame":     SERVER + "game/newgame",
+		"create":      SERVER + "game/new",
+		"edit":        SERVER + "game/edit",
+		"view":        SERVER + "game/view",
+		"join":        SERVER + "game/join",
+		"join":        SERVER + "game/join",
+		"poll":        SERVER + "game/poll",
+		"send":        SERVER + "game/send",
+		"bet":         SERVER + "game/bet",
+		"judge":       SERVER + "game/judge",
+		"vote":        SERVER + "game/vote",
+		"skip":        SERVER + "game/skip",
+		"rejoin":      SERVER + "game/rejoin",
+		"pass":        SERVER + "game/pass",
+		"restart":     SERVER + "game/restart",
+		"deal":        SERVER + "game/deal",
+		"login":       SERVER + "user/login",
+		"checkin":     SERVER + "game/list",
+		"user_view":   SERVER + "user/view",
+		"user_edit":   SERVER + "user/edit",
+		"combo_user":  SERVER + "combo/user",
+		"combo_judge": SERVER + "combo/judge",
+		"combo_game":  SERVER + "combo/game",
+		"like_add":    SERVER + "like/add",
+		"like_remove": SERVER + "like/remove",
+		"pomme_count": SERVER + "pomme/count",
 		},
 	is_safari: navigator.appVersion.indexOf("Safari") !== -1 && navigator.appVersion.indexOf("Chrome") === -1,
 	}
@@ -271,8 +269,7 @@ var Auth =
 			return
 			}
 		Auth.session = data.session
-		document.cookie = "session="+Auth.session+";path=/;domain=.pomme.us;max-age=1086400"
-		Auth.unload ()
+		document.cookie = "session="+Auth.session+";path=/;domain=." + BROWSER + ";max-age=1086400";
 		Auth.loginCallback ()
 		},
 	passwordForm: function ()
@@ -307,7 +304,7 @@ var Auth =
 	loginCallback: function () {},
 	logout: function ()
 		{
-		document.cookie = "session=false;path=/;domain=.pomme.us;max-age=0"
+		document.cookie = "session=false;path=/;domain=." + BROWSER + ";max-age=0"
 		Auth.username = false
 		Auth.session = false
 		Auth.logoutCallback ()
@@ -518,7 +515,7 @@ var Game =
 			Auth.username = data['username']
 		if ("error" in data)
 			return Game.pollError()
-		document.cookie = "session="+Auth.session+";path=/;domain=.pomme.us;max-age=1086400"
+		document.cookie = "session="+Auth.session+";path=/;domain=." + BROWSER + ";max-age=1086400"
 		// document.getElementById("chat-message").focus()
 		Game.last = data['last']
 		Game.score = data['score']
@@ -654,7 +651,7 @@ var Newgame =
 			return
 			}
 		var path = data.path
-		document.location = "http://pomme.us/" + path
+		document.location = BROWSER + path
 		},
 	unload: function ()
 		{
@@ -768,6 +765,7 @@ var Lobby =
 		},
 	load: function ()
 		{
+		$("#login").fadeOut(100)
 		$("#loading").fadeIn(100)
 		var params =
 			{
@@ -810,11 +808,11 @@ var Lobby =
 		},
 	autojoinCallback: function (data)
 		{
-		document.location = "http://pomme.us/" + data['path']
+		document.location = BROWSER + data['path']
 		},
 	redirect_to_profile: function ()
 		{
-		document.location = "http://pomme.us/profile/" + Auth.username
+		document.location = BROWSER + "profile/" + Auth.username
 		},
 	reload: function ()
 		{
@@ -869,10 +867,10 @@ var Lobby =
 				continue
 			game_list.push (Lobby.gameRow(game))
 			}
-		if (game_list.length < 2)
+		if (game_list.length < 2 && AUTOJOIN)
 			{
 			if (!(first_key in Lobby.games) || Lobby.games[first_key].players.length < 4)
-				document.location = "http://pomme.us/" + first_key
+				document.location = BROWSER + first_key
 			}
 		$("#game-list").html(game_list.join(""))
 		return first_key
@@ -906,11 +904,14 @@ var Lobby =
 		var path = $(this).data("path")
 		if (Lobby.games[path].private)
 			return
-		document.location = "http://pomme.us/" + path
+		document.location = BROWSER + path
 		},
 	manifestUpdatePath: function (path)
 		{
 		var game = Lobby.games[path]
+    if (!game) {
+      return;
+    }
 		if (game.players.length >= game.capacity)
 			{
 			$("#game-manifest span.full").show()

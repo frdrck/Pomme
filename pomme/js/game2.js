@@ -228,6 +228,8 @@ var Game =
 		},
 	joinCallback: function (data)
 		{
+    console.log(data);
+    while(true) {}
 		if (! data)
 			return Game.joinError ()
 		if ("redirect" in data)
@@ -238,7 +240,7 @@ var Game =
 			return Game.redirect_to_lobby ()
 		if (Auth.username === false)
 			Auth.username = data['username']
-		document.cookie = "session="+Auth.session+";path=/;domain=.pomme.us;max-age=1086400"
+		document.cookie = "session="+Auth.session+";path=/;domain=." + BROWSER + ";max-age=1086400"
 		Game.last = data['last']
 		Room.init ()
 		Game.viewCallback (data)
@@ -290,9 +292,9 @@ var Game =
 	pollError: function ()
 		{ self.timeout = setTimeout (Game.poll, 5000) },
 	redirect_to: function (redirect)
-		{ document.location = "http://pomme.us" + redirect },
+		{ document.location =  BROWSER + redirect },
 	redirect_to_lobby: function ()
-		{ document.location = "http://pomme.us/" },
+		{ document.location = BROWSER },
 	fatalError: function (error)
 		{
 		$("#game").hide ()
@@ -668,9 +670,9 @@ var Game =
 			Countdown.stop ()
 			Game.hideCards ()
 			if (data['round'] > 0)
-				return ["Nobody here -- Send the link to your friends!<br/><input type='text' id='copy_url' readonly value='http://pomme.us/"+Game.name+"'/>", " "]
+				return ["Nobody here -- Send the link to your friends!<br/><input type='text' id='copy_url' readonly value='" + BROWSER + Game.name+"'/>", " "]
 			else
-				return ["Nobody here -- Send the link to your friends!<br/><input type='text' id='copy_url' readonly value='http://pomme.us/"+Game.name+"'/>", " "]
+				return ["Nobody here -- Send the link to your friends!<br/><input type='text' id='copy_url' readonly value='" BROWSER + Game.name+"'/>", " "]
 				// return ["Nobody here -- Send the link to your friends!<br/></"+Game.name+"'>http://pomme.us/"+Game.name+"</a>", " "]
 				// return ["Nobody here -- Send the link to your friends!", " "]
 			}

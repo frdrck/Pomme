@@ -16,7 +16,7 @@ var Game =
 			Auth.username = data['username']
 		if ("error" in data)
 			return Game.pollError()
-		document.cookie = "session="+Auth.session+";path=/;domain=.pomme.us;max-age=1086400"
+		document.cookie = "session="+Auth.session+";path=/;domain=." + BROWSER + ";max-age=1086400"
 		document.getElementById("chat-message").focus()
 		Game.last = data['last']
 		Chat.add (data['chat'])
@@ -136,7 +136,7 @@ var Newgame =
 			return
 			}
 		var path = data.path
-		document.location = "http://pomme.us/" + path
+		document.location = BROWSER + path
 		},
 	unload: function ()
 		{
@@ -349,7 +349,7 @@ var Lobby =
 		var path = $(this).data("path")
 		if (Lobby.games[path].private)
 			return
-		document.location = "http://pomme.us/" + path
+		document.location = BROWSER + path
 		},
 	manifestUpdatePath: function (path)
 		{
