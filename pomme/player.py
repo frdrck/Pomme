@@ -1,3 +1,5 @@
+from util import now
+
 class Player:
   def __init__(self, game, args):
     self.game = game
