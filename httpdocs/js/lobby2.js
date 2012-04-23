@@ -680,8 +680,12 @@ var Slideshow =
 	timer: false,
 	combos:
 		[
-		["1279213983813-dumpfm-noisia-slimer-at-the-door.gif", "1279235222382-dumpfm-neue-slimer_walk.gif", "mint milano", "hmoob"],
-		[ "chairsta.gif", "gun-guy.gif", "deanna", "fred" ],
+      ["moebius-arzach-sketch.jpg", "cambodia004_905.jpg"],
+      ["walline.jpg", "tumblr_l6npn9HUay1qd4bjmo1_500.jpg"],
+      ["city.png", "cambodia005.jpg"],
+      ["libris14.jpg", "tumblr_l6rzmnBUMg1qd4bjmo1_500.jpg"],
+      ["meatman.png", "cobain.jpg"],
+      ["mygod.png", "tumblr_lkniayM5yk1qd4bjmo1_500.jpg"]
 		],
 	preload: function ()
 		{
