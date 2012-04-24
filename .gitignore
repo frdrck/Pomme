@@ -3,3 +3,7 @@ config.py
 *.pyc
 pid_*
 .DS_Store
+
+pomme/config.py
+
+pomme/config.py
