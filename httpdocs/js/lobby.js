@@ -234,7 +234,7 @@ var Auth =
 	login: function ()
 		{
 		var nick = $("#login-name").val().replace (/\W+/g,'')
-		if (! nick.length)
+		if (!nick.length)
 			return
 		if (nick === "false" || nick === "None")
 			{
@@ -245,8 +245,9 @@ var Auth =
 		$("#login-altname").html(nick)
 		var params =
 			{
-			'name': nick,
+			'username': nick,
 			}
+    console.log(params);
 		$.post(API.URL.login, params, Auth.loginCheck, "json")
 		},
 	loginCheck: function (data)
@@ -296,7 +297,7 @@ var Auth =
 		password =  $.md5("pomme"+password)
 		var params =
 			{
-			'name': Auth.username,
+			'username': Auth.username,
 			'password': password,
 			}
 		$.post(API.URL.login, params, Auth.loginCheck, "json")

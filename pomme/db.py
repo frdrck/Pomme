@@ -291,7 +291,7 @@ class db:
 
   def session_new(self, sessionid, userid):
     sql = "INSERT INTO pomme_session (sessionid, userid, date) VALUES(%s,%s,%s)"
-    args = (sessionid,userid,now())
+    args = (sessionid, userid, now())
     self.execute(sql, args)
 
   def session_list_all(self):

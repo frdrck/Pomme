@@ -247,7 +247,7 @@ var Auth =
 		$("#login-altname").html(nick)
 		var params =
 			{
-			'name': nick,
+			'username': nick,
 			}
 		$.post(API.URL.login, params, Auth.loginCheck, "json")
 		},
@@ -299,7 +299,7 @@ var Auth =
 		password =  $.md5("pomme"+password)
 		var params =
 			{
-			'name': Auth.username,
+			'username': Auth.username,
 			'password': password,
 			}
 		$.post(API.URL.login, params, Auth.loginCheck, "json")
@@ -519,7 +519,7 @@ var Profile =
 		Profile.username = username
 		var params =
 			{
-			'name': username,
+			'username': username,
 			'session': Auth.session,
 			}
 		$.post(API.URL.user_view, params, Profile.viewCallback, "json")
@@ -575,7 +575,7 @@ var Profile =
 		$("#profile_menu_container").fadeOut(300)
 		var params =
 			{
-			'name': Auth.username,
+			'username': Auth.username,
 			'session': Auth.session,
 			}
 		$.post(API.URL.user_view, params, Profile.editCallback, "json")
@@ -595,7 +595,7 @@ var Profile =
 		{
 		var params =
 			{
-			'name': Auth.username,
+			'username': Auth.username,
 			'session': Auth.session,
 			'avatar': $("#profile_edit_avatar").val (),
 			'facebook': prepare_url($("#profile_edit_facebook").val()),
@@ -669,14 +669,14 @@ var Combos =
 		{
 		Combos.viewReset(username + "'s winning pommes")
 		Combos.viewApi = API.URL.combo_user
-		Combos.params = { 'name': username, }
+		Combos.params = { 'username': username, }
 		$.post(API.URL.combo_user, Combos.params, Combos.viewCallback, "json")
 		},
 	viewJudge: function (username)
 		{
 		Combos.viewReset(username + "'s judged pommes")
 		Combos.viewApi = API.URL.combo_judge
-		Combos.params = { 'name': username, }
+		Combos.params = { 'username': username, }
 		$.post(API.URL.combo_judge, Combos.params, Combos.viewCallback, "json")
 		},
 	viewGame: function ()
@@ -684,7 +684,7 @@ var Combos =
 		$("#profile").show()
 		Combos.viewReset(Game.name + " pomme history")
 		Combos.viewApi = API.URL.combo_game
-		Combos.params = { 'name': Game.name, 'session': Auth.session, }
+		Combos.params = { 'username': Game.name, 'session': Auth.session, }
 		$.post(API.URL.combo_game, Combos.params, Combos.viewCallback, "json")
 		},
 	params: {},

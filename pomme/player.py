@@ -4,7 +4,7 @@ HAND_SIZE = 5
 class Player:
   def __init__(self, game, args):
     self.game = game
-    self.name = args['username']
+    self.username = args['username']
     self.avatar = args['user'].avatar
     self.lastseen = now()
     self.cards = game.player_deck.hand(HAND_SIZE)
@@ -19,6 +19,6 @@ class Player:
     self.discards = 3
 
   def report(self):
-    rec = {'name': self.name, 'score': self.score, 'avatar': self.avatar, }
+    rec = {'username': self.username, 'score': self.score, 'avatar': self.avatar, }
     return rec
 

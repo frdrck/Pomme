@@ -25,12 +25,12 @@ LIST_UPDATE_TIME = 10
 COMBO_LOG_SIZE = 20
 
 FORM_FIELDS = {
-  "/user/login":   ("name","password",),
-  "/user/logout":   ("game","name",),
-  "/user/view":   ("name",),
-  "/user/edit":   ("name","email","password","avatar","bio","facebook","twitter","tumblr",),
-  "/game/new":   ("name","capacity","goal","private","password","timer",),
-  "/game/edit":   ("name","capacity","goal","private","password","bg","timer","avatar","title",),
+  "/user/login":   ("username","password",),
+  "/user/logout":   ("game","username",),
+  "/user/view":   ("username",),
+  "/user/edit":   ("username","email","password","avatar","bio","facebook","twitter","tumblr",),
+  "/game/new":   ("username","capacity","goal","private","password","timer",),
+  "/game/edit":   ("username","capacity","goal","private","password","bg","timer","avatar","title",),
   "/game/list":   (),
   "/game/view":   ("game",),
   "/game/join":   ("game","last",),
@@ -45,9 +45,9 @@ FORM_FIELDS = {
   "/game/restart": ("game",),
   "/game/deal":   ("game",),
   "/game/discard": ("game","cards"),
-  "/combo/user":   ("name","start",),
-  "/combo/judge":  ("name","start",),
-  "/combo/game":    ("name","start",),
+  "/combo/user":   ("username","start",),
+  "/combo/judge":  ("username","start",),
+  "/combo/game":    ("username","start",),
   "/like/add":     ("comboid",),
   "/like/remove":  ("comboid",),
   "/pomme/count":  (),
@@ -100,7 +100,7 @@ class PommeDatabase:
 
   def user_new(self, args):
     params = {
-      'username': args['name'],
+      'username': args['username'],
       'joindate': now(),
       'seendate': now(),
       }
@@ -141,7 +141,7 @@ class PommeDatabase:
       return None
 
   def api_user_view(self, args):
-    user = self.user_from_username(args['name'])
+    user = self.user_from_username(args['username'])
     if user is None:
       return { "error": "no user" }
     data = {
@@ -164,7 +164,7 @@ class PommeDatabase:
     return data
 
   def api_user_edit(self, args):
-    user = self.user_from_username(args['name'])
+    user = self.user_from_username(args['username'])
     if user is None:
       return { "error": "no user" }
     if user.id != args['user'].id and not args['user'].is_admin():
@@ -243,12 +243,12 @@ class PommeDatabase:
       self.db.user_win_game(user.id, game.goal)
 
   def api_login(self, args, client_address):
-    if args['name'] is None or args['name'] == "" or args['name'] == " ":
+    if args['username'] is None or args['username'] == "" or args['username'] == " ":
       return { "error": "empty" }
-    user = self.user_from_username(args['name'])
+    user = self.user_from_username(args['username'])
 
     if user is not None:
-      print "login attempt:", args['name']
+      print "login attempt:", args['username']
       if len(user.password):
         if args['password'] is None:
           return { "error": "password" }
@@ -257,11 +257,11 @@ class PommeDatabase:
       if not user.check_ip(client_address):
         return { "error": "ip" }
     else:
-      print "new user:", args['name']
+      print "new user:", args['username']
       for cuss in ILLEGAL_WORDS:
-        if cuss in args['name'].lower():
+        if cuss in args['username'].lower():
           return None
-      if args['name'].lower() in ILLEGAL_USERS:
+      if args['username'].lower() in ILLEGAL_USERS:
         return { "error": "illegal" }
       else:
         user = self.user_new(args)
@@ -271,8 +271,8 @@ class PommeDatabase:
 
   def api_game_new(self, args):
     # ("name","capacity","rounds","private","password",),
-    game = self.game_from_name(args['name'])
-    if args['name'] is None:
+    game = self.game_from_name(args['username'])
+    if args['username'] is None:
       return { "error": "empty" }
     elif game is not None:
       game.flush()
@@ -285,7 +285,7 @@ class PommeDatabase:
         args['lastdate'] = now()
         game.lastdate = now()
         return self.api_game_edit(args)
-    path = sanitize_url(args['name'])
+    path = sanitize_url(args['username'])
     if len(path) == 0:
       return { "error": "url" }
     elif path in ILLEGAL_ROOMS:
@@ -340,7 +340,7 @@ class PommeDatabase:
     return { 'path': path }
 
   def api_game_edit(self, args):
-    game = self.game_from_name(args['name'])
+    game = self.game_from_name(args['username'])
     if game is None:
       return { "error": "empty" }
 
@@ -374,10 +374,10 @@ class PommeDatabase:
 #    if args['title'] is not None:
 #      game.name = sanitize_html(args['title'])
 
-#    del args['name']
-#    args['name'] = sanitize_html(args['title'])
+#    del args['username']
+#    args['username'] = sanitize_html(args['title'])
 
-    path = sanitize_url(args['name'])
+    path = sanitize_url(args['username'])
 
     game.goal = args['goal']
     game.private = args['private']
@@ -416,23 +416,23 @@ class PommeDatabase:
     return { 'games': self.active_games, 'username': args['username'], 'score': args['user'].score, 'combos': [x for x in self.combos], }
 
   def api_combo_game(self, args):
-    game = self.game_from_name(args['name'])
+    game = self.game_from_name(args['username'])
     if game is None:
       return []
     return self.db.combo_list_game(game.id, args['start'])
 
   def api_combo_user(self, args):
-    if args['name'] is None:
+    if args['username'] is None:
       return []
-    user = self.user_from_username(args['name'])
+    user = self.user_from_username(args['username'])
     if user is None:
       return []
     return self.db.combo_list_user(user.id, args['start'])
 
   def api_combo_judge(self, args):
-    if args['name'] is None:
+    if args['username'] is None:
       return []
-    user = self.user_from_username(args['name'])
+    user = self.user_from_username(args['username'])
     if user is None:
       return []
     return self.db.combo_list_judge(user.id, args['start'])
@@ -488,8 +488,7 @@ class PommeHandler(BaseHTTPRequestHandler):
 
   def do_POST(self):
     if "poll" not in self.path:
-      print 'path: ' + self.path
-    #  print 'client: ' + repr(self.client_address)
+      print "path: " + self.path
 
     self.send_response(200)
     self.send_cors_headers()
@@ -512,7 +511,8 @@ class PommeHandler(BaseHTTPRequestHandler):
     for field in FORM_FIELDS[self.path]:
       try:
         args[field] = form[field].value
-      except:
+      except Exception as e:
+        print "Form parsing error", e
         args[field] = None
 
     if 'session' in form:
@@ -525,10 +525,6 @@ class PommeHandler(BaseHTTPRequestHandler):
         args['user'] = None
         args['username'] = ""
         args['userid'] = 0
-    else:
-      args['user'] = None
-      args['username'] = ""
-      args['userid'] = 0
     if 'game' in args:
       # if args['game'] == "lobby":
       #   return self.lobby_api(args)
@@ -538,7 +534,7 @@ class PommeHandler(BaseHTTPRequestHandler):
       elif game is not None:
         self.game_api(game, args)
       else:
-        self.api_error("game does not exist "+args['game'])
+        self.api_error("game does not exist " + args['game'])
     else:
       self.bureau_api(args)
 
