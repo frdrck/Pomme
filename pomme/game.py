@@ -197,15 +197,16 @@ class Game:
         self.setup = True
         self.new_round()
     elif self.state == STATE_BET:
-      advancing = self.countdown < now()
-      if len(self.betters) == active_count - 1 or (advancing and len(self.betters) > 0):
+      timed_out = self.countdown < now()
+      everyone_voted = len(self.betters) == active_count - 1 
+      if everyone_voted or timed_out:
         if self.judge not in self.active or self.judge in self.skipped:
           self.countdown = now() + self.timer
           self.state = STATE_VOTE
         else:
           self.countdown = now() + self.timer
           self.state = STATE_JUDGE
-        if advancing:
+        if timed_out:
           for name in self.active:
             if name not in self.bets:
               if name in self.idlers:
@@ -434,6 +435,11 @@ class Game:
     return {}
 
   def win(self, win_card):
+    if win_card is None:
+      self.state = STATE_WIN
+      self.winner = "no votes. no one"
+      self.nextgame = now() + 10
+      return
     if self.win_image == win_card:
       return
     print "WINNING:", win_card
@@ -486,6 +492,9 @@ class Game:
     if len(sorted_scores):
       print "TALLIED ENOUGH CARDS"
       self.win(sorted_scores[0][0])
+    else:
+      print "No votes."
+      self.win(None)
 
   # skip requires simple majority
   def api_skip(self, args):
