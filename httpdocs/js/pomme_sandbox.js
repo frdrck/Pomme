@@ -1639,7 +1639,7 @@ var Game =
 	view: function ()
 		{
 		var params = { name: Game.name, session: Auth.session }
-		$.post(API.URL.view, params, Room.viewCallback, json)
+		$.post(API.URL.view, params, Room.viewCallback, "json")
 		},
 	viewCallback: function (data)
 		{
