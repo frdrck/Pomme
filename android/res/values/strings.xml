@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pomme</string>
+    <string name="your_score">your score: 7</string>
+    <string name="winning_score">winning score: 9</string>
+    <string name="timer">:20</string>    
+</resources>
