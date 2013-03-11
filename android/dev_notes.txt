@@ -1,0 +1,37 @@
+Mon Mar 11 02:12:43 PDT 2013
+============================
+Implemented basic layout, taking images from Fred's mockup.
+Included three views:
+  main.xml shows the mock layout
+  viewflipper.xml shows a possible way to flip between images.
+  gifviewer.xml show a possible way to display gifs
+
+It was surprised that Android doesn't have a native way to show gifs easily.
+Gifs must be show in a webview or a movie view.
+the current gifviewer doesn't include a background color
+I imagine the webview will be the best way to display gifs
+
+It should be easy to use the same server for all web/android/iPhone platforms
+all basic data should be JSON
+images will be fetched seperately from game data (they won't be JSON)
+
+there should be a simple loading screen
+there should be a simple lobby screen
+there should be a simple profile screen
+
+I'll ignore favorites, chat and webcam for now
+
+we need to figure out a gesture to "select" cards to play
+swiping left and right should flip through cards in hand
+perhaps swiping a card up could submit it for play?
+
+there needs to be a Pomme.java class that represents the game state
+this will include the score, current player cards, current judge card
+once it is created the data from it can be bound to the view.
+
+another class should be created that represents the network layer
+
+perhaps the pomme and network classes could be built as a command line interface
+this would be easy to build and test
+
+that's all for now
