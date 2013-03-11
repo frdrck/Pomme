@@ -1,0 +1,7 @@
+bin
+.DS_Store
+.classpath
+.gitignore
+.project
+gen
+proguard.cfg
