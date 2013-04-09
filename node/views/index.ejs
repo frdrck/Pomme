@@ -6,6 +6,10 @@
   </head>
   <body>
     <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
+    <form action="login" method="post">
+      username: <input name="username" type="text">
+      password: <input name="password" type="text">
+      <button>login</button>
+    </form>
   </body>
 </html>

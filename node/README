@@ -16,3 +16,9 @@ change to the app directory and install dependencies
 
 run the server
   node app.js
+
+we're using node-mysql to connect to the database
+docs at: https://github.com/felixge/node-mysql
+
+using node express for frameworks and templating
+http://expressjs.com/
