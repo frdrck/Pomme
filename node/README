@@ -1,0 +1,14 @@
+Install node
+
+  brew install node
+
+Install express globally
+
+  npm install -g express
+
+change to the app directory and install dependencies
+  npm install
+
+
+run the server
+  node app.js
