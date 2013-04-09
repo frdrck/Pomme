@@ -1,6 +1,4 @@
-Install node
-
-  brew install node
+Install node by following instructions on http://nodejs.org/
 
 Install npm
 
