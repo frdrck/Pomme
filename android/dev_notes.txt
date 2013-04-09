@@ -35,3 +35,59 @@ perhaps the pomme and network classes could be built as a command line interface
 this would be easy to build and test
 
 that's all for now
+
+Sun Mar 31 05:43:48 PDT 2013
+============================
+Some of the JSON that comes from polling a game:
+
+{ "bets" : [ "tumblr_kop1uicLxf1qz7p0co1_400.jpg",
+      "tumblr_lhzfqjkE1c1qzxuoxo1_400.gif"
+    ],
+  "betters" : [ "ItsMeBob",
+      "Clyde"
+    ],
+  "chat" : [ [ 37501,
+        1364680896,
+        "Bubba",
+        "but with pictures"
+      ],
+      [ 37502,
+        1364680903,
+        "Bubba",
+        "its pretty fun with more ppl"
+      ],
+      [ 37550,
+        1364705140,
+        "esque",
+        "hii"
+      ]
+    ],
+  "countdown" : -820289,
+  "idle" : true,
+  "image" : "l-9d8b7c04f6e043e5ae9e90678a06990a.jpg",
+  "judge" : "Melissa",
+  "last" : 1364737672,
+  "next_image" : "SlimLine-POD-with-Model-DBs.jpg",
+  "players" : [ { "avatar" : "",
+        "name" : "moon",
+        "score" : 0,
+        "skipped" : true
+      } ],
+  "round" : 0,
+  "settingsUpdated" : 1350162223,
+  "skipped" : [ "derkerjers",
+      "cfhjfiyurir",
+      "moon",
+      "PappyODaniels"
+    ],
+  "state" : 0,
+  "win_combo" : 0,
+  "win_image" : "",
+  "winner" : ""
+}
+
+
+Mon Apr  8 23:18:34 PDT 2013
+============================
+Added a python client that is able to access the server.
+I did this some time ago. Just adding an entry to the log here.
