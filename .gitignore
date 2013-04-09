@@ -4,7 +4,5 @@ config.py
 pid_*
 .DS_Store
 *.swp
-
 pomme/config.py
-
-pomme/config.py
+node_modules
