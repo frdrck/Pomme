@@ -250,6 +250,7 @@ class PommeDatabase:
     if user is not None:
       print "login attempt:", args['username']
       if len(user.password):
+        print "expected:", user.password, "given:", args['password']
         if args['password'] is None:
           return { "error": "password" }
         elif user.password != args['password']:
