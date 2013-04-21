@@ -632,6 +632,7 @@ var Auth =
 		{
 		if (data && 'error' in data)
 			{
+                        console.log("login error:", data.error);
 			if (data.error === "password")
 				return Auth.passwordForm ()
 			if (data.error === "bad_password")
@@ -1607,8 +1608,22 @@ var Game =
 	bg: "",
 	join: function ()
 		{
-		var params = { session: Auth.session, last: Game.last, game: Game.name }
-		$.post(API.URL.join, params, Game.joinCallback, "json").error(Game.joinError)
+                console.log("game name:", Game.name);
+		var s = Game.socket = new WebSocket('ws://'+window.location.host+'/game/join/?name='+Game.name,'game');
+		s.sendMessage = function(msg) {
+			this.send(JSON.stringify(msg));
+		};
+		s.onopen = function() {
+		};
+		s.onmessage = function(e) {
+			var msg = JSON.parse(e.data);
+			Game[msg.type+'Callback'](msg);
+		};
+		s.onerror = function(e) {
+			Game.joinError();
+		};
+		// var params = { session: Auth.session, last: Game.last, game: Game.name }
+		// $.post(API.URL.join, params, Game.joinCallback, "json").error(Game.joinError)
 		},
 	joinCallback: function (data)
 		{
@@ -1649,8 +1664,8 @@ var Game =
 		},
 	view: function ()
 		{
-		var params = { name: Game.name, session: Auth.session }
-		$.post(API.URL.view, params, Room.viewCallback, "json")
+		var params = { name: Game.name, type: 'view' }
+		Game.socket.sendMessage(params);
 		},
 	viewCallback: function (data)
 		{
@@ -2257,12 +2272,12 @@ var Game =
 		Game.rejoinDisplay ()
 		var params =
 			{
-			"session": Auth.session,
+			"type": "bet",
 			"game": Game.name,
 			"card": filename,
 			"deck": "player",
 			}
-		$.post(API.URL.bet, params, Game.pickCallback, "json")
+		Game.socket.sendMessage(params);
 		for (var i = 0; i < Game.cards.length; i++)
 			{
 			if (Game.cards[i] === filename)
@@ -2507,11 +2522,11 @@ var Game =
 			var filename = $(this).data("file")
 			var params =
 				{
-				"session": Auth.session,
+				"type": "vote",
 				"game": Game.name,
 				"card": filename,
 				}
-			$.post(API.URL.vote, params, Game.judgeCallback, "json")
+			Game.socket.sendMessage(params);
 			Game.judged = true
 			document.getElementById("chat-message").focus()
 			}
@@ -2521,11 +2536,11 @@ var Game =
 			var filename = $(this).data("file")
 			var params =
 				{
-				"session": Auth.session,
+				"type": "judge",
 				"game": Game.name,
 				"card": filename,
 				}
-			$.post(API.URL.judge, params, Game.judgeCallback, "json")
+			Game.socket.sendMessage(params);
 			Game.judged = true
 			document.getElementById("chat-message").focus()
 			Game.hideCards ()
