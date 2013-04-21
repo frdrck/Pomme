@@ -632,6 +632,7 @@ var Auth =
 		{
 		if (data && 'error' in data)
 			{
+                        console.log("login error:", data.error);
 			if (data.error === "password")
 				return Auth.passwordForm ()
 			if (data.error === "bad_password")
@@ -1607,6 +1608,7 @@ var Game =
 	bg: "",
 	join: function ()
 		{
+                console.log("game name:", Game.name);
 		var s = Game.socket = new WebSocket('ws://'+window.location.host+'/game/join/?name='+Game.name,'game');
 		s.sendMessage = function(msg) {
 			this.send(JSON.stringify(msg));

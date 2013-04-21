@@ -88,7 +88,8 @@ app.ws.use(function(req,next) {
 	express.cookieParser()(req,{},next);
 });
 app.ws.usepath('/game/join/',function(req,next) {
-	var gameid = req.query.name;
+	var gameid = req.query.name || 'default';
+        console.log('requesting game:', gameid)
 	var game = games[gameid];
 	var session = getSession(req);
 
@@ -155,4 +156,3 @@ app.use(function(req,res) {
 });
 
 app.listen(8080);
-console.log('listening on 8080');
