@@ -1,0 +1,40 @@
+<html ng-app="pomme">
+  <head>
+    <title>title</title>
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.6/angular.min.js"></script>
+    <script src="js/PommeCtrl.js"></script>
+  </head>
+  <body ng-controller="PommeCtrl">
+    <div>
+      <h1>current phase: {{currentPhase}}</h1>
+    </div>
+
+    <div ng-switch on="currentPhase">
+      <div ng-switch-when="bid">
+        <img ng-src="{{mainImage}}">
+        <h1>hand</h1>
+        <img ng-repeat="card in hand" ng-src="{{card}}" ng-click="submit(card)">
+      </div>
+
+      <div ng-switch-when="judge">
+        <img ng-src="{{mainImage}}">
+        <h1>submissions</h1>
+        <img ng-repeat="card in submissions" ng-src="{{card}}" ng-click="declareWinner(card)">
+      </div>
+
+      <div ng-switch-when="vote">
+        <img ng-src="{{mainImage}}">
+        <h1>submissions</h1>
+        <img ng-repeat="card in submissions" ng-src="{{card}}" ng-click="vote(card)">
+      </div>
+
+      <div ng-switch-when="win" ng-click="setPhase('bid')">
+        <h1>winner</h1>
+        <img ng-src="{{winner}}">
+        <img ng-src="{{mainImage}}">
+      </div>
+    </div>
+  </body>
+</html>
