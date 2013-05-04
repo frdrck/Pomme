@@ -20,8 +20,11 @@ app.use(express.favicon());
 app.use(express.logger('dev'));
 app.use(express.bodyParser());
 app.use(express.methodOverride());
-  app.use(express.cookieParser('your secret here'));
-  app.use(express.session({key:'sid'}));
+var secret = 'your secret here';
+var cookieParser = express.cookieParser(secret);
+var session = express.session({key: 'sid', secret:secret});
+app.use(cookieParser);
+app.use(session);
 app.use(app.router);
   app.use(require('stylus').middleware(__dirname + '/public'));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -36,6 +39,28 @@ app.get('/users', user.list);
 app.get('/mysql', server.mysql);
 app.post('/login', server.login);
 
-http.createServer(app).listen(app.get('port'), function(){
+var httpServer = http.createServer(app);
+
+var sio = require('socket.io').listen(httpServer);
+sio.set('authorization', function (req, accept) {
+  req.originalUrl = '/';
+  req.on = function(){};
+  req.removeListener = function(){};
+  var res = {on:function(){},removeListener:function(){}};
+  cookieParser(req,res,function() {
+    session(req,res,function() {
+      if (!req.sessionID) {
+        return accept('No sessionID', false);
+      } else {
+        return accept(null, true);
+      }
+    });
+  });
+});
+sio.sockets.on('connection', function(socket) {
+  console.log('Client connected');
+});
+
+httpServer.listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
