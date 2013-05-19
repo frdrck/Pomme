@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head ng-app>
+    <title><%= title %></title>
+    <script src="angular.js"></script>
+    <script src="ApiCtrl.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      var socket = io.connect('http://localhost');
+      socket.on('news', function (data) {
+        console.log(data);
+      });
+
+      function login() {
+        console.log("login");
+        socket.emit('login', { username: 'lvh', password: '' });
+      }
+
+      socket.on('login-response', function(data) {
+        console.log(data);
+      });
+    </script>
+  </head>
+  <body ng-controller="ApiCtrl">
+    <div class="response">
+      <pre>{{response}}</pre>
+    </div>
+    <div class="apis">
+      <h1>User</h1>
+      <div>
+        <button onclick="login(username, password)">login</button>
+        username: <input ng-model="username">
+        password: <input ng-model="password">
+      </div>
+      <div>
+        <button onclick="logout()">logout</button>
+      </div>
+    </div>
+  </body>
+</html>
