@@ -1,0 +1,254 @@
+<html>
+  <head>
+      <script src="/socket.io/socket.io.js"></script>
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+      <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.6/angular.min.js"></script>
+<style>
+div {
+  padding: 20px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  position: relative;
+}
+div:before {
+  content: attr(class) ": " attr(data);
+  font-weight: bolder;
+  position: absolute;
+  left: 2px;
+  top: 0px;
+  color: #ddd;
+
+}
+</style>
+<script>
+window.utils = (function() {
+  var utils = {};
+  utils.assert = function(cond,msg) {
+    if (!cond) {
+      throw 'Assertion failed: ' + msg;
+    }
+  };
+  utils.between = function(v,lower,upper) {
+    return v >= lower && v <= upper;
+  };
+  utils.isArray = function(o) {
+    return (typeof o === 'object') && (typeof (o.length) === 'number');
+  };
+  utils.recurse = function(arr,cb) {
+    utils.assert(arguments.length === 2);
+    if (utils.isArray(arr)) {
+      for(var i=0;i<arr.length;i++) {
+        utils.recurse(arr[i],cb);
+      }
+    } else {
+      cb(arr);
+    }
+  };
+  utils.flatten = function(arr) {
+    utils.assert(arguments.length === 1);
+    var r = [];
+    utils.recurse(arr,function(i) {
+      r.push(i);
+    });
+    return r;
+  };
+  utils.compact = function(arr) {
+    utils.assert(arguments.length === 1);
+    return arr.filter(function(i) {
+      return i !== null && i !== undefined;
+    });
+  };
+
+  utils.clear = function(e) {
+    utils.assert(arguments.length === 1);
+    e.innerHTML = '';
+    return e;
+  };
+  utils.append = function(parent,content) {
+    utils.assert(arguments.length === 2);
+    utils.recurse(content,function(e) {
+      _append(parent,e);
+    });
+    return parent;
+  };
+  function _append(parent,content) {
+    utils.assert(arguments.length === 2);
+    if (!content) { return; }
+    if (typeof content === 'string') {
+      parent.appendChild(document.createTextNode(content));
+    } else if (typeof content === 'number') {
+      _append(parent,content.toString());
+    } else {
+      parent.appendChild(content);
+    }
+  }
+  utils.replace = function(search,replacement) {
+    utils.assert(search);
+    utils.assert(search.parentNode);
+    if (search === replacement) { return; }
+    var parent = search.parentNode;
+    parent.insertBefore(replacement,search);
+    parent.removeChild(search);
+  };
+  utils.remove = function(elem) {
+    utils.assert(arguments.length === 1);
+    elem.parentNode.removeChild(elem);
+  };
+  utils.setContent = function(parent,content) {
+    utils.assert(arguments.length === 2);
+    utils.clear(parent);
+    utils.append(parent,content);
+    return parent;
+  };
+  return utils;
+})();
+
+window.c = (function(utils) {
+  function c(tag,attributes,content) {
+    var r = document.createElement(tag);
+    if (attributes) {
+      for(var attr in attributes) {
+        r.setAttribute(attr,attributes[attr]);
+      }
+    }
+    utils.append(r,content);
+    return r;
+  }
+  c.ctag = function(tag) {
+    return function(attributes, content) {
+      return c(tag,attributes,content);
+    };
+  };
+  c.cctag = function(tag,attributes) {
+    return function(content) {
+      return c(tag,attributes,content);
+    };
+  };
+  c.text = function(text) { return document.createTextNode(text); }
+  c.a = c.ctag('a');
+  c.div = c.ctag('div');
+  c.span = c.ctag('span');
+  c.h1 = c.cctag('h1');
+  c.h2 = c.cctag('h2');
+  c.h3 = c.cctag('h3');
+  c.h4 = c.cctag('h4');
+  c.h5 = c.cctag('h5');
+  c.p = c.cctag('p');
+  c.b = c.cctag('b');
+  c.i = c.cctag('i');
+  c.table = c.ctag('table');
+  c.tr = c.ctag('tr');
+  c.td = c.ctag('td');
+  c.input = c.ctag('input');
+  c.img = c.ctag('img');
+  c.input = c.ctag('input');
+  c.textbox = function(attr,onchange) {
+    var r = c.input(attr);
+    r.onchange = onchange;
+    return r;
+  };
+  c.button = function(attr,content,onclick) {
+    var r = c('button',attr,content);
+    r.onclick = onclick;
+    return r;
+  };
+  return c;
+})(window.utils);
+</script>
+  </head>
+  <body>
+    <script>
+      var socket = io.connect(window.location.origin);
+      var user = { id: undefined, name: undefined, socket: socket }
+      var rooms = [];
+
+      function remove(arr,elem) {
+        var i = arr.indexOf(elem);
+        if (i >= 0) {
+          return arr.splice(i,1);
+        } else {
+          return null;
+        }
+      }
+      function removeIf(arr,condition) {
+        for(var i=0;i<arr.length;i++) {
+          if (condition(arr[i])) {
+            arr.splice(i,1);
+            i--;
+          }
+        }
+      }
+      function removeById(arr,id) {
+        removeIf(arr,function(elem) {
+          return elem.id === id;
+        });
+      }
+      function getRoomByName(name) {
+        return rooms.filter(function(room) { return room.name === name; })[0];
+      }
+      socket.ond = function(name,f) {
+        this.on(name,function(/*...*/) {
+          console.log(name, arguments);
+          f.apply(this,arguments);
+          showState();
+        });
+      };
+      socket.ond('connect',function() {
+        console.log('connected');
+      });
+      socket.ond('joinedRoom',function(data) {
+        rooms.push(data.room);
+      });
+      socket.ond('leftRoom',function(data) {
+        removeById(rooms,data.roomId);
+      });
+      socket.ond('joinedParticipant',function(data) {
+        var room = getRoomByName(data.room);
+        room.participants.push(data.participant);
+      });
+      socket.ond('leftParticipant',function(data) {
+        var room = getRoomByName(data.room);
+        removeById(room.participants,data.participant);
+
+        // TODO: If my user left, interpret that as if I left and I'm not in the room anymore
+      });
+      socket.ond('leftRoom',function(data) {
+        var room = getRoomByName(data.room);
+        removeById(room.participants,data.participantId);
+      });
+      function d(f) {
+        console.log()
+        var r = f.apply(this,arguments);
+        showState();
+        return r;
+      }
+      function showState() {
+        console.log('user:',user);
+        console.log('rooms:',rooms);
+        utils.setContent(document.body,[
+          c.button({},'Create Room',function() {
+            socket.emit('createRoom', {name: 'MyFirstRoom'});
+          }),
+          c.button({},'Join Room',function() {
+            socket.emit('joinRoom', {name: 'MyFirstRoom'});
+          }),
+          c.button({},'Set Name',function() {
+            socket.emit('name', {name: 'Henk'});
+          }),
+          rooms.map(function(room) {
+            return c.div({class:'room',data:room.name},[
+              c.button({},'Leave Room',function() {
+                socket.emit('leaveRoom', {name: room.name});
+              }),
+              c.div({class:'participants'},
+                room.participants.map(function(participant) {
+                  return c.div({class:'participant',data:participant.id}, participant.name);
+                })
+              )
+            ]);
+          })
+        ]);
+      }
+    </script>
+  </body>
+</html>

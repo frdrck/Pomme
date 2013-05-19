@@ -10,6 +10,7 @@
     "ejs": "*",
     "stylus": "*",
     "mysql": "*",
-    "socket.io": "~0.9.14"
+    "socket.io": "~0.9.14",
+    "debug": "~0.7.2"
   }
 }
