@@ -38,8 +38,6 @@ if ('development' == app.get('env')) {
 
 app.get('/', routes.index);
 app.get('/users', user.list);
-app.get('/mysql', server.mysql);
-app.post('/login', server.login);
 
 var httpServer = http.createServer(app);
 
