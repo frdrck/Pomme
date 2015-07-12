@@ -1,3 +1,6 @@
+from util import now
+HAND_SIZE = 5
+
 class Player:
   def __init__(self, game, args):
     self.game = game
