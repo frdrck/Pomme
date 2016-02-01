@@ -319,8 +319,6 @@ class Game:
       if len(self.active) == 0:
         return True
       return False
-    if self.path == "bigapple":
-      return False
     return False
 
   def api_join(self, args):
@@ -449,8 +447,8 @@ class Game:
           self.state = STATE_GAMEOVER
           self.countdown = now() + self.timer
           self.votes = {}
-          self.db.win_game(self, user)
-        self.win_combo = self.db.win_round(self, user, self.judge, card, self.image)
+          #self.db.win_game(self, user)
+        #self.win_combo = self.db.win_round(self, user, self.judge, card, self.image)
         print self.players[user].score, "__", self.goal
         return
     self.state = STATE_WIN

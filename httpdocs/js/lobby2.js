@@ -1,4 +1,4 @@
-BASE_URL = "http://pomme.us:32123";
+BASE_URL = "http://pomme.us:32123"
 
 var API =
 	{
@@ -34,27 +34,27 @@ var API =
 		"pomme_count": BASE_URL + "/pomme/count",
 		},
 	is_safari: navigator.appVersion.indexOf("Safari") !== -1 && navigator.appVersion.indexOf("Chrome") === -1,
-	};
+	}
 function trim (s)
 	{
 	return s.replace(/^\s+/, "").replace(/\s+$/, "")
-	};
+	}
 function sanitize (s)
 	{
 	return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;")
-	};
+	}
 function prepare_url (s)
 	{
 	s = trim(s);
 	if (s.indexOf("javascript") === 0) return "";
 	if (s.indexOf("http") !== 0) return "http://" + s;
 	return s;
-	};
+	}
 function scrollToBottom (elem)
 	{
 	try { $(elem).scrollTop( $(elem)[0].scrollHeight ) }
 	catch (err) { }
-	};
+	}
 function shuffle (list)
 	{
 	var i, j, t;
@@ -68,19 +68,19 @@ function shuffle (list)
 			list[j] = t;
 			}
 		}
-	};
+	}
 function keys (o)
 	{
 	var keys = []
 	for(var key in o)
 		keys.push(key)
 	return keys
-	};
+	}
 function choice (list)
 	{
 	return list[Math.floor(Math.random() * list.length)]
-	};
-NUMBERS = "none one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty twenty-one twenty-two twenty-three twenty-four twenty-five twenty-six twenty-seven twenty-eight twenty-nine thirty".split(" ");
+	}
+NUMBERS = "none one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty twenty-one twenty-two twenty-three twenty-four twenty-five twenty-six twenty-seven twenty-eight twenty-nine thirty".split(" ")
 ILLEGAL_SNARK =
 	[
 	'That\'s not your name!',
@@ -88,7 +88,7 @@ ILLEGAL_SNARK =
 	'I highly doubt that\'s your name',
 	'Maybe people do really call you that..',
 	'Try a name that won\'t make your mother cry',
-	];
+	]
 
 STATE_IDLE      = 0
 STATE_SETUP     = 1
@@ -149,10 +149,10 @@ var Preload =
 			{
 			Preload.timeout = setTimeout(Preload.checkQueue, 500)
 			}
-		}
-	};
+		},
+	}
 
-var nullplayer = { play: function(){}, stop: function (){} };
+var nullplayer = { play: function(){}, stop: function (){} }
 var Sound =
 	{
 	new_player: nullplayer,
@@ -225,8 +225,8 @@ var Sound =
 			soundManager.mute()
 			self.muted = true
 			}
-		}
-	};
+		},
+	}
 soundManager.onready(Sound.init)
 
 var Auth =
@@ -375,6 +375,98 @@ var Auth =
 		}
 	}
 
+var EMOTICONS = {
+	
+	":beer:" : "/img/emoticons/beer.gif",
+	"D:" : "/img/emoticons/mad.gif",
+	"D-:" : "/img/emoticons/mad.gif",
+	":((" : "/img/emoticons/mad.gif",
+	":-((" : "/img/emoticons/mad.gif",
+	":judge:" : "/img/emoticons/judge.gif",
+	"???" : "/img/emoticons/question.gif",	
+	":creep:" : "/img/emoticons/creep.gif",
+	"8-)" : "/img/emoticons/cool.gif",
+	"8)" : "/img/emoticons/cool.gif",
+	"B-)" : "/img/emoticons/cool.gif",
+	"B)" : "/img/emoticons/cool.gif",
+	":-*" : "/img/emoticons/kiss.gif",
+	":*" : "/img/emoticons/kiss.gif",
+	"(n)" : "/img/emoticons/no.gif",
+	":-x" : "/img/emoticons/notspeaking.gif",
+	":-X" : "/img/emoticons/notspeaking.gif",
+	":X" : "/img/emoticons/notspeaking.gif",
+	":x" : "/img/emoticons/notspeaking.gif",
+	":(" : "/img/emoticons/sad.gif",
+	":-(" : "/img/emoticons/sad.gif",
+	":-s" : "/img/emoticons/smouth.gif",
+	":-S" : "/img/emoticons/smouth.gif",
+	":S" : "/img/emoticons/smouth.gif",
+	":s" : "/img/emoticons/smouth.gif",
+	":'-(" : "/img/emoticons/tear.gif",
+	":'(" : "/img/emoticons/tear.gif",
+	":-/" : "/img/emoticons/unsure.gif",
+	":/" : "/img/emoticons/unsure.gif",
+	":-\\" : "/img/emoticons/embarrassed.gif",
+	":\\" : "/img/emoticons/embarrassed.gif",
+	";-)" : "/img/emoticons/wink.gif",
+	";)" : "/img/emoticons/wink.gif",
+	":srs:" : "/img/emoticons/wat.gif",
+	":-|" : "/img/emoticons/wat.gif",
+	"<3"  : "/img/emoticons/heartsmile.gif",
+	"&lt;3"  : "/img/emoticons/heartsmile.gif",
+	":sleepy:" : "/img/emoticons/sleepy.gif",
+	":crazy:" : "/img/emoticons/crazy.gif",
+	":imdead:" : "/img/emoticons/imdead.gif",
+	":-)" : "/img/emoticons/happy.gif",
+	":)" : "/img/emoticons/happy.gif",
+	":sly:" : "/img/emoticons/sly.gif",
+	":proud:" : "/img/emoticons/proud.gif",
+	":timid:" : "/img/emoticons/timid.gif"
+
+}
+var Emotiwidget = {
+  init: function(){	
+		var EMOTICON_REVERSE = {};
+		for (var emoticon in EMOTICONS) {
+			if (emoticon.indexOf("&lt;") !== -1) {
+				continue;
+			}
+			var image = EMOTICONS[emoticon];
+			EMOTICON_REVERSE[image] = emoticon;
+		}
+		for (var image in EMOTICON_REVERSE) {
+			var emoticon = EMOTICON_REVERSE[image];
+			Emotiwidget.add(emoticon, image);
+		}
+		$("#open-emoticons").click(Emotiwidget.toggle);
+	},
+	
+	add: function (emoticon, image) {
+		var $img = $("<img>").attr("src", image);
+		$img.click(function(){
+		  var newval = $("#chat-message").val();
+		  newval += " " + emoticon + " ";
+		  $("#chat-message").val(newval);
+		  Emotiwidget.hide();
+		  $("#chat-message").focus();
+		});
+		$("#emoticons").append($img);
+	},
+
+	toggle: function(){
+		$("#emoticons").toggle();
+	},
+	
+	show: function(){
+		$("#emoticons").show();
+	},
+	
+	hide: function(){
+		$("#emoticons").hide();
+	}
+}
+$(Emotiwidget.init());
+
 var Chat =
 	{
 	seen: {},
@@ -420,38 +512,47 @@ var Chat =
 		$.post(API.URL.send, params)
 		// Game.rejoinDisplay ()
 		},
-	parse: function (raw)
+	parse: function (raw, name)
 		{
 		// return sanitize(raw) || ""
 		if (! raw)
 			return ""
-		if (raw.indexOf("http") !== -1)
+		name = name || "frederick";
+		var words = sanitize(raw).split(" ")
+		var parsed = []
+		for (var i = 0; i < words.length; i++)
 			{
-			var words = sanitize(raw).split(" ")
-			var parsed = []
-			for (var i = 0; i < words.length; i++)
+			var word = words[i];
+			if (word.indexOf("http") === 0)
 				{
-				if (words[i].indexOf("http") === 0)
+				if (name == "frederick" && 
+					(
+					words[i].indexOf("gif") !== -1 ||
+					words[i].indexOf("jpg") !== -1 ||
+					words[i].indexOf("png") !== -1 ||
+					words[i].indexOf("jpeg") !== -1 ||
+					words[i].indexOf("GIF") !== -1 ||
+					words[i].indexOf("JPG") !== -1 ||
+					words[i].indexOf("PNG") !== -1 ||
+					words[i].indexOf("JPEG") !== -1
+					))
 					{
-					if (words[i].indexOf("gif") !== -1 ||
-						words[i].indexOf("jpg") !== -1 ||
-						words[i].indexOf("png") !== -1 ||
-						words[i].indexOf("jpeg") !== -1 ||
-						words[i].indexOf("GIF") !== -1 ||
-						words[i].indexOf("JPG") !== -1 ||
-						words[i].indexOf("PNG") !== -1 ||
-						words[i].indexOf("JPEG") !== -1)
-						parsed.push ("<img src='"+words[i]+"'>")
-						// parsed.push ("<a href='"+words[i]+"' target='_blank'><img src='"+words[i]+"'></a>")
-					else
-						parsed.push ("<a href='"+words[i]+"' target='_blank'>"+words[i]+"</a>")
-					}
+					parsed.push ("<img src='"+word+"'>")
+					// parsed.push ("<a href='"+word+"' target='_blank'><img src='"+word+"'></a>")
+					}						
 				else
-					parsed.push (words[i])
+					{
+					parsed.push ("<a href='"+word+"' target='_blank'>"+word+"</a>")
+					}
 				}
-			return parsed.join(" ")
+			else if (word in EMOTICONS)
+				{
+				parsed.push ("<img src='" + EMOTICONS[word] + "'>");
+				}
+			else
+				parsed.push (word)
 			}
-		return sanitize(raw)
+		return parsed.join(" ")
 		},
 	add: function (lines)
 		{
@@ -471,14 +572,12 @@ var Chat =
 				var hash = $.md5 (line[3])
 				if (hash in Chat.seen)
 					continue
-				rows.push( "<p><span class='user you'>"+line[2]+"</span><span class='msg'>"+sanitize(line[3])+"</span></p>" )
+				rows.push( "<p><span class='user you'>"+line[2]+"</span><span class='msg'>"+Chat.parse(line[3], line[2])+"</span></p>" )
 				}
 			else if (line[2] in Game.ignoreList)
 				continue
-			else if (line[2] === "frederick")
-				rows.push( "<p><span class='user'>"+line[2]+"</span><span class='msg'>"+Chat.parse(line[3])+"</span></p>" )
 			else
-				rows.push( "<p><span class='user'>"+line[2]+"</span><span class='msg'>"+sanitize(line[3])+"</span></p>" )
+				rows.push( "<p><span class='user'>"+line[2]+"</span><span class='msg'>"+Chat.parse(line[3], line[2])+"</span></p>" )
 			Chat.seen[line[0]] = true
 			if (line[3].indexOf("http") !== -1)
 				has_images = true
@@ -497,7 +596,7 @@ var Chat =
 					setTimeout ('scrollToBottom("#chat_container")', 2000)
 				}
 			}
-		}
+		},
 	}
 
 var Game =
@@ -549,7 +648,7 @@ var Game =
 		// Active.update(data)
 		Game.last = data['last']
 		self.timeout = setTimeout (Game.poll, 1000)
-		}
+		},
 	}
 var Active =
 	{
@@ -588,7 +687,7 @@ var Active =
 	init: function ()
 		{
 		$("#chat_active_container").hover(Active.mouseIn, Active.mouseOut)
-		}
+		},
 	}
 var Newgame =
 	{
@@ -673,7 +772,7 @@ var Newgame =
 		$("#newgame-name").bind("keydown", Newgame.keys)
 		$("#newgame-go").bind("click", Newgame.start)
 		$("#newgame-private").bind("click", Newgame.privateToggle)
-		}
+		},
 	}
 var Slideshow =
 	{
@@ -800,7 +899,7 @@ var Lobby =
 		$("#profile").click(Lobby.redirect_to_profile)
 		// Lobby.reloadDelay()
 		},
-	room_to_autojoin: "bigapple",
+	room_to_autojoin: "apple",
 	autojoin: function ()
 		{
 		clearTimeout (Game.timeout)
@@ -848,9 +947,7 @@ var Lobby =
 		var first_score = 0
 		for (key in Lobby.games)
 			keys.push(key)
-		// Lobby.games["bigapple"].name = "Main Room"
 		keys = keys.sort ()
-		game_list.push (Lobby.gameRow(Lobby.games["bigapple"]))
 		for (var i = 0; i < keys.length; i++)
 			{
 			var game = Lobby.games[keys[i]]
@@ -860,13 +957,11 @@ var Lobby =
 				continue
 			if (keys[i] === "lobbychat")
 				continue
-			if (first_key === "bigapple" || (game.players.length > first_score && game.players.length !== game.capacity))
+			if (game.players.length > first_score && game.players.length !== game.capacity)
 				{
 				first_key = keys[i]
 				first_score = game.players.length
 				}
-			if (keys[i] === "bigapple")
-				continue
 			game_list.push (Lobby.gameRow(game))
 			}
 		if (game_list.length < 2)
@@ -949,7 +1044,7 @@ var Lobby =
 		$("#game-list li").live("mouseover", Lobby.manifestUpdate)
 		$("#game-list li").live("click", Lobby.joinClick)
 		Active.init()
-		}
+		},
 	}
 var Main =
 	{
@@ -1010,7 +1105,7 @@ var Main =
 		 	Lobby.load ()
 		else
 		 	Auth.load ()
-		}
+		},
 	}
 Main.init ()
 

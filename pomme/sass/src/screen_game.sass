@@ -158,8 +158,32 @@ body
 		outline: 0
 		border: 1px solid #ccc
 		padding: 2px
-		width: 100%
+		width: 92%
 		font-size: 13px
+	#open-emoticons
+		position: absolute
+		right: -3px
+		bottom: 18px
+		width: 15px
+		height: 15px
+		cursor: pointer
+	#emoticons
+		display: none
+		display: center
+		z-index: 100
+		position: absolute
+		right: -5px
+		bottom: 39px
+		width: 110px
+		padding: 2px 0px 2px 5px
+		border: 1px solid #ddd
+		background: #fff
+		img
+			margin: 2px
+			border: 1px solid transparent
+			cursor: pointer
+			&:hover
+				border: 1px solid black
 	button
 		display: none
 		border: 0
@@ -250,9 +274,14 @@ body
 		margin-bottom: 10px
 		font-size: 14px
 #countdown
+	z-index: 10000
+	font-size: 24px
+	taxt-align: center
+	width: 50px
+	left: 50%
+	margin-left: -25px
 	position: absolute
-	top: 10px
-	right: 10px
+	top: 20px
 	&.close
 		color: red
 #status
@@ -507,8 +536,8 @@ body
 	position: absolute
 	overflow: hidden
 	white-space: nowrap
-	top: 30%
-	left: 50%
+	top: 20%
+	left: 47.5%
 	margin-left: -160px
 	background-color: #fff
 	width: 375px

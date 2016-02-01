@@ -45,15 +45,21 @@
 
 <div id="loading">loading...</div>
 <div id="game">
-	<div id="chat_container">
-		<div id="chat"><div id="chat_shim"></div></div>
-	</div>
 	<div id="chat_bg"></div>
+
+	<div id="chat_container">
+		<div id="chat"><div id="chat_shim"></div>
+		</div>
+	  
+    </div>
 
 	<div id="form">
 		<input type="text" id="chat-message" maxlength="200"/>
+    <div id="emoticons"></div>
+    <img id="open-emoticons" src="/img/emoticons/happy.gif">
 	</div>
-
+	
+	
 	<div id="status">
 		<h2 id="round"></h2>
 		<div id="instructions"></div>
@@ -72,8 +78,8 @@
 		<div id="show-bg">Show BG</div>
 		<div id="hide-bg">Hide BG</div>
 		<div class="icon" id="history">History</div>
-		<div id="countdown"></div>
-	</div>
+	</div>		
+	<div id="countdown"></div>
 	<div id="status-menu">
 		<span id="status-profile">Profile</span>
 		<span id="status-skip">Skip</span>
@@ -128,19 +134,23 @@
 	<div id="attract-curtain"></div>
 	<div id="attract-container">
 		<span id="attract-close">x</span>
-		<p>
-			Hey! This room is empty right now.<br>
-			Why don't you invite your friends to play?
-		</p>
-		<div id="share-buttons">
-			<div id="facebook-share">Share on Facebook</div>
-			<div id="twitter-share">Share on Twitter</div>
-			<br>
-			<input type="text" id="link-share">
+		<p>Pomme is an online multiplayer game.</p></br>
+     	<p>It requires 3 or more people to play.</p></br>
+    	<p>It's like Cards Against Humanity, but with gifs!</p>
+    	</br>
+		<center><img src="img/pomme-apple.gif"></center>
+		</br>
+		<p>Share this link with your friends to start playing!</p>
+                <div style="margin-top: 1em;">
+                <center>
+	          <a style="margin: 1em;" href="http://twitter.com/home?status=play pomme with me! http://pomme.us " target="_blank"> <img src="img/twitter.png" alt="twitter" width="32" height="32" title="" border="0"></a>
+                  <a style="margin: 1em;" href="https://www.facebook.com/sharer/sharer.php?u=pomme.us" onclick="return fbs_click()" target="_blank" title="Pomme"> <img src="img/facebook.png" alt="facebook" width="32" height="32" border="0"></a>
+	          <a style="margin: 1em;" href="http://www.tumblr.com/share/link?url=http:%2F%2Fpomme.us%2F&amp;name=pomme" target="_blank title=" pomme"=""> <img src="img/tumblr.png" alt="tumblr" width="32" height="32" border="0"> </a>
+                </center>
+                </div>
+			<center> <input type="text" id="link-share" style="margin-top: 1em;width: 179px;height: 20px;font-size: 13px;"> </center>
 		</div>
-		<p>
-			Or <span id="room-autojoin">join another room.</span>
-		</p>
+	</div>
 	</div>
 	<div id="buttons">
 		<a id="pomme" href="/"></a>
@@ -150,22 +160,6 @@
 		<div id="your-profile">Profile</div>
 		<div id="credits">Credits</div>
 		<div id="logout">Logout</div>
-		<form action="https://www.paypal.com/cgi-bin/webscr" method="post" style="float: right; padding-top: 9px; display: inline-block;">
-			<input type="hidden" name="cmd" value="_donations">
-			<input type="hidden" name="business" value="pomme.game@gmail.com">
-			<input type="hidden" name="lc" value="US">
-			<input type="hidden" name="item_name" value="Pomme.us">
-			<input type="hidden" name="no_note" value="0">
-			<input type="hidden" name="currency_code" value="USD">
-			<input type="hidden" name="bn" value="PP-DonationsBF:btn_donate_SM.gif:NonHostedGuest">
-			<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
-			<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
-		</form>
-<a href="http://www.tumblr.com/follow/pommeus"><img src="http://i.imgur.com/eaRCy.gif" /></a>
-	
-<a href="https://twitter.com/pomme_us" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pomme_us</a>
-<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-
 		<fb:like id="fblike" href="http://pomme.us/" send="false" layout="button_count" width="85" show_faces="false" action="like" font="lucida grande"></fb:like>
 	</div>
 	<div id="room-edit-curtain"></div>
@@ -228,49 +222,21 @@
 		<h2>Pomme</h2>
 
             <font size="2">
-                <ul style="float:left;text-align:left;margin-left:5%;padding:10px;">
-                </br>
+                <ul style="float:center;text-align:center;margin-left:0%;padding:10px;">
                 <li>Created by</li>
-                <li><a href="mailto:pomme.game@gmail.com" target="_blank">Frederick Heydt</a></li>
+                <li><a href="mailto:frederick@pomme.us" target="_blank">Frederick Heydt</a></li>
                 <li>Programmed by</li>
                 <li><a href="http://asdf.us/" target="_blank">Jules Welter</a></li>
-                <li><a href="http://scannerjammer.com" target="_blank">pepper</a></li>
-                <li>PR by</li>
-                <li><a href="http://www.facebook.com/kmeizner" target="_blank">Kate Meizner</a></li>
+                <li><a href="http://5tephen.com/" target="_blank">5tehpen</a></li>
                 <li>Logo by</li>
                 <li><a href="http://cargocollective.com/hermesarriola" target="_blank">Hermes Arriola</a></li>
                 <li>Sound by</li>
                 <li><a href="http://lolz.biz/" target="_blank">Joel Cook</a></li>
-                </ul>
-                </font>
-                <br/>
-
-                <ul style="float:top;text-align:left;margin-left:45%;">
-                Special Thanks
-                </br>
-                <a href="https://twitter.com/#!/brettcm82" target="_blank">Brett Mounce</a>/<a href="http://solikeiguesstheresno.us/" target="_blank">James Mckain</a>
-                </br>
-                <a href="https://twitter.com/#!/mggimcg" target="_blank">Maggie McGee</a>/<a href="http://tightartists.com/" target="_blank">Tight Artists</a>
-                </br>
-                <a href="http://youtu.be/PW902InP424" target="_blank">Randumb Productions</a>/<a href="http://youtu.be/pC83w-NeYOI" target="_blank">Mac</a>
-                 </br>
-                <a href="http://scannerjammer.com" target="_blank">Scannerjammer</a>/<a href="http://dump.fm/" target="_blank">Dump.fm</a>
-                </br>
-                <a href="http://www.deannahavas.com/" target="_blank">Deanna Havas</a>/<a href="http://www.nahchill.com/" target="_blank">Samuel Howe</a>
-                </br>
-                <a href="http://i.imgur.com/YdNBl.jpg" target="_blank">Lauren Aimsell</a>/<a href="http://www.youtube.com/user/ZackScottGames" target="_blank">Zack Scott</a>
-                </br>
-                <a href="http://facebook.com/bhideas" target="_blank">Bill Hitchert</a>/<a href="http://www.lulinternet.com" target="_blank">Lacey Micallef</a>
-                </br>
-                <a href="https://twitter.com/#!/flourides" target="_blank">Dayton Castleman</a>/<a href="http://www.youtube.com/watch?v=Z0-Wo3LstZw" target="_blank">Chris Moes</a>
-                </br>
-                <a href="http://bananaslug.tumblr.com" target="_blank">Alli Crawford</a>/<a href="http://www.youtube.com/user/SwimmingBird941?ob=0&feature=results_main" target="_blank">Adam Holley</a>
-                </br>
-                <a href="http://www.youtube.com/watch?v=jHhrej-vm_A" target="_blank">Tyler Aitchkay</a>/<a href="http://www.familylobby.com/common/tt8372685fltt.gif" target="_blank">Mary Burford</a>
-                </br>
-                <a href="http://anamanaguchi.com" target="_blank">Anamanaguchi</a>
-                </br>
-                </br>
+                <li>Special Thanks</li>
+                <li><a href="https://www.youtube.com/user/ZackScottGames" target="_blank">Zack Scott</a> </li>
+            	<li><a href="http://youtu.be/PW902InP424" target="_blank">Randumb Productions</a> </li>
+                <li><a href="http://facebook.com/bhideas" target="_blank">Bill Hitchert</a> </li>
+                <li><a href="http://anamanaguchi.com" target="_blank">Anamanaguchi</a></li>
                 </ul>
 	
 		<small style="float: right"><a href="/static/terms" target="_blank">Terms</a></small>

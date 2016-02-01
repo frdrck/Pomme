@@ -1,4 +1,4 @@
-import jon.dbpool as dbpool
+import dbpool
 import MySQLdb, MySQLdb.cursors
 import time
 
@@ -41,7 +41,7 @@ class db:
       cursor = self.conn.cursor()
       cursor.execute(sql,args)
       return cursor
-    except OperationalError, e:
+    except dbpool.OperationalError, e:
       print "Error %d: %s" % (e.args[0], e.args[1])
       # sys.exit(1)
       self.connect()
@@ -54,7 +54,7 @@ class db:
       dict_cursor = self.conn.cursor(MySQLdb.cursors.DictCursor)
       dict_cursor.execute(sql,args)
       return dict_cursor
-    except OperationalError, e:
+    except dbpool.OperationalError, e:
       print "Error %d: %s" % (e.args[0], e.args[1])
       # sys.exit(1)
       self.connect()
@@ -131,6 +131,56 @@ class db:
     args = (userid)
     self.execute(sql, args)
 
+  def win_game (self, game, username):
+    if game.goal == 0:
+      return
+    if len(game.active) < 3:
+      return
+    user = self.user_from_username (username)
+    if game.goal == 10:
+      user.wins_10 += 1
+      user_win_game(user.id, game.goal)
+    elif game.goal == 20:
+      user.wins_20 += 1
+      user_win_game(user.id, game.goal)
+    elif game.goal == 30:
+      user.wins_30 += 1
+      user_win_game(user.id, game.goal)
+
+  def win_round (self, game, username, judgename, playercard, matchcard):
+    user = self.user_from_username (username)
+    judge = self.user_from_username (judgename)
+    userid = 0
+    judgeid = 0
+    if user is not None:
+      userid = user.id
+    if judge is not None:
+      judgeid = judge.id
+    params = {
+      'date': now (),
+      'gameid': game.id,
+      'gamename': game.path,
+      # 'free': game.free,
+      'userid': userid,
+      'username': username,
+      'judgeid': judgeid,
+      'judgename': judgename,
+      'pair': playercard,
+      'pairtype': 'player',
+      'image': matchcard,
+      'imagetype': 'main',
+      }
+    comboid = combo_new (params)
+    if judge is not None:
+      like_add (judgeid, comboid, userid)
+    if user is not None:
+      user.score += 1
+    # if game.free != 1:
+    self.combos.append ((playercard, matchcard, comboid))
+    if len(self.combos) > COMBO_LOG_SIZE:
+      self.combos.popleft ()
+    return comboid
+
   ### GAMES
 
   def game_new(self, data):
@@ -171,8 +221,7 @@ class db:
   def combo_list_latest(self):
     sql = "SELECT * FROM pomme_combo ORDER BY id DESC LIMIT %s"
     args = (COMBO_LIMIT)
-    self.dict_execute(sql, args)
-    return self.dict_cursor.fetchall()
+    return self.dict_execute(sql, args).fetchall()
 
   def combo_list_top(self, userid, start=None, limit=None):
     sql = "SELECT * FROM pomme_combo WHERE userid=%s "
@@ -184,8 +233,7 @@ class db:
       limit = COMBO_LIMIT
     sql += "ORDER BY likes DESC LIMIT %s"
     args.append(limit)
-    self.dict_execute(sql, args)
-    return self.dict_cursor.fetchall()
+    return self.dict_execute(sql, args).fetchall()
 
   def combo_list_user(self, userid, start=None, limit=None):
     sql = "SELECT * FROM pomme_combo WHERE userid=%s "
@@ -197,8 +245,7 @@ class db:
       limit = COMBO_LIMIT
     sql += "ORDER BY id DESC LIMIT %s"
     args.append(limit)
-    self.dict_execute(sql, args)
-    return self.dict_cursor.fetchall()
+    return self.dict_execute(sql, args).fetchall()
 
   def combo_list_judge(self, userid, start=None, limit=None):
     sql = "SELECT * FROM pomme_combo WHERE judgeid=%s "
@@ -210,8 +257,7 @@ class db:
       limit = COMBO_LIMIT
     sql += "ORDER BY id DESC LIMIT %s"
     args.append(limit)
-    self.dict_execute(sql, args)
-    return self.dict_cursor.fetchall()
+    return self.dict_execute(sql, args).fetchall()
 
   def combo_list_likes(self, userid, start=None, limit=None):
     sql = "SELECT comboid FROM pomme_like WHERE likerid=%s "
@@ -227,9 +273,7 @@ class db:
     sql += ",".join([str(x[0]) for x in comboids])
     sql += ")"
     args = ()
-    self.dict_execute(sql, args)
-    # TODO: resort by the order in comboids
-    return self.dict_cursor.fetchall()
+    return self.dict_execute(sql, args).fetchall()
 
   def combo_list_game(self, gameid, start=None, limit=None):
     sql = "SELECT * FROM pomme_combo WHERE gameid=%s "
@@ -241,8 +285,7 @@ class db:
       limit = COMBO_LIMIT
     sql += "ORDER BY id DESC LIMIT %s"
     args.append(limit)
-    self.dict_execute(sql, args)
-    return self.dict_cursor.fetchall()
+    return self.dict_execute(sql, args).fetchall()
 
   def combo_gain_point(self, comboid):
     sql = "UPDATE pomme_combo SET score = score + 1 WHERE id=%s"

@@ -298,7 +298,7 @@ var Lobby =
 		$("#profile").click(Lobby.redirect_to_profile)
 		// Lobby.reloadDelay()
 		},
-	room_to_autojoin: "bigapple",
+	room_to_autojoin: "apple",
 	autojoin: function ()
 		{
 		clearTimeout (Game.timeout)
@@ -346,9 +346,7 @@ var Lobby =
 		var first_score = 0
 		for (key in Lobby.games)
 			keys.push(key)
-		// Lobby.games["bigapple"].name = "Main Room"
 		keys = keys.sort ()
-		game_list.push (Lobby.gameRow(Lobby.games["bigapple"]))
 		for (var i = 0; i < keys.length; i++)
 			{
 			var game = Lobby.games[keys[i]]
@@ -358,13 +356,11 @@ var Lobby =
 				continue
 			if (keys[i] === "lobbychat")
 				continue
-			if (first_key === "bigapple" || (game.players.length > first_score && game.players.length !== game.capacity))
+			if (game.players.length > first_score && game.players.length !== game.capacity)
 				{
 				first_key = keys[i]
 				first_score = game.players.length
 				}
-			if (keys[i] === "bigapple")
-				continue
 			game_list.push (Lobby.gameRow(game))
 			}
 		if (game_list.length < 2)
