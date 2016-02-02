@@ -6,3 +6,4 @@ pid_*
 *.swp
 pomme/config.py
 node_modules
+pomme_combo.sql
