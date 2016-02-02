@@ -1,4 +1,4 @@
-BASE_URL = "http://pomme.us:32123"
+BASE_URL = "http://heavyfeathered.com:32123"
 
 var API =
 	{
@@ -271,7 +271,7 @@ var Auth =
 			return
 			}
 		Auth.session = data.session
-		document.cookie = "session="+Auth.session+";path=/;domain=.pomme.us;max-age=1086400"
+		document.cookie = "session="+Auth.session+";path=/;domain=.heavyfeathered.com;max-age=1086400"
 		Auth.unload ()
 		Auth.loginCallback ()
 		},
@@ -307,7 +307,7 @@ var Auth =
 	loginCallback: function () {},
 	logout: function ()
 		{
-		document.cookie = "session=false;path=/;domain=.pomme.us;max-age=0"
+		document.cookie = "session=false;path=/;domain=.heavyfeathered.com;max-age=0"
 		Auth.username = false
 		Auth.session = false
 		Auth.logoutCallback ()

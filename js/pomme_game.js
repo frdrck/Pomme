@@ -319,7 +319,7 @@ var Webcam =
 		},
 	receive: function (url)
 		{
-		filename = url.replace("http://pomme.us/img/webcam/", "")
+		filename = url.replace("http://heavyfeathered.com/img/webcam/", "")
 		Game.camCard(filename)
 		},
 	reset: function () 
@@ -376,7 +376,7 @@ var Webcam =
 		}
 	}
 
-BASE_URL = "http://pomme.us:32123"
+BASE_URL = "http://heavyfeathered.com:32123"
 
 var API =
 	{
@@ -650,7 +650,7 @@ var Auth =
 			return
 			}
 		Auth.session = data.session
-		document.cookie = "session="+Auth.session+";path=/;domain=.pomme.us;max-age=1086400"
+		document.cookie = "session="+Auth.session+";path=/;domain=.heavyfeathered.com;max-age=1086400"
 		Auth.unload ()
 		Auth.loginCallback ()
 		},
@@ -686,7 +686,7 @@ var Auth =
 	loginCallback: function () {},
 	logout: function ()
 		{
-		document.cookie = "session=false;path=/;domain=.pomme.us;max-age=0"
+		document.cookie = "session=false;path=/;domain=.heavyfeathered.com;max-age=0"
 		Auth.username = false
 		Auth.session = false
 		Auth.logoutCallback ()
@@ -1724,7 +1724,7 @@ var Game =
 		Share.test(data['players'].length);
 		if (Auth.username === false)
 			Auth.username = data['username']
-		document.cookie = "session="+Auth.session+";path=/;domain=.pomme.us;max-age=1086400"
+		document.cookie = "session="+Auth.session+";path=/;domain=.heavyfeathered.com;max-age=1086400"
 		Game.last = data['last']
 		Room.init ()
 		Game.viewCallback (data)
@@ -1778,9 +1778,9 @@ var Game =
 	pollError: function ()
 		{ self.timeout = setTimeout (Game.poll, 5000) },
 	redirect_to: function (redirect)
-		{ document.location = "http://pomme.us" + redirect },
+		{ document.location = "http://heavyfeathered.com" + redirect },
 	redirect_to_lobby: function ()
-		{ document.location = "http://pomme.us/" },
+		{ document.location = "http://heavyfeathered.com/" },
 	fatalError: function (error)
 		{
 		$("#game").hide ()
@@ -2157,10 +2157,10 @@ var Game =
 			Countdown.stop ()
 			Game.hideCards ()
 			if (data['round'] > 0)
-				return ["Nobody here -- Send the link to your friends!<br/><input type='text' id='copy_url' readonly value='http://pomme.us/"+Game.name+"'/>", " "]
+				return ["Nobody here -- Send the link to your friends!<br/><input type='text' id='copy_url' readonly value='http://heavyfeathered.com/"+Game.name+"'/>", " "]
 			else
-				return ["Nobody here -- Send the link to your friends!<br/><input type='text' id='copy_url' readonly value='http://pomme.us/"+Game.name+"'/>", " "]
-				// return ["Nobody here -- Send the link to your friends!<br/></"+Game.name+"'>http://pomme.us/"+Game.name+"</a>", " "]
+				return ["Nobody here -- Send the link to your friends!<br/><input type='text' id='copy_url' readonly value='http://heavyfeathered.com/"+Game.name+"'/>", " "]
+				// return ["Nobody here -- Send the link to your friends!<br/></"+Game.name+"'>http://heavyfeathered.com/"+Game.name+"</a>", " "]
 				// return ["Nobody here -- Send the link to your friends!", " "]
 			}
 		Game.states[STATE_SETUP] = function (data)
@@ -2697,7 +2697,7 @@ var Game =
 		},
 	autojoinCallback: function (data)
 		{
-		document.location = "http://pomme.us/" + data['path']
+		document.location = "http://heavyfeathered.com/" + data['path']
 		},
 	load: function ()
 		{

@@ -1,4 +1,4 @@
-BASE_URL = "http://pomme.us:32123"
+BASE_URL = "http://heavyfeathered.com:32123"
 
 var API =
 	{
@@ -271,7 +271,7 @@ var Auth =
 			return
 			}
 		Auth.session = data.session
-		document.cookie = "session="+Auth.session+";path=/;domain=.pomme.us;max-age=1086400"
+		document.cookie = "session="+Auth.session+";path=/;domain=.heavyfeathered.com;max-age=1086400"
 		Auth.unload ()
 		Auth.loginCallback ()
 		},
@@ -307,7 +307,7 @@ var Auth =
 	loginCallback: function () {},
 	logout: function ()
 		{
-		document.cookie = "session=false;path=/;domain=.pomme.us;max-age=0"
+		document.cookie = "session=false;path=/;domain=.heavyfeathered.com;max-age=0"
 		Auth.username = false
 		Auth.session = false
 		Auth.logoutCallback ()
@@ -617,7 +617,7 @@ var Game =
 			Auth.username = data['username']
 		if ("error" in data)
 			return Game.pollError()
-		document.cookie = "session="+Auth.session+";path=/;domain=.pomme.us;max-age=1086400"
+		document.cookie = "session="+Auth.session+";path=/;domain=.heavyfeathered.com;max-age=1086400"
 		// document.getElementById("chat-message").focus()
 		Game.last = data['last']
 		Game.score = data['score']
@@ -753,7 +753,7 @@ var Newgame =
 			return
 			}
 		var path = data.path
-		document.location = "http://pomme.us/" + path
+		document.location = "http://heavyfeathered.com/" + path
 		},
 	unload: function ()
 		{
@@ -909,11 +909,11 @@ var Lobby =
 		},
 	autojoinCallback: function (data)
 		{
-		document.location = "http://pomme.us/" + data['path']
+		document.location = "http://heavyfeathered.com/" + data['path']
 		},
 	redirect_to_profile: function ()
 		{
-		document.location = "http://pomme.us/profile/" + Auth.username
+		document.location = "http://heavyfeathered.com/profile/" + Auth.username
 		},
 	reload: function ()
 		{
@@ -967,7 +967,7 @@ var Lobby =
 		if (game_list.length < 2)
 			{
 			if (!(first_key in Lobby.games) || Lobby.games[first_key].players.length < 4)
-				document.location = "http://pomme.us/" + first_key
+				document.location = "http://heavyfeathered.com/" + first_key
 			}
 		$("#game-list").html(game_list.join(""))
 		return first_key
@@ -1001,7 +1001,7 @@ var Lobby =
 		var path = $(this).data("path")
 		if (Lobby.games[path].private)
 			return
-		document.location = "http://pomme.us/" + path
+		document.location = "http://heavyfeathered.com/" + path
 		},
 	manifestUpdatePath: function (path)
 		{
