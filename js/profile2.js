@@ -1,5 +1,3 @@
-BASE_URL = "http://heavyfeathered.com:32123"
-
 var API =
 	{
 	URL:
@@ -271,7 +269,7 @@ var Auth =
 			return
 			}
 		Auth.session = data.session
-		document.cookie = "session="+Auth.session+";path=/;domain=.heavyfeathered.com;max-age=1086400"
+		document.cookie = loginCookie(Auth.session);
 		Auth.unload ()
 		Auth.loginCallback ()
 		},
@@ -307,7 +305,7 @@ var Auth =
 	loginCallback: function () {},
 	logout: function ()
 		{
-		document.cookie = "session=false;path=/;domain=.heavyfeathered.com;max-age=0"
+		document.cookie = logoutCookie();
 		Auth.username = false
 		Auth.session = false
 		Auth.logoutCallback ()

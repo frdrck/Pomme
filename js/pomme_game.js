@@ -319,7 +319,7 @@ var Webcam =
 		},
 	receive: function (url)
 		{
-		filename = url.replace("http://heavyfeathered.com/img/webcam/", "")
+		filename = url.replace(SITE_URL + "img/webcam/", "")
 		Game.camCard(filename)
 		},
 	reset: function () 
@@ -375,8 +375,6 @@ var Webcam =
 		$("#webcam-close,#webcam-curtain").bind("click", Webcam.unload)
 		}
 	}
-
-BASE_URL = "http://heavyfeathered.com:32123"
 
 var API =
 	{
@@ -650,7 +648,7 @@ var Auth =
 			return
 			}
 		Auth.session = data.session
-		document.cookie = "session="+Auth.session+";path=/;domain=.heavyfeathered.com;max-age=1086400"
+		document.cookie = loginCookie(Auth.session);
 		Auth.unload ()
 		Auth.loginCallback ()
 		},
@@ -686,7 +684,7 @@ var Auth =
 	loginCallback: function () {},
 	logout: function ()
 		{
-		document.cookie = "session=false;path=/;domain=.heavyfeathered.com;max-age=0"
+		document.cookie = logoutCookie();
 		Auth.username = false
 		Auth.session = false
 		Auth.logoutCallback ()
@@ -1724,7 +1722,7 @@ var Game =
 		Share.test(data['players'].length);
 		if (Auth.username === false)
 			Auth.username = data['username']
-		document.cookie = "session="+Auth.session+";path=/;domain=.heavyfeathered.com;max-age=1086400"
+		document.cookie = loginCookie(Auth.session);
 		Game.last = data['last']
 		Room.init ()
 		Game.viewCallback (data)
@@ -1778,9 +1776,9 @@ var Game =
 	pollError: function ()
 		{ self.timeout = setTimeout (Game.poll, 5000) },
 	redirect_to: function (redirect)
-		{ document.location = "http://heavyfeathered.com" + redirect },
+		{ document.location = SITE_URL + redirect },
 	redirect_to_lobby: function ()
-		{ document.location = "http://heavyfeathered.com/" },
+		{ document.location = SITE_URL },
 	fatalError: function (error)
 		{
 		$("#game").hide ()
@@ -2157,11 +2155,9 @@ var Game =
 			Countdown.stop ()
 			Game.hideCards ()
 			if (data['round'] > 0)
-				return ["Nobody here -- Send the link to your friends!<br/><input type='text' id='copy_url' readonly value='http://heavyfeathered.com/"+Game.name+"'/>", " "]
+				return ["Nobody here -- Send the link to your friends!<br/><input type='text' id='copy_url' readonly value='" + SITE_URL + Game.name+"'/>", " "]
 			else
-				return ["Nobody here -- Send the link to your friends!<br/><input type='text' id='copy_url' readonly value='http://heavyfeathered.com/"+Game.name+"'/>", " "]
-				// return ["Nobody here -- Send the link to your friends!<br/></"+Game.name+"'>http://heavyfeathered.com/"+Game.name+"</a>", " "]
-				// return ["Nobody here -- Send the link to your friends!", " "]
+				return ["Nobody here -- Send the link to your friends!<br/><input type='text' id='copy_url' readonly value='" + SITE_URL + Game.name+"'/>", " "]
 			}
 		Game.states[STATE_SETUP] = function (data)
 			{
@@ -2697,7 +2693,7 @@ var Game =
 		},
 	autojoinCallback: function (data)
 		{
-		document.location = "http://heavyfeathered.com/" + data['path']
+		document.location = SITE_URL + data['path']
 		},
 	load: function ()
 		{
