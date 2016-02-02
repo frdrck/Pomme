@@ -1,4 +1,4 @@
-import dbpool
+from jon import dbpool
 import MySQLdb, MySQLdb.cursors
 import time
 
