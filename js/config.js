@@ -1,6 +1,6 @@
-var BASE_URL = "http://heavyfeathered.com:32123";
-var COOKIE_DOMAIN = ".heavyfeathered.com";
-var SITE_URL = "http://heavyfeathered.com/";
+var BASE_URL = "http://159.203.84.158:32123";
+var COOKIE_DOMAIN = ".159.203.84.158";
+var SITE_URL = "http://159.203.84.158/";
 
 function logoutCookie() {
 	var cookie = "session=false;path=/;max-age=0;domain=" + COOKIE_DOMAIN;

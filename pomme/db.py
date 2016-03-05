@@ -26,8 +26,10 @@ def is_number(i):
 
 class db:
   def __init__(self):
+    print "connect"
     self.conn = None
     self.connect()
+    print "done connect"
 
   def connect(self):
     self.conn = dbpool.connect(

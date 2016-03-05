@@ -4,6 +4,7 @@ from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from SocketServer import ThreadingMixIn
 import threading
 import os
+import sys
 import re
 import cgi
 import sha
@@ -15,10 +16,16 @@ import simplejson as json
 from collections import deque
 from fruits import FRUITS
 
+print "db"
+
 import db
 import config
 
+print "db done"
+
 DB = db.db ()
+
+print "new db"
 
 BAN_TIME = 5 * 60
 GAME_IDLE_TIME = 10
@@ -1358,6 +1365,7 @@ class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
 if __name__ == '__main__':
 	while True:
 		try:
+                        print "starting server", config.SERVER_HOST, config.SERVER_PORT
 			server = ThreadedHTTPServer((config.SERVER_HOST, config.SERVER_PORT), PommeHandler)
 			print 'Listening on', config.SERVER_HOST, config.SERVER_PORT, '...'
 			print 'PID', os.getpid()
@@ -1366,5 +1374,6 @@ if __name__ == '__main__':
 			print '^C'
 			server.socket.close()
 		except:
-			pass
+                        print "Unexpected error:", sys.exc_info()[0]
+			raise
 
