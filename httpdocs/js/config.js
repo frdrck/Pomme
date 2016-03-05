@@ -1,3 +1,3 @@
-BROWSER = "http://localhost/";
-SERVER = "http://localhost:32123/";
+BROWSER = "http://159.203.84.158/";
+SERVER = "http://159.203.84.158:32123/";
 AUTOJOIN = false;
