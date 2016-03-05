@@ -3,3 +3,7 @@ config.py
 *.pyc
 pid_*
 .DS_Store
+img
+img/*
+httpdocs
+pomme_combo.sql
