@@ -5,6 +5,7 @@ from SocketServer import ThreadingMixIn
 import threading
 import os
 import sys
+import time
 import re
 import cgi
 import sha
@@ -1371,6 +1372,8 @@ if __name__ == '__main__':
 			print 'PID', os.getpid()
 			server.serve_forever()
 		except KeyboardInterrupt:
+			# seep for two seconds to allow program to really quit.
+			time.sleep(2)
 			print '^C'
 			server.socket.close()
 		except:
