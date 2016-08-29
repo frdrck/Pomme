@@ -1,6 +1,6 @@
-var BASE_URL = "http://heavyfeathered.com:32123";
-var COOKIE_DOMAIN = ".heavyfeathered.com";
-var SITE_URL = "http://heavyfeathered.com/";
+var BASE_URL = "http://pomme.us:32123";
+var COOKIE_DOMAIN = ".pomme.us";
+var SITE_URL = "http://pomme.us/";
 
 function logoutCookie() {
 	var cookie = "session=false;path=/;max-age=0;domain=" + COOKIE_DOMAIN;

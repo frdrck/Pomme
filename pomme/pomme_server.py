@@ -112,6 +112,7 @@ class Cards:
 	def __init__ (self):
 		self.load ()
 	def load (self):
+		print "card dirs:", config.PLAYER_CARDS, config.MAIN_CARDS
 		self.player = self.load_dir (config.PLAYER_CARDS)
 		self.main = self.load_dir (config.MAIN_CARDS)
 	def load_dir (self, path):
