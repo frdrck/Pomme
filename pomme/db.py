@@ -98,7 +98,7 @@ class db:
     self.insert("pomme_user", USER_FIELDS, data)
     id = self.lastinsertid()
     sql = "SELECT * FROM pomme_user WHERE id=%s"
-    args = (id)
+    args = (id,)
     cursor = self.execute(sql, args)
     try:
       return cursor.fetchall()[0]
