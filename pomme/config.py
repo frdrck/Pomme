@@ -14,7 +14,7 @@ BASE_PATH	= "/home/pomme_admin/pomme.us/"
 PLAYER_CARDS	= "img/player/"
 MAIN_CARDS = "img/main/"
 
-DEV = True
+DEV = False
 if (DEV):
   BASE_PATH = "/Users/moonmayor/Code/Pomme/"
   PLAYER_CARDS = "img/dev/player/"
