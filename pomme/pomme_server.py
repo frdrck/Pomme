@@ -8,11 +8,11 @@ import sys
 import time
 import re
 import cgi
-import sha
 import copy
 import time
 import random
 import operator
+import hashlib
 import simplejson as json
 from collections import deque
 from fruits import FRUITS
@@ -104,7 +104,7 @@ def sanitize_html (s):
 def generate_hash (s):
 	if not s:
 		s = "POMME"
-	return sha.new(str(time.time())+s).hexdigest()
+	return hashlib.sha256(str(time.time()).encode() + s.encode()).hexdigest()
 
 START_TIME = now ()
 
