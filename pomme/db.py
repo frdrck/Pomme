@@ -1,10 +1,12 @@
 from jon import dbpool
-import MySQLdb, MySQLdb.cursors
+#import MySQLdb, MySQLdb.cursors
+import mysql.connector
 import time
 
 import config
+import db_config
 
-dbpool.set_database(MySQLdb, 5)
+#dbpool.set_database(MySQLdb, 5)
 
 COMBO_LIMIT = 30
 
@@ -32,18 +34,19 @@ class db:
     print("done connect")
 
   def connect(self):
-    self.conn = dbpool.connect(
+    self.conn = mysql.connector.connect(
         host = config.MYSQL_HOST,
         user = config.MYSQL_USER,
-        passwd = config.MYSQL_PASSWORD,
-        db = config.MYSQL_DATABASE)
+        password = config.MYSQL_PASSWORD,
+        database = config.MYSQL_DATABASE,
+    )
 
   def execute(self,sql,args=()):
     try:
       cursor = self.conn.cursor()
       cursor.execute(sql,args)
       return cursor
-    except dbpool.OperationalError, e:
+    except dbpool.OperationalError as e:
       print("Error %d: %s" % (e.args[0], e.args[1]))
       # sys.exit(1)
       self.connect()
@@ -56,7 +59,7 @@ class db:
       dict_cursor = self.conn.cursor(MySQLdb.cursors.DictCursor)
       dict_cursor.execute(sql,args)
       return dict_cursor
-    except dbpool.OperationalError, e:
+    except dbpool.OperationalError as e:
       print("Error %d: %s" % (e.args[0], e.args[1]))
       # sys.exit(1)
       self.connect()
