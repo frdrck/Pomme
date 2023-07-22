@@ -140,8 +140,8 @@ class Game:
     return data
 
   def new_round(self):
-    print "___________"
-    print "NEW ROUND"
+    print("___________")
+    print("NEW ROUND")
     if len(self.active) - len(self.skipped) < 2:
       self.state = STATE_IDLE
       self.judge = ""
@@ -213,7 +213,7 @@ class Game:
               else:
                 self.idlers[name] = 1
               if self.idlers[name] > IDLE_THRESHOLD:
-                print "IDLE SKIPPING PLAYER", name
+                print("IDLE SKIPPING PLAYER", name)
                 self.skip(name)
         #  self.state = STATE_IDLE
       #if self.judge not in self.active or self.judge in self.skipped:
@@ -228,12 +228,12 @@ class Game:
         self.state = STATE_VOTE
         self.countdown = now() + self.timer
         self.votes = {}
-        print "SWITCHING TO STATE_VOTE"
+        print("SWITCHING TO STATE_VOTE")
         if self.judge in self.idlers:
           self.idlers[self.judge] += 1
         if self.idlers[self.judge] > IDLE_THRESHOLD:
           self.skip(self.judge)
-          print "IDLE SKIPPING JUDGE", self.judge
+          print("IDLE SKIPPING JUDGE", self.judge)
     elif self.state == STATE_VOTE:
       advancing = self.countdown < now()
       if advancing:
@@ -422,19 +422,19 @@ class Game:
     return { "card": new_card }
 
   def api_judge(self, args):
-    print "JUDGING ", args['card']
+    print("JUDGING ", args['card'])
     if self.judge != args['username']:
       return { "error": "you aren't the judge" }
     if args['card'] not in self.bets.values():
       return { "error": "card not in bets" }
-    print "ATTEMPTING TO WIN"
+    print("ATTEMPTING TO WIN")
     self.win(args['card'])
     return {}
 
   def win(self, win_card):
     if self.win_image == win_card:
       return
-    print "WINNING:", win_card
+    print("WINNING:", win_card)
     for user, card in self.bets.iteritems():
       if card == win_card:
         self.state = STATE_WIN
@@ -443,25 +443,25 @@ class Game:
         self.players[user].score += 1
         self.nextgame = now() + 10
         if self.players[user].score >= self.goal and self.goal != 0:
-          print ">>>>>", user, "won the game in", self.name, "!"
+          print(">>>>>", user, "won the game in", self.name, "!")
           self.state = STATE_GAMEOVER
           self.countdown = now() + self.timer
           self.votes = {}
           #self.db.win_game(self, user)
         #self.win_combo = self.db.win_round(self, user, self.judge, card, self.image)
-        print self.players[user].score, "__", self.goal
+        print(self.players[user].score, "__", self.goal)
         return
     self.state = STATE_WIN
     self.winner = "someone"
     self.nextgame = now() + 10
-    print "_____________________"
-    print "judge leaving bug?"
-    print self.name
-    print self.judge
-    print card
-    print repr(self.bets)
-    print 
-    print "_____________________"
+    print("_____________________")
+    print("judge leaving bug?")
+    print(self.name)
+    print(self.judge)
+    print(card)
+    print(repr(self.bets))
+    print() 
+    print("_____________________")
 
   def api_vote(self, args):
     if args['card'] not in self.bets.values():
@@ -482,7 +482,7 @@ class Game:
         scores[card] = 1
     sorted_scores = sorted(scores.iteritems(), key=operator.itemgetter(1), reverse=True)
     if len(sorted_scores):
-      print "TALLIED ENOUGH CARDS"
+      print("TALLIED ENOUGH CARDS")
       self.win(sorted_scores[0][0])
 
   # skip requires simple majority

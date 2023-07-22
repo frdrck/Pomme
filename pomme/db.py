@@ -26,10 +26,10 @@ def is_number(i):
 
 class db:
   def __init__(self):
-    print "connect"
+    print("connect")
     self.conn = None
     self.connect()
-    print "done connect"
+    print("done connect")
 
   def connect(self):
     self.conn = dbpool.connect(
@@ -44,7 +44,7 @@ class db:
       cursor.execute(sql,args)
       return cursor
     except dbpool.OperationalError, e:
-      print "Error %d: %s" % (e.args[0], e.args[1])
+      print("Error %d: %s" % (e.args[0], e.args[1]))
       # sys.exit(1)
       self.connect()
       cursor = self.conn.cursor()
@@ -57,7 +57,7 @@ class db:
       dict_cursor.execute(sql,args)
       return dict_cursor
     except dbpool.OperationalError, e:
-      print "Error %d: %s" % (e.args[0], e.args[1])
+      print("Error %d: %s" % (e.args[0], e.args[1]))
       # sys.exit(1)
       self.connect()
       dict_cursor = self.conn.cursor(MySQLdb.cursors.DictCursor)
