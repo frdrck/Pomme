@@ -1,12 +1,7 @@
-from jon import dbpool
-#import MySQLdb, MySQLdb.cursors
 import mysql.connector
 import time
 
 import config
-import db_config
-
-#dbpool.set_database(MySQLdb, 5)
 
 COMBO_LIMIT = 30
 
@@ -46,7 +41,7 @@ class db:
       cursor = self.conn.cursor()
       cursor.execute(sql,args)
       return cursor
-    except dbpool.OperationalError as e:
+    except Exception as e:
       print("Error %d: %s" % (e.args[0], e.args[1]))
       # sys.exit(1)
       self.connect()
@@ -59,7 +54,7 @@ class db:
       dict_cursor = self.conn.cursor(MySQLdb.cursors.DictCursor)
       dict_cursor.execute(sql,args)
       return dict_cursor
-    except dbpool.OperationalError as e:
+    except Exception as e:
       print("Error %d: %s" % (e.args[0], e.args[1]))
       # sys.exit(1)
       self.connect()
