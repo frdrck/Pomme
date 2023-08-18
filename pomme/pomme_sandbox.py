@@ -562,7 +562,7 @@ class Game:
 		if self.win_image == win_card:
 			return
 		print("WINNING:", win_card)
-		for user, card in self.bets.iteritems ():
+		for user, card in self.bets.items ():
 			if card == win_card:
 				self.state = STATE_WIN
 				self.winner = user
@@ -605,7 +605,7 @@ class Game:
 				scores[card] += 1
 			else:
 				scores[card] = 1
-		sorted_scores = sorted(scores.iteritems(), key=operator.itemgetter(1), reverse=True)
+		sorted_scores = sorted(scores.items(), key=operator.itemgetter(1), reverse=True)
 		if len(sorted_scores):
 			print("TALLIED ENOUGH CARDS")
 			self.win (sorted_scores[0][0])
@@ -1053,7 +1053,7 @@ class PommeDatabase:
 	def find_an_active_game (self, skip):
 		if skip is None:
 			skip = ""
-		for name,game in self.games.iteritems():
+		for name,game in self.games.items():
 			if name != "bigapple" and name != skip and not game.private:
 				game.flush()
 				if len(game.active) > 0 and len(game.active) < 8:
@@ -1069,7 +1069,7 @@ class PommeDatabase:
 			return { 'games': self.active_games, 'username': args['username'], 'score': args['user'].score, 'combos': [x for x in self.combos], }
 		self.last_update = curtime
 		updated_games = {}
-		for name,game in self.games.iteritems():
+		for name,game in self.games.items():
 			if len(game.active) < 1 and game.id != 1:
 				continue
 			updated_games[name] = game.report (curtime)
@@ -1112,7 +1112,7 @@ class PommeDatabase:
 		return { "count": self.last_active_count }
 	def get_active_user_count (self):
 		users = {}
-		for name,game in Pomme.games.iteritems():
+		for name,game in Pomme.games.items():
 			if len(game.active) < 1 and game.id != 1:
 				continue
 			game.flush()
@@ -1316,7 +1316,7 @@ class PommeHandler (BaseHTTPRequestHandler):
 		users = {}
 		games = []
 		self.wfile.write ("<b>active games</b>\n")
-		for name,game in Pomme.games.iteritems():
+		for name,game in Pomme.games.items():
 			if len(game.active) < 2:
 				continue
 			games.append(name)

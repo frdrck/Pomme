@@ -6,3 +6,4 @@ img
 img/*
 httpdocs
 pomme_combo.sql
+*.pem

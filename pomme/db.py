@@ -62,9 +62,6 @@ class db:
       dict_cursor.execute(sql,args)
       return dict_cursor
 
-  def lastinsertid(self):
-    return self.conn.insert_id()
-  
   def insert(self, table, expected, data):
     sql = "INSERT INTO " + table + " "
     fields = []
@@ -75,7 +72,7 @@ class db:
         values.append(data[field])
     sql += "(" + ",".join(fields) + ") "
     sql += "VALUES(" + ",".join(["%s" for x in values]) + ")"
-    self.execute(sql, values)
+    return self.execute(sql, values)
 
   def update(self, table, expected, data, id):
     sql = "UPDATE " + table + " SET "
@@ -93,10 +90,11 @@ class db:
   ### USERS
 
   def user_new(self, data):
-    self.insert("pomme_user", USER_FIELDS, data)
-    id = self.lastinsertid()
+    breakpoint()
+    cursor = self.insert("pomme_user", USER_FIELDS, data)
+    user_id = cursor.lastrowid
     sql = "SELECT * FROM pomme_user WHERE id=%s"
-    args = (id,)
+    args = (user_id,)
     cursor = self.execute(sql, args)
     try:
       return cursor.fetchall()[0]
@@ -184,8 +182,8 @@ class db:
   ### GAMES
 
   def game_new(self, data):
-    self.insert("pomme_game", GAME_FIELDS, data)
-    id = self.lastinsertid()
+    cursor = self.insert("pomme_game", GAME_FIELDS, data)
+    id = cursor.lastrowid
     sql = "SELECT * FROM pomme_game WHERE id=%s"
     args = (id)
     cursor = self.execute(sql, args)
@@ -205,8 +203,8 @@ class db:
   ### COMBOS
 
   def combo_new(self, data):
-    self.insert("pomme_combo", COMBO_FIELDS, data)
-    comboid = self.lastinsertid()
+    cursor = self.insert("pomme_combo", COMBO_FIELDS, data)
+    comboid = cursor.lastrowid
     return comboid
 
   def combo_get_userid(self, comboid):

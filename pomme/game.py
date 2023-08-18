@@ -435,7 +435,7 @@ class Game:
     if self.win_image == win_card:
       return
     print("WINNING:", win_card)
-    for user, card in self.bets.iteritems():
+    for user, card in self.bets.items():
       if card == win_card:
         self.state = STATE_WIN
         self.winner = user
@@ -480,7 +480,7 @@ class Game:
         scores[card] += 1
       else:
         scores[card] = 1
-    sorted_scores = sorted(scores.iteritems(), key=operator.itemgetter(1), reverse=True)
+    sorted_scores = sorted(scores.items(), key=operator.itemgetter(1), reverse=True)
     if len(sorted_scores):
       print("TALLIED ENOUGH CARDS")
       self.win(sorted_scores[0][0])

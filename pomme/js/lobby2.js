@@ -136,7 +136,7 @@ var Newgame =
 			return
 			}
 		var path = data.path
-		document.location = "http://pomme.us/" + path
+		document.location = "https://pomme.us/" + path
 		},
 	unload: function ()
 		{
@@ -349,7 +349,7 @@ var Lobby =
 		var path = $(this).data("path")
 		if (Lobby.games[path].private)
 			return
-		document.location = "http://pomme.us/" + path
+		document.location = "https://pomme.us/" + path
 		},
 	manifestUpdatePath: function (path)
 		{
