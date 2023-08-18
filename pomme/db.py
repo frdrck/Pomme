@@ -90,7 +90,6 @@ class db:
   ### USERS
 
   def user_new(self, data):
-    breakpoint()
     cursor = self.insert("pomme_user", USER_FIELDS, data)
     user_id = cursor.lastrowid
     sql = "SELECT * FROM pomme_user WHERE id=%s"
@@ -116,17 +115,17 @@ class db:
 
   def user_gain_point(self, userid):
     sql = "UPDATE pomme_user SET score = score + 1 WHERE id=%s"
-    args = (userid)
+    args = (userid,)
     self.execute(sql, args)
 
   def user_lose_point(self, userid):
     sql = "UPDATE pomme_user SET score = score - 1 WHERE id=%s"
-    args = (userid)
+    args = (userid,)
     self.execute(sql, args)
 
   def user_win_game(self, userid, goal):
     sql = "UPDATE pomme_user SET wins_" + str(goal) + " = wins_" + str(goal) + " + 1 WHERE id=%s"
-    args = (userid)
+    args = (userid,)
     self.execute(sql, args)
 
   def win_game (self, game, username):
@@ -185,7 +184,7 @@ class db:
     cursor = self.insert("pomme_game", GAME_FIELDS, data)
     id = cursor.lastrowid
     sql = "SELECT * FROM pomme_game WHERE id=%s"
-    args = (id)
+    args = (id,)
     cursor = self.execute(sql, args)
     try:
       return cursor.fetchall()[0]
@@ -209,7 +208,7 @@ class db:
 
   def combo_get_userid(self, comboid):
     sql = "SELECT userid FROM pomme_combo WHERE id=%s"
-    args = (comboid)
+    args = (comboid,)
     cursor = self.execute(sql, args)
     try:
       return cursor.fetchall()[0][0]
@@ -218,7 +217,7 @@ class db:
 
   def combo_list_latest(self):
     sql = "SELECT * FROM pomme_combo ORDER BY id DESC LIMIT %s"
-    args = (COMBO_LIMIT)
+    args = (COMBO_LIMIT,)
     return self.dict_execute(sql, args).fetchall()
 
   def combo_list_top(self, userid, start=None, limit=None):
@@ -287,12 +286,12 @@ class db:
 
   def combo_gain_point(self, comboid):
     sql = "UPDATE pomme_combo SET score = score + 1 WHERE id=%s"
-    args = (comboid)
+    args = (comboid,)
     self.execute(sql, args)
 
   def combo_lose_point(self, comboid):
     sql = "UPDATE pomme_combo SET score = score - 1 WHERE id=%s"
-    args = (comboid)
+    args = (comboid,)
     self.execute(sql, args)
 
 
@@ -369,7 +368,7 @@ class db:
 
   def users_new_today(self):
     sql = "SELECT DISTINCT username FROM pomme_user WHERE joindate > %s"
-    args = (now()-86400)
+    args = (now()-86400,)
     cursor = self.execute(sql, args)
     rows = cursor.fetchall()
     users = []

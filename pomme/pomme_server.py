@@ -1356,7 +1356,6 @@ class PommeHandler (BaseHTTPRequestHandler):
 		#		self.wfile.write("%s => %s\n" % (str(key), repr(game.__dict__[key])))
 
 	def json (self, data, is_debugging=False):
-		#breakpoint()
 		bb = bytes(json.dumps(data), 'utf-8')
 		self.wfile.write(bb)
 
