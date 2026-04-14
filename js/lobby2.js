@@ -1059,6 +1059,12 @@ var Main =
 		var p = 10
 		var fh = 20
 
+		if (w < 768) {
+		// === MOBILE LAYOUT ===
+		// Chat, combo hidden via CSS. Games list and welcome are relative-positioned.
+		$("#games").css({ "height": "auto" })
+		} else {
+		// === DESKTOP LAYOUT (original) ===
 		var gh = h - 100 - 250 - 40
 		var nh = gh - 70
 
@@ -1086,6 +1092,8 @@ var Main =
 		// $("#combo-wrapper").css({ "top": 70 })
 		// $("#combo-wrapper").css({ "bottom": 30 })
 		$("#combo-wrapper").css({ "bottom": 50 })
+		} // end desktop
+
 		scrollToBottom("#chat_container")
 		},
 	init: function ()
