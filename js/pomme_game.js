@@ -376,6 +376,46 @@ var Webcam =
 		}
 	}
 
+/* Temporary mobile build banner — remove PommeMobileBuildModal and the joinCallback call below when done. */
+var PommeMobileBuildModal =
+	{
+	BUNDLE: "v4",
+	show: function ()
+		{
+		if (window.innerWidth >= 768)
+			return
+		if (document.getElementById("pomme-mobile-build-modal"))
+			return
+		var root = document.createElement("div")
+		root.id = "pomme-mobile-build-modal"
+		root.setAttribute("role", "dialog")
+		root.setAttribute("aria-modal", "true")
+		root.style.cssText = "position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);padding:16px;box-sizing:border-box;font-family:system-ui,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;"
+		var panel = document.createElement("div")
+		panel.style.cssText = "background:#fff;color:#111;border-radius:10px;max-width:300px;width:100%;padding:20px 18px 16px;box-shadow:0 10px 40px rgba(0,0,0,0.25);text-align:center;"
+		var h = document.createElement("p")
+		h.textContent = "Welcome to Pomme (mobile)"
+		h.style.cssText = "margin:0 0 10px;font-size:18px;font-weight:600;"
+		var p = document.createElement("p")
+		p.style.cssText = "margin:0 0 16px;font-size:14px;line-height:1.45;color:#333;"
+		p.appendChild(document.createTextNode("This screen means you loaded client bundle "))
+		var strong = document.createElement("strong")
+		strong.textContent = PommeMobileBuildModal.BUNDLE
+		p.appendChild(strong)
+		p.appendChild(document.createTextNode("."))
+		var b = document.createElement("button")
+		b.type = "button"
+		b.textContent = "Dismiss"
+		b.style.cssText = "width:100%;padding:11px 14px;font-size:15px;border:none;border-radius:6px;background:#222;color:#fff;cursor:pointer;"
+		b.onclick = function () { root.remove() }
+		panel.appendChild(h)
+		panel.appendChild(p)
+		panel.appendChild(b)
+		root.appendChild(panel)
+		document.body.appendChild(root)
+		}
+	}
+
 var API =
 	{
 	URL:
@@ -1801,6 +1841,7 @@ var Game =
 
 		$("#loading").fadeOut(200)
 		$("#game").fadeIn(500)
+		PommeMobileBuildModal.show()
 		// $("#beta").css({"left": $("h1").width() - $("#beta").width() + 15 })
 		$("#beta").css({"left": 55 })
 		Game.setupCards (data)
