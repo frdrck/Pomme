@@ -379,7 +379,7 @@ var Webcam =
 /* Dev-only modal — remove PommeMobileBuildModal when no longer needed. */
 var PommeMobileBuildModal =
 	{
-	BUNDLE: "v23",
+	BUNDLE: "v24",
 	TRIGGER_NAMES: ["modal", "mobile", "desktop"],
 	show: function ()
 		{
@@ -2274,7 +2274,8 @@ var Game =
 		var $game = $("#game")
 		if (!$win.length || !$game.length || !$win.is(":visible"))
 			return
-		var gap = 12
+		/* Extra gap: large #banner font can visually overlap #win if too tight */
+		var gap = $(window).width() < 768 ? 20 : 32
 		/* top relative to #game (banner’s offset parent), robust when #win is position:absolute */
 		var top = $win.offset().top - $game.offset().top + $win.outerHeight(true) + gap
 		$("#banner").show().css({
@@ -2681,8 +2682,7 @@ var Game =
 		newimg.onload = Game.displayWinCard
 		newimg.setAttribute("src", "/img/"+set+"/"+card)
 		newimg.setAttribute("data-file", card)
-		newimg.style.maxWidth = Game.winWidth + "px"
-		newimg.style.maxHeight = Game.winHeight + "px"
+		/* Sizing from CSS .win-card-cell — inline max-* was larger than the box and drew outside #win */
 		return newimg
 		},
 	winCount: 0,
@@ -3103,10 +3103,6 @@ var Main =
 		$("#votes img").each(function ()
 			{
 			setMax(this, Game.voteWidth, Game.cardHeight)
-			})
-		$("#win img").each(function ()
-			{
-			setMax(this, Game.winWidth, Game.winHeight)
 			})
 		$("#discard-cards img").each(function ()
 			{

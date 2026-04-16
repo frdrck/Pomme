@@ -447,17 +447,20 @@
   display: flex !important;
   align-items: center;
   justify-content: center;
-  min-height: min(36vh, 320px);
-  height: min(40vh, 380px);
+  overflow: hidden;
+  /* Shared slot height — both columns match; images scale inside */
+  height: min(36vh, 320px);
+  min-height: 0;
 }
 #game #win .win-card-cell img {
   display: block;
   margin: 0 auto;
   width: auto;
   height: auto;
-  max-width: 100%;
-  max-height: 100%;
+  max-width: 100% !important;
+  max-height: 100% !important;
   object-fit: contain;
+  vertical-align: middle;
 }
 
 /* Desktop: hide mobile-only elements */
