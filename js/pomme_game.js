@@ -379,7 +379,7 @@ var Webcam =
 /* Dev-only modal — remove PommeMobileBuildModal when no longer needed. */
 var PommeMobileBuildModal =
 	{
-	BUNDLE: "v19",
+	BUNDLE: "v20",
 	TRIGGER_NAMES: ["modal", "mobile", "desktop"],
 	show: function ()
 		{
@@ -2262,6 +2262,26 @@ var Game =
 			Game.lastBanner = pair[1]
 			$("#banner").html(pair[1])
 			}
+		if ((Game.state === STATE_WIN || Game.state === STATE_GAMEOVER) && $("#win").is(":visible"))
+			setTimeout(function () { Game.syncWinBannerBelowWin() }, 0)
+		},
+	/* Place lavender phrase below #win so it is not covered (win is z-index 30 vs banner 5). */
+	syncWinBannerBelowWin: function ()
+		{
+		if (Game.state !== STATE_WIN && Game.state !== STATE_GAMEOVER)
+			return
+		var $win = $("#win")
+		if (!$win.length || !$win.is(":visible"))
+			return
+		var gap = 12
+		var top = $win.position().top + $win.outerHeight(true) + gap
+		$("#banner").show().css({
+			"position": "absolute",
+			"top": top,
+			"left": 0,
+			"width": "100%",
+			"zIndex": 35
+			})
 		},
 	states: {},
 	handVisible: false,
@@ -2485,7 +2505,7 @@ var Game =
 			Countdown.stop ()
 			$("#match").fadeOut(500, function(){$("#match").html ("")})
 			Game.hideCards ()
-			if ($(window).width() < 768) $("#banner").hide()
+			Game.lastBanner = ""
 			$("#votes").removeClass("live")
 			var win = ""
 			Game.winCount = 0
@@ -2496,12 +2516,6 @@ var Game =
 			$("#win").html("")
 			$("#win").append (player_card)
 			$("#win").append (match_card)
-			if ($(window).width() < 768) {
-				var winName = document.createElement("span")
-				winName.id = "win-name"
-				winName.textContent = data['winner'] + " won!"
-				$("#win").append(winName)
-			}
 			$("#win").data("comboid", data['comboid'])
 			var mask = document.createElement("span")
 			mask.className = "mask"
@@ -2529,7 +2543,7 @@ var Game =
 			Countdown.stop ()
 			$("#match").fadeOut(500, function(){$("#match").html ("")})
 			Game.hideCards ()
-			if ($(window).width() < 768) $("#banner").hide()
+			Game.lastBanner = ""
 			$("#votes").removeClass("live")
 			var win = ""
 			Game.winCount = 0
@@ -2539,12 +2553,6 @@ var Game =
 			$("#win").html("")
 			$("#win").append (player_card)
 			$("#win").append (match_card)
-			if ($(window).width() < 768) {
-				var winName = document.createElement("span")
-				winName.id = "win-name"
-				winName.textContent = data['winner'] + " won the game!"
-				$("#win").append(winName)
-			}
 			Main.title_msg = ""
 			var params =
 				{
@@ -2560,7 +2568,7 @@ var Game =
 			// $("#champion-restart").bind("click", Game.restart)
 			setTimeout(Game.restart, 10000)
 			$.post(API.URL.deal, params, Game.dealCallback, "json")
-			return ["",""]
+			return ["", data['winner'] + " won the game!"]
 			// return ["The judge has abandoned the game! Starting over...", "game reset"]
 			}
 		},
@@ -2669,13 +2677,13 @@ var Game =
 		if (Game.winCount > 1)
 			{
 			if ($(window).width() < 768) {
-				$("#banner").hide()
 				$("#win-backdrop").fadeIn(300)
-				$("#win").fadeIn(500)
+				$("#win").fadeIn(500, function () { Game.syncWinBannerBelowWin() })
 			} else {
-				$("#win").fadeIn(500)
+				$("#win").fadeIn(500, function () { Game.syncWinBannerBelowWin() })
 				$("#win").css({"left": (Game.width - 2* Game.chatWidth - $("#win").width()) / 2 + Game.chatWidth - 10 })
 			}
+			Game.syncWinBannerBelowWin()
 			if (Game.state !== STATE_GAMEOVER) {
 				$("#win").delay(10000).fadeOut(500)
 				if ($(window).width() < 768) $("#win-backdrop").delay(10000).fadeOut(500)
@@ -3133,6 +3141,8 @@ var Main =
 		if (Game.state > STATE_VOTE) {
 			$("#win").show()
 			if ($(window).width() < 768) $("#win-backdrop").show()
+			if (Game.state === STATE_WIN || Game.state === STATE_GAMEOVER)
+				Game.syncWinBannerBelowWin()
 		} else {
 			$("#win,#win-backdrop").hide()
 			// console.log("HID WIN ON FOCUS "+Game.state)
@@ -3254,7 +3264,7 @@ var Main =
 		var matchBottom = matchTop + ($("#match").outerHeight(true) || 0)
 		/* Orders sit just under the image; banner (lavender phrase) below orders — like desktop stack */
 		$("#orders").css({ "top": matchBottom + 10, })
-		$("#banner").css({ "top": matchBottom + 48, "left": 0, width: "100%" })
+		$("#banner").css({ "top": matchBottom + 48, "left": 0, width: "100%", "zIndex": 5 })
 		$("#whose").css({ "top": Game.handTop - 20, "left": p, })
 
 		$("#hand, #votes").css({ "left": "0", "height": hh })
@@ -3343,7 +3353,7 @@ var Main =
 			$("#votes").css({ "top": Game.handTop })
 		else
 			$("#votes").css({ "top": h })
-		$("#banner").css({ "top": ch+fh+2*p+50, "left": 0, width: "100%" })
+		$("#banner").css({ "top": ch+fh+2*p+50, "left": 0, width: "100%", "zIndex": 5 })
 		$("#whose").css({ "top": h - Game.handHeight - 2*p - 32 - 5, "left": p, })
 
 		$("#champion").css({ "top": h - Game.handHeight, "left": "50%", "width": 600, "margin-left": -310, })
@@ -3363,6 +3373,8 @@ var Main =
 		scrollToBottom("#chat_container")
 		Main.applyGameImageLimits()
 		Main.relayoutCardStacks()
+		if ((Game.state === STATE_WIN || Game.state === STATE_GAMEOVER) && $("#win").is(":visible"))
+			Game.syncWinBannerBelowWin()
 		},
 	init: function ()
 		{
