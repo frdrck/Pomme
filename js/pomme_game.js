@@ -1960,6 +1960,7 @@ var Game =
 	appendMatch: function ()
 		{
 		var card = Game.matchCard("main", Game.current_match)
+		$("#win, #win-backdrop").stop(true, true).hide()
 		$("#match").stop(true, true).hide().html("")
 		$("#match").append(card)
 		},
@@ -2234,6 +2235,9 @@ var Game =
 		Game.current_judge = data['judge']
 		Game.is_judge = Game.current_judge === Auth.username
 
+		/* setupMatch runs before per-state handlers; hide round-win UI first so #match can never
+		   appear while #win is still up (e.g. BET after WIN). */
+		Game.hideRoundOverlays()
 		Game.setupMatch(data)
 
 		var pair = ["",""]
@@ -2416,9 +2420,19 @@ var Game =
 			$("#orders").fadeIn(500)
 			}
 		},
-	hideCards: function ()
+	/* immediate: round/game win — hide judge strip and hand now so nothing sits under #win / champion */
+	hideCards: function (immediate)
 		{
 		Game.clearCardLayoutTimers()
+		if (immediate)
+			{
+			$("#orders, #whose").stop(true, true).hide()
+			$("#hand, #votes").stop(true, true).hide()
+			Lorgnette.fadeOut()
+			Game.handVisible = false
+			Game.votesVisible = false
+			return
+			}
 		$("#orders,#whose").fadeOut(500)
 		$("#hand").animate({'opacity': 0.2, 'top': Game.height })
 		$("#votes").animate({'opacity': 0.2, 'top': Game.height })
@@ -2426,8 +2440,7 @@ var Game =
 		Game.votesHideTimer = setTimeout(function ()
 			{
 			$("#hand").hide()
-			if (!Game.votesVisible)
-				$("#votes").hide()
+			$("#votes").hide()
 			Game.votesHideTimer = null
 			}, 500)
 		Game.handVisible = false
@@ -2519,8 +2532,9 @@ var Game =
 		Game.states[STATE_WIN] = function (data)
 			{
 			Countdown.stop ()
-			$("#match").fadeOut(500, function(){$("#match").html ("")})
-			Game.hideCards ()
+			/* Round win: remove center match + judge strip immediately (not the end-of-game champion flow). */
+			$("#match").stop(true, true).hide().html("")
+			Game.hideCards(true)
 			Game.lastBanner = ""
 			$("#votes").removeClass("live")
 			var win = ""
@@ -2556,8 +2570,8 @@ var Game =
 		Game.states[STATE_GAMEOVER] = function (data)
 			{
 			Countdown.stop ()
-			$("#match").fadeOut(500, function(){$("#match").html ("")})
-			Game.hideCards ()
+			$("#match").stop(true, true).hide().html("")
+			Game.hideCards(true)
 			Game.lastBanner = ""
 			$("#votes").removeClass("live")
 			var win = ""
@@ -2696,6 +2710,7 @@ var Game =
 			}
 		if (Game.winCount > 1)
 			{
+			$("#match").stop(true, true).hide()
 			if ($(window).width() < 768) {
 				$("#win-backdrop").fadeIn(300)
 				$("#win").fadeIn(500, function () { Game.syncWinBannerBelowWin() })
@@ -2722,6 +2737,9 @@ var Game =
 		newimg.setAttribute("fetchpriority", "high")
 		newimg.onload = function ()
 			{
+			/* Round win / game over: do not resurrect #match over #win or champion. */
+			if (Game.state === STATE_WIN || Game.state === STATE_GAMEOVER)
+				return
 			$(this).parent().css("opacity", 1)
 			/* No #match.fadeIn: animating container opacity vs GIF frames desyncs compositing (~500ms then flicker). */
 			$("#match").stop(true, true).css({ opacity: 1 }).show()
