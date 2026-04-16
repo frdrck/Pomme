@@ -103,7 +103,8 @@
     align-items: flex-end;
     justify-content: center;
   }
-  #match img { max-width: 90vw !important; max-height: 35vh !important; }
+  /* No !important: JS (applyGameImageLimits) sets inline max-* so sizes track resize / desktop */
+  #match img { max-width: 90vw; max-height: 35vh; }
   #match div { padding: 5px !important; }
 
   /* === Countdown === own row below #mobile-players; top/padding from pomme_game.js Main.resize */

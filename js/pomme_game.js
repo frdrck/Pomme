@@ -3029,30 +3029,34 @@ var Main =
 	resizeDebounceMs: Math.round(1000 / 30),
 	applyGameImageLimits: function ()
 		{
+		function setMax (el, w, h)
+			{
+			var ws = w + "px"
+			var hs = h + "px"
+			if (el.style.maxWidth !== ws)
+				el.style.maxWidth = ws
+			if (el.style.maxHeight !== hs)
+				el.style.maxHeight = hs
+			}
 		$("#match img").each(function ()
 			{
-			this.style.maxWidth = Game.matchWidth + "px"
-			this.style.maxHeight = Game.matchHeight + "px"
+			setMax(this, Game.matchWidth, Game.matchHeight)
 			})
 		$("#hand img").each(function ()
 			{
-			this.style.maxWidth = Game.cardWidth + "px"
-			this.style.maxHeight = Game.cardHeight + "px"
+			setMax(this, Game.cardWidth, Game.cardHeight)
 			})
 		$("#votes img").each(function ()
 			{
-			this.style.maxWidth = Game.voteWidth + "px"
-			this.style.maxHeight = Game.cardHeight + "px"
+			setMax(this, Game.voteWidth, Game.cardHeight)
 			})
 		$("#win img").each(function ()
 			{
-			this.style.maxWidth = Game.winWidth + "px"
-			this.style.maxHeight = Game.winHeight + "px"
+			setMax(this, Game.winWidth, Game.winHeight)
 			})
 		$("#discard-cards img").each(function ()
 			{
-			this.style.maxWidth = Game.cardWidth + "px"
-			this.style.maxHeight = Game.cardHeight + "px"
+			setMax(this, Game.cardWidth, Game.cardHeight)
 			})
 		},
 	relayoutCardStacks: function ()
@@ -3205,14 +3209,18 @@ var Main =
 			})
 		var countdownBlockH = $("#countdown").outerHeight(true) || (24 * 1.25 + 2 * padHalfEm + 4)
 		var matchTop = countdownRowTop + countdownBlockH + padHalfEm
+		Game.matchHeight = Math.max(100, Math.min(Math.floor(h * 0.42), Game.handTop - matchTop - 90))
 		$("#match").css({ "top": matchTop, "bottom": "auto" })
 		$("#match img").each(function ()
 			{
-			this.style.maxWidth = Game.matchWidth + "px"
-			this.style.maxHeight = Game.matchHeight + "px"
+			var ws = Game.matchWidth + "px"
+			var hs = Game.matchHeight + "px"
+			if (this.style.maxWidth !== ws)
+				this.style.maxWidth = ws
+			if (this.style.maxHeight !== hs)
+				this.style.maxHeight = hs
 			})
 		var matchBottom = matchTop + ($("#match").outerHeight(true) || 0)
-		Game.matchHeight = Math.max(100, Math.min(Math.floor(h * 0.42), Game.handTop - matchTop - 90))
 		/* Orders sit just under the image; banner (lavender phrase) below orders — like desktop stack */
 		$("#orders").css({ "top": matchBottom + 10, })
 		$("#banner").css({ "top": matchBottom + 48, "left": 0, width: "100%" })
@@ -3295,7 +3303,15 @@ var Main =
 		$("#form").css({ "top": ch-2-32, "left": 8, "width": cw-15, "height": fh, "padding-right": "+= 10", "padding-bottom": 15 })
 		$("#orders").css({ "top": ch+2, })
 
-		$("#hand, #votes").css({ "top": h, "left": "50%", "height": hh, })
+		$("#hand, #votes").css({ "left": "50%", "height": hh, })
+		if (Game.handVisible)
+			$("#hand").css({ "top": Game.handTop })
+		else
+			$("#hand").css({ "top": h })
+		if (Game.votesVisible)
+			$("#votes").css({ "top": Game.handTop })
+		else
+			$("#votes").css({ "top": h })
 		$("#banner").css({ "top": ch+fh+2*p+50, "left": 0, width: "100%" })
 		$("#whose").css({ "top": h - Game.handHeight - 2*p - 32 - 5, "left": p, })
 
@@ -3315,16 +3331,6 @@ var Main =
 
 		scrollToBottom("#chat_container")
 		Main.applyGameImageLimits()
-		if (Game.state === STATE_BET)
-			{
-			if (! Game.is_judge)
-				{
-				Game.handVisible = false
-				Game.showHand ()
-				}
-			}
-		else if (Game.state === STATE_JUDGE)
-			Game.showVotes ()
 		Main.relayoutCardStacks()
 		},
 	init: function ()
