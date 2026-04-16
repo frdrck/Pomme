@@ -2226,7 +2226,7 @@ var Game =
 		if (pair[1] && pair[1].length && pair[1] !== Game.lastBanner)
 			{
 			Game.lastBanner = pair[1]
-			$("#banner").html(pair[1])
+			$("#banner").html(pair[1]).show()
 			}
 		},
 	states: {},
@@ -2510,11 +2510,13 @@ var Game =
 			// $("#champion-waiting").hide()
 			// $("#champion-restart").show()
 			Sound.wongame.play()
+			Game.lastBanner = ""
+			$("#banner").html("").hide()
 			$("#champion").fadeIn(500)
 			// $("#champion-restart").bind("click", Game.restart)
 			setTimeout(Game.restart, 10000)
 			$.post(API.URL.deal, params, Game.dealCallback, "json")
-			return ["", data['winner'] + " won the game!"]
+			return ["", ""]
 			// return ["The judge has abandoned the game! Starting over...", "game reset"]
 			}
 		},
