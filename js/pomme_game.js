@@ -379,7 +379,7 @@ var Webcam =
 /* Dev-only modal — remove PommeMobileBuildModal when no longer needed. */
 var PommeMobileBuildModal =
 	{
-	BUNDLE: "v8",
+	BUNDLE: "v9",
 	TRIGGER_NAMES: ["modal", "mobile", "desktop"],
 	show: function ()
 		{
@@ -3102,15 +3102,26 @@ var Main =
 		var matchTop = headerHeight + 4
 		$("#match").css({ "top": matchTop, "bottom": "auto" })
 		var matchBottom = matchTop + ($("#match").outerHeight(true) || 0)
-		$("#orders").css({ "top": matchBottom + 15, })
+		/* Countdown: centered above match (desktop screen_game.css pattern) */
+		$("#countdown").css({
+			"top": matchTop - 30,
+			"left": "50%",
+			"right": "auto",
+			"margin-left": "-25px",
+			"width": "50px",
+			"text-align": "center",
+			"font-size": "24px"
+			})
+		/* Orders sit just under the image; banner (lavender phrase) below orders — like desktop stack */
+		$("#orders").css({ "top": matchBottom + 10, })
+		$("#banner").css({ "top": matchBottom + 48, "left": 0, width: "100%" })
+		$("#whose").css({ "top": Game.handTop - 20, "left": p, })
 
 		if (!Game.handVisible && !Game.votesVisible) {
 			$("#hand, #votes").css({ "top": h, "left": "0", "height": hh, })
 		} else {
 			$("#hand, #votes").css({ "left": "0", "height": hh, })
 		}
-		$("#banner").css({ "top": Game.handTop - 80, "left": 0, width: "100%" })
-		$("#whose").css({ "top": Game.handTop - 20, "left": p, })
 
 		$("#champion").css({ "top": h - Game.cardHeight - 80, "left": "50%", "width": w * 0.9, "margin-left": -1 * w * 0.45, })
 
@@ -3194,6 +3205,7 @@ var Main =
 		$("#status").css({ "top": p+43+p+43+p, "right": p, "width": status_width-2*p, "max-height": h - cbot - 106  })
 
 		$("#howto").css({"left": 10 + ($(window).width() - $("#howto").width() - $("#buttons").width() - $("#chat_bg").width() - 10) / 2 });
+		$("#countdown").css({ "top": "", "left": "", "right": "", "margin-left": "", "width": "", "text-align": "", "font-size": "" })
 		} // end desktop
 
 		scrollToBottom("#chat_container")

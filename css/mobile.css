@@ -106,16 +106,13 @@
   #match img { max-width: 90vw !important; max-height: 35vh !important; }
   #match div { padding: 5px !important; }
 
-  /* === Countdown === */
+  /* === Countdown === (top/left/margin set in pomme_game.js Main.resize — centered above #match) */
   #countdown {
-    top: 0 !important;
-    right: 5px !important;
-    left: auto !important;
-    margin-left: 0 !important;
-    font-size: 16px !important;
-    width: auto !important;
-    text-align: right !important;
-    z-index: 102;
+    position: absolute !important;
+    z-index: 102 !important;
+    font-size: 24px !important;
+    width: 50px !important;
+    text-align: center !important;
   }
 
   /* === Orders text === */
@@ -127,16 +124,17 @@
     text-align: center !important;
   }
 
-  /* === Banner text: large gradient text like desktop === */
+  /* === Banner text: same lavender as desktop #banner (screen_game.css color #b3d) === */
   #banner {
-    font-size: 48px !important;
-    opacity: 0.3 !important;
+    color: #b3d !important;
+    font-size: clamp(28px, 10vw, 72px) !important;
+    opacity: 0.2 !important;
     text-align: center !important;
     width: 100% !important;
     pointer-events: none;
     overflow: visible !important;
-    white-space: nowrap !important;
-    line-height: 1.2 !important;
+    white-space: normal !important;
+    line-height: 1.15 !important;
   }
 
   /* === "your hand:" label === */
