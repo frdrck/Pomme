@@ -696,6 +696,7 @@ var Auth =
 		$("#login").hide ()
 		$("#login-name").val("")
 		$("#login-password").val("")
+		$("#mobile-players").html("")
 		},
 	reset: function ()
 		{
@@ -1250,6 +1251,8 @@ var Chat =
 			// Sound.chat.play ()
 			$("#chat").append( rows.join('') )
 			scrollToBottom("#chat_container")
+			if ($(window).width() < 768 && !$("#chat_container").hasClass("mobile-open"))
+				$("#mobile-chat-toggle").addClass("unread")
 			if (has_images)
 				{
 				setTimeout ('scrollToBottom("#chat_container")', 200)
@@ -1369,7 +1372,8 @@ var Discard = {
 			var offset = (Game.handHeight - divheight) / 2
 			$(this).parent().animate({ "opacity": 1, "top": offset })
 			var par = $("#discard-cards");
-			par.css({ "margin-left": -1 * par.width() / 2 })
+			if ($(window).width() >= 768)
+				par.css({ "margin-left": -1 * par.width() / 2 })
 		}
 		newimg.setAttribute("src", "/img/"+set+"/"+card)
 		newimg.style.maxWidth = Game.cardWidth + "px"
@@ -1492,7 +1496,8 @@ var Placement =
 		if (! Game.votesVisible)
 			$("#votes").show()
 		var divwidth = $("#votes").width()
-		$("#votes").css({ "margin-left": -1 * divwidth / 2 })
+		if ($(window).width() >= 768)
+			$("#votes").css({ "margin-left": -1 * divwidth / 2 })
 		$("#votes").children().each( function ()
 			{
 			var divheight = $(this).height()
@@ -1570,6 +1575,69 @@ var Lorgnette =
 //		$("#lorgnette").stop().show();
 		}
 	}
+var CardPreview =
+	{
+	active: false,
+	pendingAction: null,
+	pendingMask: null,
+	timer: null,
+	show: function (imgSrc, action, maskEl)
+		{
+		if ($(window).width() >= 768) return
+		if (CardPreview.timer) clearTimeout(CardPreview.timer)
+		$(".card-previewing").removeClass("card-previewing")
+		$(maskEl).parent().addClass("card-previewing")
+		CardPreview.active = true
+		CardPreview.pendingAction = action
+		CardPreview.pendingMask = maskEl
+		$("#card-preview-img").attr("src", imgSrc)
+		if (action) $("#card-preview-select").show()
+		else $("#card-preview-select").hide()
+		$("#card-preview").stop(true).fadeIn(150)
+		CardPreview.timer = setTimeout(CardPreview.hide, 3000)
+		},
+	hide: function ()
+		{
+		if (CardPreview.timer) clearTimeout(CardPreview.timer)
+		CardPreview.timer = null
+		CardPreview.active = false
+		CardPreview.pendingAction = null
+		CardPreview.pendingMask = null
+		$(".card-previewing").removeClass("card-previewing")
+		$("#card-preview").stop(true).fadeOut(150)
+		},
+	select: function ()
+		{
+		if (!CardPreview.pendingAction || !CardPreview.pendingMask) return
+		var mask = CardPreview.pendingMask
+		var action = CardPreview.pendingAction
+		CardPreview.hide()
+		if (action === "pick") Game.pick.call(mask)
+		else if (action === "judge") Game.judge.call(mask)
+		},
+	init: function ()
+		{
+		$("#card-preview-backdrop").bind("click", CardPreview.hide)
+		$("#card-preview-img").bind("click", CardPreview.hide)
+		$("#card-preview-select").bind("click", function (e) {
+			e.stopPropagation()
+			CardPreview.select()
+		})
+		},
+	}
+function applyFanLayout(container) {
+	if ($(window).width() >= 768) return
+	var cards = $(container).children("div")
+	var count = cards.length
+	var totalSpread = 24
+	cards.each(function (idx) {
+		var angle = -totalSpread/2 + (totalSpread / (count - 1 || 1)) * idx
+		var arcOffset = Math.abs(angle) * 0.5
+		$(this).css({
+			"transform": "rotate(" + angle + "deg) translateY(" + arcOffset + "px)"
+		})
+	})
+}
 var Room =
 	{
 	setupAvatar: function ()
@@ -1823,7 +1891,7 @@ var Game =
 	setupCards: function (data)
 		{
 		Game.cards = data['cards']
-		$("#win, #champion").hide()
+		$("#win,#champion,#win-backdrop").hide()
 		$("#hand").html("")
 		for (var i = 0; i < Game.cards.length; i++)
 			$("#hand").append( Game.handCard ("player", Game.cards[i]) )
@@ -1942,6 +2010,32 @@ var Game =
 			s += "</p>"
 			}
 		$("#scores").html(s)
+
+		// Populate mobile player strip
+		if ($(window).width() < 768) {
+			var mp = "<span class='mp-room'>" + (Game.title || Game.name || "Room") + "</span>"
+			if (!data.players || data.players.length <= 1) {
+				mp += "<span class='mp-empty'>Invite your friends to play!</span>"
+				mp += "<span class='mp-copy' onclick=\"navigator.clipboard.writeText('" + SITE_URL + Game.name + "').then(function(){var el=document.querySelector('.mp-copy');el.textContent='Copied!';setTimeout(function(){el.textContent='Copy Link'},1500)})\">Copy Link</span>"
+			}
+			if (data.players && data.players.length > 0) {
+				for (var i = 0; i < data.players.length; i++) {
+					var player = data.players[i]
+					var cls = ""
+					if (player.skipped) cls = "mp-skipped"
+					else if (player.name === data.judge) cls = "mp-judge"
+					else if (player.name === data.winner) cls = "mp-winner"
+					else if (player.name in betters) cls = "mp-picked"
+					if (player.name === Auth.username) cls += " mp-you"
+					var score = player.score > 0 ? " " + player.score : ""
+					mp += "<span class='" + cls + "'>" + player.name + score + "</span>"
+				}
+			}
+			var oldHtml = $("#mobile-players").html()
+			$("#mobile-players").html(mp)
+			if (mp !== oldHtml) Main.resize()
+		}
+
 		Game.last_players = players
 		Game.started = true
 		},
@@ -2032,6 +2126,7 @@ var Game =
 			return
 		Game.stateDelay = Game.stateDelayMode[data['state']]
 		Game.state = data['state']
+		if (CardPreview.active) CardPreview.hide()
 
 		if (data['round'] > 0)
 			 $("#round").html("Round "+data['round'])
@@ -2083,7 +2178,8 @@ var Game =
 			var offset = (Game.handHeight - $(this).height()) / 2
 			$(this).css({ "opacity": 1, "top": offset })
 			})
-		$("#hand").css({ "margin-left": -1 * $("#hand").width() / 2 })
+		if ($(window).width() >= 768)
+			$("#hand").css({ "margin-left": -1 * $("#hand").width() / 2 })
 		if (! Game.handVisible)
 			{
 			$("#hand").animate({'opacity': 1, 'top': Game.handTop })
@@ -2150,7 +2246,7 @@ var Game =
 		{
 		Game.states[STATE_IDLE] = function (data)
 			{
-			$("#win,#champion").hide()
+			$("#win,#champion,#win-backdrop").hide()
 			Main.title_msg = ""
 			Countdown.stop ()
 			Game.hideCards ()
@@ -2161,7 +2257,7 @@ var Game =
 			}
 		Game.states[STATE_SETUP] = function (data)
 			{
-			$("#win,#champion").hide()
+			$("#win,#champion,#win-backdrop").hide()
 			Main.title_msg = "NEW GAME"
 			return ["Starting the next round!", "new round"]
 			}
@@ -2169,7 +2265,7 @@ var Game =
 			{
 			Sound.new_round.play ()
 			Countdown.start (data['countdown'])
-			$("#win,#champion").hide()
+			$("#win,#champion,#win-backdrop").hide()
 			if (data['judge'] === Auth.username)
 				{
 				Game.hideCards ()
@@ -2191,7 +2287,7 @@ var Game =
 			}
 		Game.states[STATE_PICKED] = function (data)
 			{
-			$("#win,#champion").hide()
+			$("#win,#champion,#win-backdrop").hide()
 			Game.hideCards ()
 			Main.title_msg = ""
 			return [" ", " "]
@@ -2199,7 +2295,7 @@ var Game =
 		Game.states[STATE_JUDGE] = function (data)
 			{
 			Countdown.start (data['countdown'])
-			$("#win,#champion").hide ()
+			$("#win,#champion,#win-backdrop").hide()
 			Game.showVotes ()
 			Game.setupVotes (data)
 			if (Game.is_judge)
@@ -2221,7 +2317,7 @@ var Game =
 		Game.states[STATE_VOTE] = function (data)
 			{
 			Countdown.start (data['countdown'])
-			$("#win,#champion").hide ()
+			$("#win,#champion,#win-backdrop").hide()
 			Game.setupVotes (data)
 			$(".mycard").hide()
 			Game.showVotes ()
@@ -2240,6 +2336,7 @@ var Game =
 			Countdown.stop ()
 			$("#match").fadeOut(500, function(){$("#match").html ("")})
 			Game.hideCards ()
+			if ($(window).width() < 768) $("#banner").hide()
 			$("#votes").removeClass("live")
 			var win = ""
 			Game.winCount = 0
@@ -2255,6 +2352,12 @@ var Game =
 			mask.className = "mask"
 			$(mask).data("comboid", data['comboid'])
 			$("#win").append (mask)
+			if ($(window).width() < 768) {
+				var winName = document.createElement("span")
+				winName.id = "win-name"
+				winName.textContent = data['winner'] + " won!"
+				$("#win").prepend(winName)
+			}
 
 			if (data['winner'] === Auth.username)
 				{
@@ -2277,6 +2380,7 @@ var Game =
 			Countdown.stop ()
 			$("#match").fadeOut(500, function(){$("#match").html ("")})
 			Game.hideCards ()
+			if ($(window).width() < 768) $("#banner").hide()
 			$("#votes").removeClass("live")
 			var win = ""
 			Game.winCount = 0
@@ -2286,6 +2390,12 @@ var Game =
 			$("#win").html("")
 			$("#win").append (player_card)
 			$("#win").append (match_card)
+			if ($(window).width() < 768) {
+				var winName = document.createElement("span")
+				winName.id = "win-name"
+				winName.textContent = data['winner'] + " won the game!"
+				$("#win").prepend(winName)
+			}
 			Main.title_msg = ""
 			var params =
 				{
@@ -2409,10 +2519,18 @@ var Game =
 			}
 		if (Game.winCount > 1)
 			{
-			$("#win").fadeIn (500)
-			$("#win").css({"left": (Game.width - 2* Game.chatWidth - $("#win").width()) / 2 + Game.chatWidth - 10 })
-			if (Game.state !== STATE_GAMEOVER)
+			if ($(window).width() < 768) {
+				$("#banner").hide()
+				$("#win-backdrop").fadeIn(300)
+				$("#win").fadeIn(500)
+			} else {
+				$("#win").fadeIn(500)
+				$("#win").css({"left": (Game.width - 2* Game.chatWidth - $("#win").width()) / 2 + Game.chatWidth - 10 })
+			}
+			if (Game.state !== STATE_GAMEOVER) {
 				$("#win").delay(10000).fadeOut(500)
+				if ($(window).width() < 768) $("#win-backdrop").delay(10000).fadeOut(500)
+			}
 			Game.winCount = 0
 			}
 		},
@@ -2465,10 +2583,12 @@ var Game =
 			if (! Game.votesVisible)
 				$("#votes").hide()
 			var par = $(this).parent().parent()
-			par.css({ "margin-left": -1 * par.width() / 2 })
+			if ($(window).width() >= 768)
+				par.css({ "margin-left": -1 * par.width() / 2 })
 			var offset = (Game.handHeight - divheight) / 2
 			$(this).parent().animate({ "opacity": 1, "top": offset })
 			}
+		if ($(window).width() >= 768) {
 		newdiv.onmouseover = function ()
 			{
 			Lorgnette.show(newimg);
@@ -2477,6 +2597,7 @@ var Game =
 			{
 			Lorgnette.hide()
 			}
+		}
 		if (card.indexOf("pommecam") !== -1)
 			set = "webcam"
 		newimg.setAttribute("src", "/img/"+set+"/"+card)
@@ -2544,9 +2665,10 @@ var Game =
 			var offset = (Game.handHeight - divheight) / 2
 			$(this).parent().animate({ "opacity": 1, "top": offset })
 			var par = $(this).parent().parent()
-			par.css({ "margin-left": -1 * par.width() / 2 })
+			if ($(window).width() >= 768)
+				par.css({ "margin-left": -1 * par.width() / 2 })
 			}
-		if (Game.state > STATE_PICKED)
+		if (Game.state > STATE_PICKED && $(window).width() >= 768)
 			{
 			newdiv.onmouseover = function ()
 				{
@@ -2587,7 +2709,8 @@ var Game =
 				$("#hand").hide()
 			var offset = (Game.handHeight - divheight) / 2
 			$(this).css({ "opacity": 1, "top": offset })
-			$("#hand").css({ "margin-left": -1 * $("#hand").width() / 2 })
+			if ($(window).width() >= 768)
+				$("#hand").css({ "margin-left": -1 * $("#hand").width() / 2 })
 			}
 		setTimeout(delay_card_load, 1000)
 		},
@@ -2708,11 +2831,16 @@ var Game =
 	init: function ()
 		{
 		$("#chat-message").bind("keydown", Chat.keys)
-		$("#hand .mask").live("click", Game.pick)
-		$("#votes .mask").live("click", Game.judge)
+		$("#hand .mask").live("click", function (e) {
+			Game.pick.call(this)
+		})
+		$("#votes .mask").live("click", function (e) {
+			Game.judge.call(this)
+		})
 		$("#win .mask").live("click", Game.likeWin)
 		$("#hand .mask").live("mouseover", Game.pickMouseover)
 		$("#votes .mask").live("mouseover", Game.judgeMouseover)
+		CardPreview.init()
 		$("#rejoin").bind("click", Game.rejoin)
 		$("#pass").bind("click", Game.pass)
 		$(".skip").live("click", Game.skip)
@@ -2776,11 +2904,11 @@ var Main =
 			console.log(Game.state)
 			}
 		*/
-		if (Game.state > STATE_VOTE)
+		if (Game.state > STATE_VOTE) {
 			$("#win").show()
-		else
-			{
-			$("#win").hide()
+			if ($(window).width() < 768) $("#win-backdrop").show()
+		} else {
+			$("#win,#win-backdrop").hide()
 			// console.log("HID WIN ON FOCUS "+Game.state)
 			}
 		if (Game.state === STATE_BET)
@@ -2810,6 +2938,74 @@ var Main =
 
 		var p = 10
 
+		if (w < 768) {
+		// === MOBILE LAYOUT ===
+		var status_width = 0
+		$("#buttons").css({ "top": 0, "right": 0 })
+		var buttonsHeight = $("#buttons").outerHeight(true) || 40
+		$("#room-buttons").css({ "top": buttonsHeight, "width": w, "right": 0 })
+		var roomButtonsHeight = $("#room-buttons").outerHeight(true) || 40
+		$("#mobile-players").css({ "top": buttonsHeight + roomButtonsHeight })
+		var playerStripHeight = $("#mobile-players").outerHeight(true) || 0
+		var headerHeight = buttonsHeight + roomButtonsHeight + playerStripHeight
+		var toggleHeight = 40  // chat toggle bar
+		Game.cardHeight = Math.min(h * 0.15, 120)
+		Game.cardWidth = (w - 6 * p) / 5
+
+		var hh = Game.cardHeight + 2 * p
+		var fh = 0
+
+		Game.height = h
+		Game.width = w
+		Game.chatWidth = 0
+
+		Game.handHeight = Game.cardHeight
+		Game.handTop = h - hh - toggleHeight
+		Game.voteWidth = Game.cardWidth
+		Game.matchRight = 4
+
+		Game.matchHeight = h - hh - headerHeight - toggleHeight - 2 * p
+		Game.matchWidth = w - 2 * p
+
+		Game.winHeight = h * 0.4
+		Game.winWidth = (w - 60) / 2
+
+		Chat.height = h * 0.5
+		Chat.bottom = 0
+
+		if (Discard.loaded) {
+			Discard.loadAnimation();
+		} else {
+			$("#discard-container").css({ "bottom": h*2 })
+			$("#discard-cards").css({ "top": h*2, "left": "0", "height": hh, })
+		}
+
+		// Hide chat/status by default on mobile — controlled by toggle buttons
+		// Reset any inline styles from desktop branch so CSS fixed positioning takes over
+		$("#form").css({ "top": "", "left": "", "width": "", "height": "", "padding-right": "", "padding-bottom": "" })
+		$("#chat_container").css({ "bottom": "", "left": "", "height": "", "width": "" })
+		$("#chat_bg").css({ "bottom": "", "left": "", "height": "", "width": "" })
+		$("#emoticons").css({ "top": "", "left": "", "bottom": "", "right": "", "width": "", "height": "" })
+
+		var matchTop = headerHeight + 4
+		$("#match").css({ "top": matchTop, "bottom": "auto" })
+		var matchBottom = matchTop + ($("#match").outerHeight(true) || 0)
+		$("#orders").css({ "top": matchBottom + 15, })
+
+		if (!Game.handVisible && !Game.votesVisible) {
+			$("#hand, #votes").css({ "top": h, "left": "0", "height": hh, })
+		} else {
+			$("#hand, #votes").css({ "left": "0", "height": hh, })
+		}
+		$("#banner").css({ "top": Game.handTop - 80, "left": 0, width: "100%" })
+		$("#whose").css({ "top": Game.handTop - 20, "left": p, })
+
+		$("#champion").css({ "top": h - Game.cardHeight - 80, "left": "50%", "width": w * 0.9, "margin-left": -1 * w * 0.45, })
+
+		$("#win").css({ "bottom": hh + toggleHeight, })
+
+		} else {
+		// === DESKTOP LAYOUT (original) ===
 		var status_width = 320
 
 		Game.cardHeight = (h / 3)
@@ -2886,6 +3082,7 @@ var Main =
 		$("#status").css({ "top": p+43+p+43+p, "right": p, "width": status_width-2*p, "max-height": h - cbot - 106  })
 
 		$("#howto").css({"left": 10 + ($(window).width() - $("#howto").width() - $("#buttons").width() - $("#chat_bg").width() - 10) / 2 });
+		} // end desktop
 
 		scrollToBottom("#chat_container")
 		if (Game.state === STATE_BET)
@@ -2912,6 +3109,12 @@ var Main =
 			Game.load ()
 		else
 			Auth.load ()
+
+		// Mobile toggle buttons
+		$("#mobile-chat-toggle").bind("click", function () {
+			$("#chat_container, #chat_bg, #form").toggleClass("mobile-open")
+			$("#mobile-chat-toggle").removeClass("unread")
+		})
 		},
 	}
 Main.init ()

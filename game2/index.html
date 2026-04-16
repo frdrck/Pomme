@@ -3,8 +3,10 @@
 <head>
 <title>Pomme</title>
 <link href="/css/screen_game.css" media="screen, projection" rel="stylesheet" type="text/css" />
-<link rel="shortcut icon" href="https://pomme.us/favicon.ico" /> 
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+<link href="/css/mobile.css" media="screen" rel="stylesheet" type="text/css" />
+<link rel="shortcut icon" href="http://pomme.us/favicon.ico" /> 
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"> 
 <meta property="og:title" content="Pomme"/> 
 <meta property="og:type" content="website"/> 
 <meta property="og:url" content="https://pomme.us/"/>
@@ -55,6 +57,7 @@
 
 	<div id="form">
 		<input type="text" id="chat-message" maxlength="200"/>
+		<button id="chat-send" onclick="Chat.send()">Send</button>
     <div id="emoticons"></div>
     <img id="open-emoticons" src="/img/emoticons/happy.gif">
 	</div>
@@ -78,7 +81,8 @@
 		<div id="show-bg">Show BG</div>
 		<div id="hide-bg">Hide BG</div>
 		<div class="icon" id="history">History</div>
-	</div>		
+	</div>
+	<div id="mobile-players"></div>
 	<div id="countdown"></div>
 	<div id="status-menu">
 		<span id="status-profile">Profile</span>
@@ -89,12 +93,25 @@
 		<span id="status-kick">Kick</span>
 		<span id="status-ban">Ban</span>
 	</div>
+	<div id="mobile-toggles">
+		<div id="mobile-chat-toggle">Chat</div>
+	</div>
 	<div id="banner"></div>
 	<div id="hand"></div>
 	<img id="lorgnette0" class="lorgnette">
 	<img id="lorgnette1" class="lorgnette">
 	<div id="votes"></div>
+	<div id="card-preview">
+		<div id="card-preview-backdrop"></div>
+		<div id="card-preview-content">
+			<img id="card-preview-img" src="">
+			<div id="card-preview-actions">
+				<button id="card-preview-select">SELECT</button>
+			</div>
+		</div>
+	</div>
 	<div id="match"></div>
+	<div id="win-backdrop"></div>
 	<div id="win"></div>
 	<div id="orders"></div>
 	<div id="whose"></div>
