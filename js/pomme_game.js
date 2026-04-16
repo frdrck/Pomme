@@ -379,10 +379,12 @@ var Webcam =
 /* Dev-only modal — remove PommeMobileBuildModal when no longer needed. */
 var PommeMobileBuildModal =
 	{
-	BUNDLE: "v7",
+	BUNDLE: "v8",
+	TRIGGER_NAMES: ["modal", "mobile", "desktop"],
 	show: function ()
 		{
-		if (!Auth.username || String(Auth.username).toLowerCase() !== "modal")
+		var u = Auth.username ? String(Auth.username).toLowerCase() : ""
+		if (PommeMobileBuildModal.TRIGGER_NAMES.indexOf(u) === -1)
 			return
 		if (document.getElementById("pomme-mobile-build-modal"))
 			return
@@ -402,7 +404,7 @@ var PommeMobileBuildModal =
 		var strong = document.createElement("strong")
 		strong.textContent = PommeMobileBuildModal.BUNDLE
 		p.appendChild(strong)
-		p.appendChild(document.createTextNode(" — user \"modal\" only."))
+		p.appendChild(document.createTextNode(" — test users: modal, mobile, desktop."))
 		var b = document.createElement("button")
 		b.type = "button"
 		b.textContent = "Dismiss"
