@@ -379,7 +379,7 @@ var Webcam =
 /* Dev-only modal — remove PommeMobileBuildModal when no longer needed. */
 var PommeMobileBuildModal =
 	{
-	BUNDLE: "v17",
+	BUNDLE: "v18",
 	TRIGGER_NAMES: ["modal", "mobile", "desktop"],
 	show: function ()
 		{
@@ -2690,7 +2690,8 @@ var Game =
 		var newimg = document.createElement("img")
 		newimg.onload = function ()
 			{
-			$(this).parent().animate({"opacity": 1})
+			/* Avoid jQuery .animate(opacity) on the GIF wrapper — it can force extra paints per tick alongside GIF frames */
+			$(this).parent().css("opacity", 1)
 			$("#match").fadeIn(500)
 			if (window.requestAnimationFrame)
 				requestAnimationFrame(function () { requestAnimationFrame(Placement.centerMatchDiv) })

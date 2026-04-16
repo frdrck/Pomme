@@ -418,6 +418,21 @@
   }
 }
 
+/*
+ * Animated GIFs in #match: each frame can trigger repaints; if the GIF shares a layer
+ * with other UI, siblings may repaint too (web.dev/speed-animated-gifs). Promoting
+ * the match strip and image to their own stacking context / compositor layer reduces
+ * visible flicker when layout or transforms change (common Safari/Chrome advice).
+ */
+#match {
+  isolation: isolate;
+}
+#match img {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
 /* Desktop: hide mobile-only elements */
 @media (min-width: 768px) {
   #mobile-toggles { display: none; }
