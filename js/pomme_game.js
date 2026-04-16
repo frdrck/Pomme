@@ -2342,6 +2342,10 @@ var Game =
 			{
 			$("#votes").show().animate({'opacity': 1, 'top': Game.handTop })
 			}
+		else
+			{
+			$("#votes").css({ "top": Game.handTop })
+			}
 		Game.handHideTimer = setTimeout(function ()
 			{
 			$("#hand").hide()
@@ -3143,11 +3147,15 @@ var Main =
 		$("#banner").css({ "top": matchBottom + 48, "left": 0, width: "100%" })
 		$("#whose").css({ "top": Game.handTop - 20, "left": p, })
 
-		if (!Game.handVisible && !Game.votesVisible) {
-			$("#hand, #votes").css({ "top": h, "left": "0", "height": hh, })
-		} else {
-			$("#hand, #votes").css({ "left": "0", "height": hh, })
-		}
+		$("#hand, #votes").css({ "left": "0", "height": hh })
+		if (Game.handVisible)
+			$("#hand").css({ "top": Game.handTop })
+		else
+			$("#hand").css({ "top": Game.height })
+		if (Game.votesVisible)
+			$("#votes").css({ "top": Game.handTop })
+		else
+			$("#votes").css({ "top": Game.height })
 
 		$("#champion").css({ "top": h - Game.cardHeight - 80, "left": "50%", "width": w * 0.9, "margin-left": -1 * w * 0.45, })
 
