@@ -106,13 +106,18 @@
   #match img { max-width: 90vw !important; max-height: 35vh !important; }
   #match div { padding: 5px !important; }
 
-  /* === Countdown === (top/left/margin set in pomme_game.js Main.resize — centered above #match) */
+  /* === Countdown === own row below #mobile-players; top/padding from pomme_game.js Main.resize */
   #countdown {
     position: absolute !important;
     z-index: 102 !important;
     font-size: 24px !important;
-    width: 50px !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    margin-left: 0 !important;
     text-align: center !important;
+    box-sizing: border-box !important;
+    line-height: 1.25 !important;
   }
 
   /* === Orders text === */

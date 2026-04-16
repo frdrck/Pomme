@@ -379,7 +379,7 @@ var Webcam =
 /* Dev-only modal — remove PommeMobileBuildModal when no longer needed. */
 var PommeMobileBuildModal =
 	{
-	BUNDLE: "v9",
+	BUNDLE: "v10",
 	TRIGGER_NAMES: ["modal", "mobile", "desktop"],
 	show: function ()
 		{
@@ -3061,6 +3061,8 @@ var Main =
 		var playerStripHeight = $("#mobile-players").outerHeight(true) || 0
 		var headerHeight = buttonsHeight + roomButtonsHeight + playerStripHeight
 		var toggleHeight = 40  // chat toggle bar
+		var emBase = parseFloat($("body").css("font-size")) || 16
+		var padHalfEm = emBase * 0.5
 		Game.cardHeight = Math.min(h * 0.15, 120)
 		Game.cardWidth = (w - 6 * p) / 5
 
@@ -3076,7 +3078,6 @@ var Main =
 		Game.voteWidth = Game.cardWidth
 		Game.matchRight = 4
 
-		Game.matchHeight = h - hh - headerHeight - toggleHeight - 2 * p
 		Game.matchWidth = w - 2 * p
 
 		Game.winHeight = h * 0.4
@@ -3099,19 +3100,25 @@ var Main =
 		$("#chat_bg").css({ "bottom": "", "left": "", "height": "", "width": "" })
 		$("#emoticons").css({ "top": "", "left": "", "bottom": "", "right": "", "width": "", "height": "" })
 
-		var matchTop = headerHeight + 4
+		/* Countdown: full-width row directly under username strip; .5em padding above/below digits */
+		var countdownRowTop = headerHeight + 2
+		$("#countdown").css({
+			"top": countdownRowTop,
+			"left": "0",
+			"right": "auto",
+			"margin-left": "0",
+			"width": "100%",
+			"transform": "none",
+			"text-align": "center",
+			"font-size": "24px",
+			"padding": padHalfEm + "px 10px",
+			"box-sizing": "border-box"
+			})
+		var countdownBlockH = $("#countdown").outerHeight(true) || (24 * 1.25 + 2 * padHalfEm + 4)
+		var matchTop = countdownRowTop + countdownBlockH + padHalfEm
 		$("#match").css({ "top": matchTop, "bottom": "auto" })
 		var matchBottom = matchTop + ($("#match").outerHeight(true) || 0)
-		/* Countdown: centered above match (desktop screen_game.css pattern) */
-		$("#countdown").css({
-			"top": matchTop - 30,
-			"left": "50%",
-			"right": "auto",
-			"margin-left": "-25px",
-			"width": "50px",
-			"text-align": "center",
-			"font-size": "24px"
-			})
+		Game.matchHeight = Math.max(100, Math.min(Math.floor(h * 0.42), Game.handTop - matchTop - 90))
 		/* Orders sit just under the image; banner (lavender phrase) below orders — like desktop stack */
 		$("#orders").css({ "top": matchBottom + 10, })
 		$("#banner").css({ "top": matchBottom + 48, "left": 0, width: "100%" })
@@ -3205,7 +3212,7 @@ var Main =
 		$("#status").css({ "top": p+43+p+43+p, "right": p, "width": status_width-2*p, "max-height": h - cbot - 106  })
 
 		$("#howto").css({"left": 10 + ($(window).width() - $("#howto").width() - $("#buttons").width() - $("#chat_bg").width() - 10) / 2 });
-		$("#countdown").css({ "top": "", "left": "", "right": "", "margin-left": "", "width": "", "text-align": "", "font-size": "" })
+		$("#countdown").css({ "top": "", "left": "", "right": "", "margin-left": "", "width": "", "text-align": "", "font-size": "", "padding-top": "", "padding-bottom": "", "transform": "", "box-sizing": "", "line-height": "" })
 		} // end desktop
 
 		scrollToBottom("#chat_container")
