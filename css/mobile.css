@@ -244,6 +244,21 @@
     padding: 5px !important;
   }
   #form.mobile-open { bottom: 40px !important; }
+
+  /* #hand / #votes use z-index 5 in screen_game.css; chat layers use 150–151, so they sit on top.
+     When chat is closed, an off-screen #form can still receive taps (iOS / % bottom quirks) and
+     focus #chat-message → keyboard. Ignore pointer events until the user opens chat. */
+  #chat_container:not(.mobile-open),
+  #chat_bg:not(.mobile-open),
+  #form:not(.mobile-open) {
+    pointer-events: none !important;
+  }
+  #chat_container.mobile-open,
+  #chat_bg.mobile-open,
+  #form.mobile-open {
+    pointer-events: auto !important;
+  }
+
   #chat-message {
     flex: 1 !important;
     min-width: 0;
