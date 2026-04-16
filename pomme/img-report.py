@@ -28,7 +28,7 @@ def generate (KEY):
 	IMG_DIR = "/img/" + KEY + "/"
 	LOCAL_DIR = BASE_DIR + IMG_DIR
 	if not os.path.exists(LOCAL_DIR):
-		print IMG_DIR, "doesn't exist"
+		print(IMG_DIR, "doesn't exist")
 		return
 	out = open (BASE_DIR+"/report/" + KEY + ".html", "w")
 	out.write("""
@@ -52,7 +52,7 @@ img { max-width: 198px; min-width: 20px; min-height: 20px; border: 1px solid #cc
 			# 	continue
 			out.write("<div><img src='%s'></div>" % (IMG_DIR+file,))
 	out.close ()
-	print KEY + "\t" + str(count)
+	print(KEY + "\t" + str(count))
 
 for KEY in KEYS:
 	generate (KEY)

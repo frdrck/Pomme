@@ -1,32 +1,33 @@
 #!/opt/python2.6/bin/python
 
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-from SocketServer import ThreadingMixIn
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from socketserver import ThreadingMixIn
 import threading
 import os
 import sys
 import time
 import re
 import cgi
-import sha
 import copy
 import time
 import random
 import operator
+import hashlib
+import ssl
 import simplejson as json
 from collections import deque
 from fruits import FRUITS
 
-print "db"
+print("db")
 
 import db
 import config
 
-print "db done"
+print("db done")
 
 DB = db.db ()
 
-print "new db"
+print("new db")
 
 BAN_TIME = 5 * 60
 GAME_IDLE_TIME = 10
@@ -104,7 +105,7 @@ def sanitize_html (s):
 def generate_hash (s):
 	if not s:
 		s = "POMME"
-	return sha.new(str(time.time())+s).hexdigest()
+	return hashlib.sha256(str(time.time()).encode() + s.encode()).hexdigest()
 
 START_TIME = now ()
 
@@ -112,7 +113,7 @@ class Cards:
 	def __init__ (self):
 		self.load ()
 	def load (self):
-		print "card dirs:", config.PLAYER_CARDS, config.MAIN_CARDS
+		print("card dirs:", config.PLAYER_CARDS, config.MAIN_CARDS)
 		self.player = self.load_dir (config.PLAYER_CARDS)
 		self.main = self.load_dir (config.MAIN_CARDS)
 	def load_dir (self, path):
@@ -276,8 +277,8 @@ class Game:
 			}
 		return data
 	def new_round (self):
-		print "___________"
-		print "NEW ROUND"
+		print("___________")
+		print("NEW ROUND")
 		if len(self.active) - len(self.skipped) < 2:
 			self.state = STATE_IDLE
 			self.judge = ""
@@ -347,7 +348,7 @@ class Game:
 							else:
 								self.idlers[name] = 1
 							if self.idlers[name] > IDLE_THRESHOLD:
-								print "IDLE SKIPPING PLAYER", name
+								print("IDLE SKIPPING PLAYER", name)
 								self.skip(name)
 				#	self.state = STATE_IDLE
 			#if self.judge not in self.active or self.judge in self.skipped:
@@ -362,12 +363,12 @@ class Game:
 				self.state = STATE_VOTE
 				self.countdown = now () + self.timer
 				self.votes = {}
-				print "SWITCHING TO STATE_VOTE"
+				print("SWITCHING TO STATE_VOTE")
 				if self.judge in self.idlers:
 					self.idlers[self.judge] += 1
 				if self.idlers[self.judge] > IDLE_THRESHOLD:
 					self.skip (self.judge)
-					print "IDLE SKIPPING JUDGE", self.judge
+					print("IDLE SKIPPING JUDGE", self.judge)
 		elif self.state == STATE_VOTE:
 			advancing = self.countdown < now ()
 			if advancing:
@@ -549,19 +550,19 @@ class Game:
 		return { "card": new_card }
 
 	def api_judge (self, args):
-		print "JUDGING ", args['card']
+		print("JUDGING ", args['card'])
 		if self.judge != args['username']:
 			return { "error": "you aren't the judge" }
 		if args['card'] not in self.bets.values ():
 			return { "error": "card not in bets" }
-		print "ATTEMPTING TO WIN"
+		print("ATTEMPTING TO WIN")
 		self.win (args['card'])
 		return {}
 	def win (self, win_card):
 		if self.win_image == win_card:
 			return
-		print "WINNING:", win_card
-		for user, card in self.bets.iteritems ():
+		print("WINNING:", win_card)
+		for user, card in self.bets.items ():
 			if card == win_card:
 				self.state = STATE_WIN
 				self.winner = user
@@ -569,25 +570,25 @@ class Game:
 				self.players[user].score += 1
 				self.nextgame = now() + 10
 				if self.players[user].score >= self.goal and self.goal != 0:
-					print ">>>>>", user, "won the game in", self.name, "!"
+					print(">>>>>", user, "won the game in", self.name, "!")
 					self.state = STATE_GAMEOVER
 					self.countdown = now() + self.timer
 					self.votes = {}
 					Pomme.win_game (self, user)
 				self.win_combo = Pomme.win_round (self, user, self.judge, card, self.image)
-				print self.players[user].score, "__", self.goal
+				print(self.players[user].score, "__", self.goal)
 				return
 		self.state = STATE_WIN
 		self.winner = "someone"
 		self.nextgame = now() + 10
-		print "_____________________"
-		print "judge leaving bug?"
-		print self.name
-		print self.judge
-		print card
-		print repr(self.bets)
-		print 
-		print "_____________________"
+		print("_____________________")
+		print("judge leaving bug?")
+		print(self.name)
+		print(self.judge)
+		print(card)
+		print(repr(self.bets))
+		print()
+		print("_____________________")
 	def api_vote (self, args):
 		if args['card'] not in self.bets.values ():
 			return { "error": "card not in bets" }
@@ -604,9 +605,9 @@ class Game:
 				scores[card] += 1
 			else:
 				scores[card] = 1
-		sorted_scores = sorted(scores.iteritems(), key=operator.itemgetter(1), reverse=True)
+		sorted_scores = sorted(scores.items(), key=operator.itemgetter(1), reverse=True)
 		if len(sorted_scores):
-			print "TALLIED ENOUGH CARDS"
+			print("TALLIED ENOUGH CARDS")
 			self.win (sorted_scores[0][0])
 
 	# skip requires simple majority
@@ -906,13 +907,13 @@ class PommeDatabase:
 			DB.user_win_game(user.id, game.goal)
 
 	def api_login (self, args, client_address):
-                print args
+		print(args)
 		if args['name'] is None or args['name'] == "" or args['name'] == " ":
 			return { "error": "empty" }
 		user = self.user_from_username(args['name'])
 
 		if user is not None:
-			print "login attempt:", args['name']
+			print("login attempt:", args['name'])
 			if len(user.password):
 				if args['password'] is None:
 					return { "error": "password" }
@@ -921,7 +922,7 @@ class PommeDatabase:
 			if not user.check_ip(client_address):
 				return { "error": "ip" }
 		else:
-			print "new user:", args['name']
+			print("new user:", args['name'])
 			for cuss in ILLEGAL_WORDS:
 				if cuss in args['name'].lower():
 					return None
@@ -930,7 +931,7 @@ class PommeDatabase:
 			else:
 				user = self.user_new (args)
 		sessionid = self.session_new (user)
-		print "created sessionid:", sessionid
+		print("created sessionid:", sessionid)
 		return { "session": sessionid }
 
 	def api_game_new (self, args):
@@ -1054,7 +1055,7 @@ class PommeDatabase:
 	def find_an_active_game (self, skip):
 		if skip is None:
 			skip = ""
-		for name,game in self.games.iteritems():
+		for name,game in self.games.items():
 			if name != "bigapple" and name != skip and not game.private:
 				game.flush()
 				if len(game.active) > 0 and len(game.active) < 8:
@@ -1070,7 +1071,7 @@ class PommeDatabase:
 			return { 'games': self.active_games, 'username': args['username'], 'score': args['user'].score, 'combos': [x for x in self.combos], }
 		self.last_update = curtime
 		updated_games = {}
-		for name,game in self.games.iteritems():
+		for name,game in self.games.items():
 			if len(game.active) < 1 and game.id != 1:
 				continue
 			updated_games[name] = game.report (curtime)
@@ -1113,7 +1114,7 @@ class PommeDatabase:
 		return { "count": self.last_active_count }
 	def get_active_user_count (self):
 		users = {}
-		for name,game in Pomme.games.iteritems():
+		for name,game in Pomme.games.items():
 			if len(game.active) < 1 and game.id != 1:
 				continue
 			game.flush()
@@ -1144,8 +1145,8 @@ class PommeHandler (BaseHTTPRequestHandler):
 
 	def do_POST (self):
 		if "poll" not in self.path:
-			print 'path: ' + self.path
-		#	print 'client: ' + repr (self.client_address)
+			print('path: ' + self.path)
+		#	print('client: ' + repr (self.client_address))
 
 		self.send_response(200)
 		self.send_cors_headers ()
@@ -1217,8 +1218,8 @@ class PommeHandler (BaseHTTPRequestHandler):
 			"/combo/game": Pomme.api_combo_game,
 			"/pomme/count": Pomme.api_user_count,
 			}
-		print self.path
-		print args
+		print(self.path)
+		print(args)
 		if self.path == "/user/login":
 			self.json ( Pomme.api_login(args, self._client_address) )
 		elif self.path in PRIVATE_API:
@@ -1258,7 +1259,12 @@ class PommeHandler (BaseHTTPRequestHandler):
 			"/game/discard": game.api_discard,
 			}
 		if self.path in GAME_API:
-			self.json ( GAME_API.get(self.path)(args) )
+			data = GAME_API.get(self.path)(args)
+			if 'bets' in data:
+				data['bets'] = list(data['bets'])
+			if 'skipped' in data:
+				data['skipped'] = list(data['skipped'])
+			self.json(data)
 		else:
 			self.api_error ("no such game API")
 
@@ -1317,7 +1323,7 @@ class PommeHandler (BaseHTTPRequestHandler):
 		users = {}
 		games = []
 		self.wfile.write ("<b>active games</b>\n")
-		for name,game in Pomme.games.iteritems():
+		for name,game in Pomme.games.items():
 			if len(game.active) < 2:
 				continue
 			games.append(name)
@@ -1349,11 +1355,13 @@ class PommeHandler (BaseHTTPRequestHandler):
 		#	else:
 		#		self.wfile.write("%s => %s\n" % (str(key), repr(game.__dict__[key])))
 
-	def json (self, data):
-		self.wfile.write (json.dumps(data))
+	def json (self, data, is_debugging=False):
+		bb = bytes(json.dumps(data), 'utf-8')
+		self.wfile.write(bb)
+
 	def api_error (self, error):
-		print "***", self.path
-		print "error:", error
+		print("***", self.path)
+		print("error:", error)
 		self.json ({ 'error': error })
 
 
@@ -1365,19 +1373,24 @@ class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
 	pass
 
 if __name__ == '__main__':
-	while True:
-		try:
-                        print "starting server", config.SERVER_HOST, config.SERVER_PORT
-			server = ThreadedHTTPServer((config.SERVER_HOST, config.SERVER_PORT), PommeHandler)
-			print 'Listening on', config.SERVER_HOST, config.SERVER_PORT, '...'
-			print 'PID', os.getpid()
-			server.serve_forever()
-		except KeyboardInterrupt:
-			# seep for two seconds to allow program to really quit.
-			time.sleep(2)
-			print '^C'
-			server.socket.close()
-		except:
-                        print "Unexpected error:", sys.exc_info()[0]
-			raise
+    while True:
+        try:
+            print("starting server", config.SERVER_HOST, config.SERVER_PORT)
+            server = ThreadedHTTPServer((config.SERVER_HOST, config.SERVER_PORT), PommeHandler)
+            server.socket = ssl.wrap_socket(server.socket,
+                server_side=True,
+                certfile='cert.pem',
+                keyfile='key.pem',
+                ssl_version=ssl.PROTOCOL_SSLv23)
+            print('Listening on', config.SERVER_HOST, config.SERVER_PORT, '...')
+            print('PID', os.getpid())
+            server.serve_forever()
+        except KeyboardInterrupt:
+            # seep for two seconds to allow program to really quit.
+            time.sleep(2)
+            print('^C')
+            server.socket.close()
+        except:
+            print("Unexpected error:", sys.exc_info()[0])
+            raise
 

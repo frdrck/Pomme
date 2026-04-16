@@ -1,4 +1,4 @@
-BASE_URL = "http://pomme.us:32123"
+BASE_URL = "https://pomme.us:32123"
 
 var API =
 	{
@@ -49,7 +49,7 @@ function prepare_url (s)
 	s = trim(s);
 	if (s.length < 5) return "";
 	if (s.indexOf("javascript") === 0) return "";
-	if (s.indexOf("http") !== 0) return "http://" + s;
+	if (s.indexOf("http") !== 0) return "https://" + s;
 	return s;
 	}
 function scrollToBottom (elem)

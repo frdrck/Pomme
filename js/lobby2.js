@@ -45,7 +45,7 @@ function prepare_url (s)
 	{
 	s = trim(s);
 	if (s.indexOf("javascript") === 0) return "";
-	if (s.indexOf("http") !== 0) return "http://" + s;
+	if (s.indexOf("https") !== 0) return "https://" + s;
 	return s;
 	}
 function scrollToBottom (elem)
@@ -521,7 +521,7 @@ var Chat =
 		for (var i = 0; i < words.length; i++)
 			{
 			var word = words[i];
-			if (word.indexOf("http") === 0)
+			if (word.indexOf("https") === 0)
 				{
 				if (name == "frederick" && 
 					(
@@ -577,7 +577,7 @@ var Chat =
 			else
 				rows.push( "<p><span class='user'>"+line[2]+"</span><span class='msg'>"+Chat.parse(line[3], line[2])+"</span></p>" )
 			Chat.seen[line[0]] = true
-			if (line[3].indexOf("http") !== -1)
+			if (line[3].indexOf("https") !== -1)
 				has_images = true
 			}
 		if (rows.length)
@@ -1059,6 +1059,12 @@ var Main =
 		var p = 10
 		var fh = 20
 
+		if (w < 768) {
+		// === MOBILE LAYOUT ===
+		// Chat, combo hidden via CSS. Games list and welcome are relative-positioned.
+		$("#games").css({ "height": "auto" })
+		} else {
+		// === DESKTOP LAYOUT (original) ===
 		var gh = h - 100 - 250 - 40
 		var nh = gh - 70
 
@@ -1086,6 +1092,8 @@ var Main =
 		// $("#combo-wrapper").css({ "top": 70 })
 		// $("#combo-wrapper").css({ "bottom": 30 })
 		$("#combo-wrapper").css({ "bottom": 50 })
+		} // end desktop
+
 		scrollToBottom("#chat_container")
 		},
 	init: function ()

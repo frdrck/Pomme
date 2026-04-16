@@ -5,7 +5,7 @@ import sha
 USERS = ['joel']
 PASSWORD = "b6aaf140827e13a9dd83173a85f57f4b"
 
-print PASSWORD
+print(PASSWORD)
 DB = db.db ()
 
 for user in USERS:

@@ -1,10 +1,7 @@
-from jon import dbpool
-import MySQLdb, MySQLdb.cursors
+import mysql.connector
 import time
 
 import config
-
-dbpool.set_database(MySQLdb, 5)
 
 COMBO_LIMIT = 30
 
@@ -26,25 +23,26 @@ def is_number(i):
 
 class db:
   def __init__(self):
-    print "connect"
+    print("connect")
     self.conn = None
     self.connect()
-    print "done connect"
+    print("done connect")
 
   def connect(self):
-    self.conn = dbpool.connect(
+    self.conn = mysql.connector.connect(
         host = config.MYSQL_HOST,
         user = config.MYSQL_USER,
-        passwd = config.MYSQL_PASSWORD,
-        db = config.MYSQL_DATABASE)
+        password = config.MYSQL_PASSWORD,
+        database = config.MYSQL_DATABASE,
+    )
 
   def execute(self,sql,args=()):
     try:
       cursor = self.conn.cursor()
       cursor.execute(sql,args)
       return cursor
-    except dbpool.OperationalError, e:
-      print "Error %d: %s" % (e.args[0], e.args[1])
+    except Exception as e:
+      print("Error %d: %s" % (e.args[0], e.args[1]))
       # sys.exit(1)
       self.connect()
       cursor = self.conn.cursor()
@@ -56,17 +54,14 @@ class db:
       dict_cursor = self.conn.cursor(MySQLdb.cursors.DictCursor)
       dict_cursor.execute(sql,args)
       return dict_cursor
-    except dbpool.OperationalError, e:
-      print "Error %d: %s" % (e.args[0], e.args[1])
+    except Exception as e:
+      print("Error %d: %s" % (e.args[0], e.args[1]))
       # sys.exit(1)
       self.connect()
       dict_cursor = self.conn.cursor(MySQLdb.cursors.DictCursor)
       dict_cursor.execute(sql,args)
       return dict_cursor
 
-  def lastinsertid(self):
-    return self.conn.insert_id()
-  
   def insert(self, table, expected, data):
     sql = "INSERT INTO " + table + " "
     fields = []
@@ -77,7 +72,7 @@ class db:
         values.append(data[field])
     sql += "(" + ",".join(fields) + ") "
     sql += "VALUES(" + ",".join(["%s" for x in values]) + ")"
-    self.execute(sql, values)
+    return self.execute(sql, values)
 
   def update(self, table, expected, data, id):
     sql = "UPDATE " + table + " SET "
@@ -95,10 +90,10 @@ class db:
   ### USERS
 
   def user_new(self, data):
-    self.insert("pomme_user", USER_FIELDS, data)
-    id = self.lastinsertid()
+    cursor = self.insert("pomme_user", USER_FIELDS, data)
+    user_id = cursor.lastrowid
     sql = "SELECT * FROM pomme_user WHERE id=%s"
-    args = (id,)
+    args = (user_id,)
     cursor = self.execute(sql, args)
     try:
       return cursor.fetchall()[0]
@@ -120,17 +115,17 @@ class db:
 
   def user_gain_point(self, userid):
     sql = "UPDATE pomme_user SET score = score + 1 WHERE id=%s"
-    args = (userid)
+    args = (userid,)
     self.execute(sql, args)
 
   def user_lose_point(self, userid):
     sql = "UPDATE pomme_user SET score = score - 1 WHERE id=%s"
-    args = (userid)
+    args = (userid,)
     self.execute(sql, args)
 
   def user_win_game(self, userid, goal):
     sql = "UPDATE pomme_user SET wins_" + str(goal) + " = wins_" + str(goal) + " + 1 WHERE id=%s"
-    args = (userid)
+    args = (userid,)
     self.execute(sql, args)
 
   def win_game (self, game, username):
@@ -186,10 +181,10 @@ class db:
   ### GAMES
 
   def game_new(self, data):
-    self.insert("pomme_game", GAME_FIELDS, data)
-    id = self.lastinsertid()
+    cursor = self.insert("pomme_game", GAME_FIELDS, data)
+    id = cursor.lastrowid
     sql = "SELECT * FROM pomme_game WHERE id=%s"
-    args = (id)
+    args = (id,)
     cursor = self.execute(sql, args)
     try:
       return cursor.fetchall()[0]
@@ -207,13 +202,13 @@ class db:
   ### COMBOS
 
   def combo_new(self, data):
-    self.insert("pomme_combo", COMBO_FIELDS, data)
-    comboid = self.lastinsertid()
+    cursor = self.insert("pomme_combo", COMBO_FIELDS, data)
+    comboid = cursor.lastrowid
     return comboid
 
   def combo_get_userid(self, comboid):
     sql = "SELECT userid FROM pomme_combo WHERE id=%s"
-    args = (comboid)
+    args = (comboid,)
     cursor = self.execute(sql, args)
     try:
       return cursor.fetchall()[0][0]
@@ -222,7 +217,7 @@ class db:
 
   def combo_list_latest(self):
     sql = "SELECT * FROM pomme_combo ORDER BY id DESC LIMIT %s"
-    args = (COMBO_LIMIT)
+    args = (COMBO_LIMIT,)
     return self.dict_execute(sql, args).fetchall()
 
   def combo_list_top(self, userid, start=None, limit=None):
@@ -291,12 +286,12 @@ class db:
 
   def combo_gain_point(self, comboid):
     sql = "UPDATE pomme_combo SET score = score + 1 WHERE id=%s"
-    args = (comboid)
+    args = (comboid,)
     self.execute(sql, args)
 
   def combo_lose_point(self, comboid):
     sql = "UPDATE pomme_combo SET score = score - 1 WHERE id=%s"
-    args = (comboid)
+    args = (comboid,)
     self.execute(sql, args)
 
 
@@ -373,7 +368,7 @@ class db:
 
   def users_new_today(self):
     sql = "SELECT DISTINCT username FROM pomme_user WHERE joindate > %s"
-    args = (now()-86400)
+    args = (now()-86400,)
     cursor = self.execute(sql, args)
     rows = cursor.fetchall()
     users = []
