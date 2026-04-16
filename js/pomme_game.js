@@ -2226,7 +2226,7 @@ var Game =
 		if (pair[1] && pair[1].length && pair[1] !== Game.lastBanner)
 			{
 			Game.lastBanner = pair[1]
-			$("#banner").html(pair[1])
+			$("#banner").html(pair[1]).show()
 			}
 		},
 	states: {},
@@ -2453,7 +2453,6 @@ var Game =
 			Countdown.stop ()
 			$("#match").fadeOut(500, function(){$("#match").html ("")})
 			Game.hideCards ()
-			if ($(window).width() < 768) $("#banner").hide()
 			$("#votes").removeClass("live")
 			var win = ""
 			Game.winCount = 0
@@ -2469,12 +2468,6 @@ var Game =
 			mask.className = "mask"
 			$(mask).data("comboid", data['comboid'])
 			$("#win").append (mask)
-			if ($(window).width() < 768) {
-				var winName = document.createElement("span")
-				winName.id = "win-name"
-				winName.textContent = data['winner'] + " won!"
-				$("#win").prepend(winName)
-			}
 
 			if (data['winner'] === Auth.username)
 				{
@@ -2497,7 +2490,6 @@ var Game =
 			Countdown.stop ()
 			$("#match").fadeOut(500, function(){$("#match").html ("")})
 			Game.hideCards ()
-			if ($(window).width() < 768) $("#banner").hide()
 			$("#votes").removeClass("live")
 			var win = ""
 			Game.winCount = 0
@@ -2507,12 +2499,6 @@ var Game =
 			$("#win").html("")
 			$("#win").append (player_card)
 			$("#win").append (match_card)
-			if ($(window).width() < 768) {
-				var winName = document.createElement("span")
-				winName.id = "win-name"
-				winName.textContent = data['winner'] + " won the game!"
-				$("#win").prepend(winName)
-			}
 			Main.title_msg = ""
 			var params =
 				{
@@ -2524,11 +2510,13 @@ var Game =
 			// $("#champion-waiting").hide()
 			// $("#champion-restart").show()
 			Sound.wongame.play()
+			Game.lastBanner = ""
+			$("#banner").html("").hide()
 			$("#champion").fadeIn(500)
 			// $("#champion-restart").bind("click", Game.restart)
 			setTimeout(Game.restart, 10000)
 			$.post(API.URL.deal, params, Game.dealCallback, "json")
-			return ["",""]
+			return ["", ""]
 			// return ["The judge has abandoned the game! Starting over...", "game reset"]
 			}
 		},
@@ -2635,7 +2623,6 @@ var Game =
 		if (Game.winCount > 1)
 			{
 			if ($(window).width() < 768) {
-				$("#banner").hide()
 				$("#win-backdrop").fadeIn(300)
 				$("#win").fadeIn(500)
 			} else {
@@ -3060,6 +3047,18 @@ var Main =
 		$("#mobile-players").css({ "top": buttonsHeight + roomButtonsHeight })
 		var playerStripHeight = $("#mobile-players").outerHeight(true) || 0
 		var headerHeight = buttonsHeight + roomButtonsHeight + playerStripHeight
+		/* Timer sits in its own row under the username strip, centered; not over match/cards. */
+		$("#countdown").css({
+			"position": "absolute",
+			"top": headerHeight,
+			"left": 0,
+			"right": 0,
+			"width": "100%",
+			"margin": 0,
+			"text-align": "center",
+			"z-index": 88
+			})
+		var countdownRowHeight = $("#countdown").outerHeight(true) || 0
 		var toggleHeight = 40  // chat toggle bar
 		Game.cardHeight = Math.min(h * 0.15, 120)
 		Game.cardWidth = (w - 6 * p) / 5
@@ -3076,7 +3075,7 @@ var Main =
 		Game.voteWidth = Game.cardWidth
 		Game.matchRight = 4
 
-		Game.matchHeight = h - hh - headerHeight - toggleHeight - 2 * p
+		Game.matchHeight = h - hh - headerHeight - countdownRowHeight - toggleHeight - 2 * p
 		Game.matchWidth = w - 2 * p
 
 		Game.winHeight = h * 0.4
@@ -3099,7 +3098,7 @@ var Main =
 		$("#chat_bg").css({ "bottom": "", "left": "", "height": "", "width": "" })
 		$("#emoticons").css({ "top": "", "left": "", "bottom": "", "right": "", "width": "", "height": "" })
 
-		var matchTop = headerHeight + 4
+		var matchTop = headerHeight + countdownRowHeight
 		$("#match").css({ "top": matchTop, "bottom": "auto" })
 		var matchBottom = matchTop + ($("#match").outerHeight(true) || 0)
 		$("#orders").css({ "top": matchBottom + 15, })
@@ -3117,6 +3116,8 @@ var Main =
 		$("#win").css({ "bottom": hh + toggleHeight, })
 
 		} else {
+		/* Clear mobile inline countdown placement so screen_game.css rules apply. */
+		$("#countdown").css({ "top": "", "left": "", "right": "", "width": "", "margin": "", "text-align": "", "z-index": "", "position": "" })
 		// === DESKTOP LAYOUT (original) ===
 		var status_width = 320
 
