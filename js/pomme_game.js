@@ -376,6 +376,14 @@ var Webcam =
 		}
 	}
 
+// On narrow viewports, focusing #chat-message opens the software keyboard and scrolls the
+// input into view — it reads as "chat opened" after taps on cards/votes. Desktop keeps focus.
+function focusChatInput ()
+	{
+	if ($(window).width() >= 768)
+		document.getElementById("chat-message").focus()
+	}
+
 var API =
 	{
 	URL:
@@ -1735,7 +1743,7 @@ var Game =
 		$("#game").fadeIn(500)
 		// $("#beta").css({"left": $("h1").width() - $("#beta").width() + 15 })
 		$("#beta").css({"left": 55 })
-		document.getElementById("chat-message").focus()
+		focusChatInput ()
 		Game.setupCards (data)
 		Game.updateStatus (data)
 		Game.updateScores (data)
@@ -2347,7 +2355,7 @@ var Game =
 		Game.pickedDiv = this
 		Game.pickedImage = filename
 		setTimeout('$(Game.pickedDiv).parent().remove()', 2000)
-		document.getElementById("chat-message").focus()
+		focusChatInput ()
 		Game.picked = true
 		$("#hand").removeClass("live")
 		Game.hideCards ()
@@ -2374,7 +2382,7 @@ var Game =
 		Sound.click.play ()
 		Sound.ticking.stop ()
 		Game.pickedImage = filename
-		document.getElementById("chat-message").focus()
+		focusChatInput ()
 		Game.picked = true
 		$("#hand").removeClass("live")
 		Game.hideCards ()
@@ -2610,7 +2618,7 @@ var Game =
 				}
 			$.post(API.URL.vote, params, Game.judgeCallback, "json")
 			Game.judged = true
-			document.getElementById("chat-message").focus()
+			focusChatInput ()
 			}
 		else if (Game.is_judge)
 			{
@@ -2624,7 +2632,7 @@ var Game =
 				}
 			$.post(API.URL.judge, params, Game.judgeCallback, "json")
 			Game.judged = true
-			document.getElementById("chat-message").focus()
+			focusChatInput ()
 			Game.hideCards ()
 			}
 		},
@@ -2765,7 +2773,7 @@ var Main =
 		{
 		Main.focused = true
 		// Main.resize()
-		document.getElementById("chat-message").focus()
+		focusChatInput ()
 		/*
 		if (console)
 			{
