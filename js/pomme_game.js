@@ -2202,7 +2202,9 @@ var Game =
 			Game.stateDelay = 0
 		else
 			Game.stateDelay -= 1
-		if (Game.stateDelay > 0)
+		/* Do not block when the server has moved to a new phase — otherwise WIN/GAMEOVER
+		   overlays can stay up until the delay counter drains (e.g. GAMEOVER → BET). */
+		if (Game.stateDelay > 0 && data['state'] === Game.state)
 			return
 		if (Game.state === data['state'])
 			{
