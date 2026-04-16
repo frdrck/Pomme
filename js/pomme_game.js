@@ -379,7 +379,7 @@ var Webcam =
 /* Dev-only modal — remove PommeMobileBuildModal when no longer needed. */
 var PommeMobileBuildModal =
 	{
-	BUNDLE: "v21",
+	BUNDLE: "v23",
 	TRIGGER_NAMES: ["modal", "mobile", "desktop"],
 	show: function ()
 		{
@@ -1943,7 +1943,7 @@ var Game =
 	setupCards: function (data)
 		{
 		Game.cards = data['cards']
-		$("#win,#champion,#win-backdrop").hide()
+		Game.hideRoundOverlays()
 		$("#hand").html("")
 		for (var i = 0; i < Game.cards.length; i++)
 			$("#hand").append( Game.handCard ("player", Game.cards[i]) )
@@ -2271,10 +2271,12 @@ var Game =
 		if (Game.state !== STATE_WIN && Game.state !== STATE_GAMEOVER)
 			return
 		var $win = $("#win")
-		if (!$win.length || !$win.is(":visible"))
+		var $game = $("#game")
+		if (!$win.length || !$game.length || !$win.is(":visible"))
 			return
 		var gap = 12
-		var top = $win.position().top + $win.outerHeight(true) + gap
+		/* top relative to #game (banner’s offset parent), robust when #win is position:absolute */
+		var top = $win.offset().top - $game.offset().top + $win.outerHeight(true) + gap
 		$("#banner").show().css({
 			"position": "absolute",
 			"top": top,
@@ -2282,6 +2284,17 @@ var Game =
 			"width": "100%",
 			"zIndex": 35
 			})
+		},
+	/* Clear jQuery fx queue on #win (delay+fadeOut from displayWinCard) or hide() is ignored / re-shown. */
+	hideRoundOverlays: function ()
+		{
+		$("#win").stop(true, true)
+		$("#win-backdrop").stop(true, true)
+		$("#champion").stop(true, true)
+		$("#win,#champion,#win-backdrop").hide()
+		$("#banner").css({ top: "", zIndex: "", position: "", left: "", width: "" })
+		if (typeof Main !== "undefined" && Main.layoutResize)
+			Main.layoutResize()
 		},
 	states: {},
 	handVisible: false,
@@ -2421,7 +2434,7 @@ var Game =
 		{
 		Game.states[STATE_IDLE] = function (data)
 			{
-			$("#win,#champion,#win-backdrop").hide()
+			Game.hideRoundOverlays()
 			Main.title_msg = ""
 			Countdown.stop ()
 			Game.hideCards ()
@@ -2432,7 +2445,7 @@ var Game =
 			}
 		Game.states[STATE_SETUP] = function (data)
 			{
-			$("#win,#champion,#win-backdrop").hide()
+			Game.hideRoundOverlays()
 			Main.title_msg = "NEW GAME"
 			return ["Starting the next round!", "new round"]
 			}
@@ -2440,7 +2453,7 @@ var Game =
 			{
 			Sound.new_round.play ()
 			Countdown.start (data['countdown'])
-			$("#win,#champion,#win-backdrop").hide()
+			Game.hideRoundOverlays()
 			if (data['judge'] === Auth.username)
 				{
 				Game.hideCards ()
@@ -2462,7 +2475,7 @@ var Game =
 			}
 		Game.states[STATE_PICKED] = function (data)
 			{
-			$("#win,#champion,#win-backdrop").hide()
+			Game.hideRoundOverlays()
 			Game.hideCards ()
 			Main.title_msg = ""
 			return [" ", " "]
@@ -2470,7 +2483,7 @@ var Game =
 		Game.states[STATE_JUDGE] = function (data)
 			{
 			Countdown.start (data['countdown'])
-			$("#win,#champion,#win-backdrop").hide()
+			Game.hideRoundOverlays()
 			Game.showVotes ()
 			Game.setupVotes (data)
 			if (Game.is_judge)
@@ -2492,7 +2505,7 @@ var Game =
 		Game.states[STATE_VOTE] = function (data)
 			{
 			Countdown.start (data['countdown'])
-			$("#win,#champion,#win-backdrop").hide()
+			Game.hideRoundOverlays()
 			Game.setupVotes (data)
 			Game.showVotes ()
 			Game.judged = false

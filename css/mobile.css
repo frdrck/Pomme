@@ -429,6 +429,8 @@
  * Win round / gameover: two images must stay left | right with the same row height.
  * winCard imgs are wrapped in .win-card-cell (see pomme_game.js wrapWinCardCell).
  */
+/* Do not set position here — it overrode screen_game #win { position:absolute } on desktop
+   (#game #win wins on specificity) and shoved the win box into normal flow / off-layout. */
 #game #win {
   display: flex !important;
   flex-direction: row;
@@ -437,7 +439,6 @@
   justify-content: center;
   gap: 10px;
   box-sizing: border-box;
-  position: relative;
 }
 #game #win .win-card-cell {
   flex: 1 1 0;
@@ -467,4 +468,8 @@
   #card-preview { display: none !important; }
   #win-backdrop { display: none !important; }
   #win { transform: none !important; }
+  /* Restore anchored overlay; JS sets bottom/left */
+  #game #win {
+    position: absolute !important;
+  }
 }
