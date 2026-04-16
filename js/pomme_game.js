@@ -2453,7 +2453,6 @@ var Game =
 			Countdown.stop ()
 			$("#match").fadeOut(500, function(){$("#match").html ("")})
 			Game.hideCards ()
-			if ($(window).width() < 768) $("#banner").hide()
 			$("#votes").removeClass("live")
 			var win = ""
 			Game.winCount = 0
@@ -2469,12 +2468,6 @@ var Game =
 			mask.className = "mask"
 			$(mask).data("comboid", data['comboid'])
 			$("#win").append (mask)
-			if ($(window).width() < 768) {
-				var winName = document.createElement("span")
-				winName.id = "win-name"
-				winName.textContent = data['winner'] + " won!"
-				$("#win").prepend(winName)
-			}
 
 			if (data['winner'] === Auth.username)
 				{
@@ -2497,7 +2490,6 @@ var Game =
 			Countdown.stop ()
 			$("#match").fadeOut(500, function(){$("#match").html ("")})
 			Game.hideCards ()
-			if ($(window).width() < 768) $("#banner").hide()
 			$("#votes").removeClass("live")
 			var win = ""
 			Game.winCount = 0
@@ -2507,12 +2499,6 @@ var Game =
 			$("#win").html("")
 			$("#win").append (player_card)
 			$("#win").append (match_card)
-			if ($(window).width() < 768) {
-				var winName = document.createElement("span")
-				winName.id = "win-name"
-				winName.textContent = data['winner'] + " won the game!"
-				$("#win").prepend(winName)
-			}
 			Main.title_msg = ""
 			var params =
 				{
@@ -2528,7 +2514,7 @@ var Game =
 			// $("#champion-restart").bind("click", Game.restart)
 			setTimeout(Game.restart, 10000)
 			$.post(API.URL.deal, params, Game.dealCallback, "json")
-			return ["",""]
+			return ["", data['winner'] + " won the game!"]
 			// return ["The judge has abandoned the game! Starting over...", "game reset"]
 			}
 		},
@@ -2635,7 +2621,6 @@ var Game =
 		if (Game.winCount > 1)
 			{
 			if ($(window).width() < 768) {
-				$("#banner").hide()
 				$("#win-backdrop").fadeIn(300)
 				$("#win").fadeIn(500)
 			} else {
