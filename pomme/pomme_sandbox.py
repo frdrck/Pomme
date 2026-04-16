@@ -502,7 +502,7 @@ class Game:
 		resp['last'] = now () - 1
 		resp['chat'] = []
 		resp['betters'] = self.betters
-		resp['bets'] = self.bets.values()
+		resp['bets'] = [self.bets[n] for n in self.betters if n in self.bets]
 		resp['winner'] = self.winner
 		resp['win_image'] = self.win_image
 		resp['win_combo'] = self.win_combo

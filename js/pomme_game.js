@@ -1912,14 +1912,17 @@ var Game =
 		},
 	setupVotes: function (data)
 		{
+		Game.clearVotesHideTimer()
 		$("#votes").html("")
-		Game.voteWidth = (Game.width - 10*(data['bets'].length + 6)) / (data['bets'].length)
-		if (data.state !== STATE_VOTE)
+		var nb = (data.bets && typeof data.bets.length === "number") ? data.bets.length : 0
+		var denom = nb > 0 ? nb : 1
+		Game.voteWidth = (Game.width - 10*(nb + 6)) / denom
+		if (data.state !== STATE_VOTE && nb > 0)
 			shuffle(data['bets'])
 		divs = []
-		for (var i = 0; i < data['bets'].length; i++)
+		for (var i = 0; i < nb; i++)
 			{
-			if (data.state === STATE_VOTE && data['bets']['i'] === Game.pickedImage)
+			if (data.state === STATE_VOTE && data['bets'][i] === Game.pickedImage)
 				continue
 			var card = Game.voteCard ("player", data['bets'][i])
 			divs.push(card)
@@ -1930,6 +1933,7 @@ var Game =
 			{
 			$("#votes").append(divs[i])
 			}
+		Game.lastBetsSignature = Game.betsSignature(data)
 		setTimeout(Placement.setupVotesRedraw, 50)
 		},
 	last_players: {},
@@ -2121,10 +2125,26 @@ var Game =
 			Game.stateDelay = 0
 		else
 			Game.stateDelay -= 1
-		if (Game.stateDelay > 0 || Game.state === data['state'])
+		if (Game.stateDelay > 0)
 			return
+		if (Game.state === data['state'])
+			{
+			if (data['state'] === STATE_JUDGE || data['state'] === STATE_VOTE)
+				{
+				var sig = Game.betsSignature(data)
+				if (sig !== Game.lastBetsSignature)
+					{
+					Game.setupVotes(data)
+					if (!Game.votesVisible)
+						Game.showVotes()
+					}
+				}
+			return
+			}
 		Game.stateDelay = Game.stateDelayMode[data['state']]
 		Game.state = data['state']
+		if (data['state'] !== STATE_JUDGE && data['state'] !== STATE_VOTE)
+			Game.lastBetsSignature = ""
 		if (CardPreview.active) CardPreview.hide()
 
 		if (data['round'] > 0)
@@ -2169,8 +2189,47 @@ var Game =
 	states: {},
 	handVisible: false,
 	votesVisible: false,
+	votesHideTimer: null,
+	handHideTimer: null,
+	lastBetsSignature: "",
+	clearVotesHideTimer: function ()
+		{
+		if (Game.votesHideTimer)
+			{
+			clearTimeout(Game.votesHideTimer)
+			Game.votesHideTimer = null
+			}
+		},
+	clearHandHideTimer: function ()
+		{
+		if (Game.handHideTimer)
+			{
+			clearTimeout(Game.handHideTimer)
+			Game.handHideTimer = null
+			}
+		},
+	clearCardLayoutTimers: function ()
+		{
+		Game.clearVotesHideTimer()
+		Game.clearHandHideTimer()
+		},
+	betsSignature: function (data)
+		{
+		if (!data || !data.bets)
+			return ""
+		var b = data.bets
+		var n = b.length
+		if (typeof n !== "number" || n < 1)
+			return ""
+		var a = []
+		for (var i = 0; i < n; i++)
+			a.push(String(b[i]))
+		a.sort()
+		return a.join("\0")
+		},
 	showHand: function ()
 		{
+		Game.clearCardLayoutTimers()
 		$("#hand").show()
 		$("#hand").children().each(function ()
 			{
@@ -2184,7 +2243,11 @@ var Game =
 			$("#hand").animate({'opacity': 1, 'top': Game.handTop })
 			$("#votes").animate({'opacity': 0.2, 'top': Game.height })
 			}
-		setTimeout('$("#votes").hide()', 500)
+		Game.votesHideTimer = setTimeout(function ()
+			{
+			$("#votes").hide()
+			Game.votesHideTimer = null
+			}, 500)
 		if (! Game.is_judge)
 			{
 			$("#whose").html("your hand:").fadeIn(200)
@@ -2201,6 +2264,7 @@ var Game =
 		},
 	showVotes: function ()
 		{
+		Game.clearCardLayoutTimers()
 		$("#votes").show()
 		$("#whose").html("judge's hand:").fadeIn(200)
 		$("#votes").children().each(function ()
@@ -2212,7 +2276,11 @@ var Game =
 			{
 			$("#votes").show().animate({'opacity': 1, 'top': Game.handTop })
 			}
-		setTimeout('$("#hand").hide()', 500)
+		Game.handHideTimer = setTimeout(function ()
+			{
+			$("#hand").hide()
+			Game.handHideTimer = null
+			}, 500)
 		Game.handVisible = false
 		Game.votesVisible = true
 		if (Game.state === STATE_VOTE)
@@ -2233,11 +2301,18 @@ var Game =
 		},
 	hideCards: function ()
 		{
+		Game.clearCardLayoutTimers()
 		$("#orders,#whose").fadeOut(500)
 		$("#hand").animate({'opacity': 0.2, 'top': Game.height })
 		$("#votes").animate({'opacity': 0.2, 'top': Game.height })
 		Lorgnette.fadeOut();
-		setTimeout('$("#hand,#votes").hide()', 500)
+		Game.votesHideTimer = setTimeout(function ()
+			{
+			$("#hand").hide()
+			if (!Game.votesVisible)
+				$("#votes").hide()
+			Game.votesHideTimer = null
+			}, 500)
 		Game.handVisible = false
 		Game.votesVisible = false
 		},
@@ -2323,9 +2398,9 @@ var Game =
 			Game.judged = false
 			$("#votes").addClass("live")
 			Main.title_msg = "VOTE!"
-			$("#votes div").each(function ()
+			$("#votes").children().each(function ()
 				{
-				if ($(this).data("filename") === Game.pickedImage)
+				if ($(this).data("file") === Game.pickedImage)
 					$(this).fadeOut(500)
 				})
 			return ["The judge took too long -- vote!", " "]
@@ -2560,7 +2635,7 @@ var Game =
 		newdiv.style.position = "relative"
 		newdiv.style.top = Game.handHeight + "px"
 		if (card === Game.pickedImage)
-			newdiv.className === "mycard"
+			newdiv.className = "mycard"
 		newdiv.setAttribute("data-file", card)
 		newdiv.setAttribute("data-set", set)
 		newdiv.setAttribute("data-overlay", Game.voteCardCount)
