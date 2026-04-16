@@ -379,7 +379,7 @@ var Webcam =
 /* Dev-only modal — remove PommeMobileBuildModal when no longer needed. */
 var PommeMobileBuildModal =
 	{
-	BUNDLE: "v16",
+	BUNDLE: "v17",
 	TRIGGER_NAMES: ["modal", "mobile", "desktop"],
 	show: function ()
 		{
@@ -1531,7 +1531,17 @@ var Placement =
 	{
 	centerMatchDiv: function ()
 		{
-		$("#match").css({ "left": (Game.width - 2* Game.chatWidth - $("#match").width()) / 2 + Game.chatWidth, })
+		if ($(window).width() < 768)
+			return
+		var w = $("#match").width()
+		if (! w || w < 1)
+			return
+		var left = Math.round((Game.width - 2 * Game.chatWidth - w) / 2 + Game.chatWidth)
+		var $m = $("#match")
+		if ($m.data("pommeCenterLeft") === left)
+			return
+		$m.data("pommeCenterLeft", left)
+		$m.css({ "left": left })
 		},
 	setupVotesRedraw: function ()
 		{
@@ -2682,8 +2692,10 @@ var Game =
 			{
 			$(this).parent().animate({"opacity": 1})
 			$("#match").fadeIn(500)
-			Placement.centerMatchDiv ()
-			setTimeout(Placement.centerMatchDiv, 10)
+			if (window.requestAnimationFrame)
+				requestAnimationFrame(function () { requestAnimationFrame(Placement.centerMatchDiv) })
+			else
+				setTimeout(Placement.centerMatchDiv, 0)
 			}
 		newimg.setAttribute("src", "/img/"+set+"/"+card)
 		newimg.setAttribute("data-file", card)
@@ -3073,8 +3085,11 @@ var Main =
 			var offset = (Game.handHeight - divheight) / 2
 			$(this).css({ "top": offset })
 			})
-		Placement.centerMatchDiv()
-		setTimeout(Placement.centerMatchDiv, 10)
+		/* One pass after layout; avoid double centerMatchDiv + subpixel left jitter (GIF repaint) */
+		if (window.requestAnimationFrame)
+			requestAnimationFrame(function () { Placement.centerMatchDiv() })
+		else
+			Placement.centerMatchDiv()
 		if ($(window).width() >= 768)
 			{
 			var $h = $("#hand")
