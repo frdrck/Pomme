@@ -379,7 +379,7 @@ var Webcam =
 /* Dev-only modal — remove PommeMobileBuildModal when no longer needed. */
 var PommeMobileBuildModal =
 	{
-	BUNDLE: "v20",
+	BUNDLE: "v21",
 	TRIGGER_NAMES: ["modal", "mobile", "desktop"],
 	show: function ()
 		{
@@ -2511,11 +2511,10 @@ var Game =
 			Game.winCount = 0
 			Webcam.snaps = 0
 			var player_card = Game.winCard ("player", data['win_image'])
-			player_card.style.paddingRight = "10px"
 			var match_card = Game.winCard ("main", data['image'])
 			$("#win").html("")
-			$("#win").append (player_card)
-			$("#win").append (match_card)
+			$("#win").append (Game.wrapWinCardCell(player_card))
+			$("#win").append (Game.wrapWinCardCell(match_card))
 			$("#win").data("comboid", data['comboid'])
 			var mask = document.createElement("span")
 			mask.className = "mask"
@@ -2548,11 +2547,10 @@ var Game =
 			var win = ""
 			Game.winCount = 0
 			var player_card = Game.winCard ("player", data['win_image'])
-			player_card.style.paddingRight = "10px"
 			var match_card = Game.winCard ("main", data['image'])
 			$("#win").html("")
-			$("#win").append (player_card)
-			$("#win").append (match_card)
+			$("#win").append (Game.wrapWinCardCell(player_card))
+			$("#win").append (Game.wrapWinCardCell(match_card))
 			Main.title_msg = ""
 			var params =
 				{
@@ -2654,6 +2652,13 @@ var Game =
 			"deck": "webcam",
 			}
 		$.post(API.URL.bet, params)
+		},
+	wrapWinCardCell: function (imgEl)
+		{
+		var cell = document.createElement("div")
+		cell.className = "win-card-cell"
+		cell.appendChild(imgEl)
+		return cell
 		},
 	winCard: function (set, card)
 		{

@@ -342,13 +342,7 @@
     z-index: 30 !important;
     text-align: center;
     white-space: normal;
-  }
-  /* Win phrase uses #banner, positioned below #win via Game.syncWinBannerBelowWin */
-  #win img {
-    display: inline-block;
-    max-height: 40vh !important;
-    max-width: 44vw !important;
-    vertical-align: top;
+    /* Row layout lives in global #game #win rules + .win-card-cell */
   }
 
   /* === Lobby page === */
@@ -429,6 +423,40 @@
 #match .mask {
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
+}
+
+/*
+ * Win round / gameover: two images must stay left | right with the same row height.
+ * winCard imgs are wrapped in .win-card-cell (see pomme_game.js wrapWinCardCell).
+ */
+#game #win {
+  display: flex !important;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  justify-content: center;
+  gap: 10px;
+  box-sizing: border-box;
+  position: relative;
+}
+#game #win .win-card-cell {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: calc(50% - 5px);
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  min-height: min(36vh, 320px);
+  height: min(40vh, 380px);
+}
+#game #win .win-card-cell img {
+  display: block;
+  margin: 0 auto;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
 }
 
 /* Desktop: hide mobile-only elements */
