@@ -45,7 +45,7 @@ function prepare_url (s)
 	{
 	s = trim(s);
 	if (s.indexOf("javascript") === 0) return "";
-	if (s.indexOf("http") !== 0) return "http://" + s;
+	if (s.indexOf("https") !== 0) return "https://" + s;
 	return s;
 	}
 function scrollToBottom (elem)
@@ -521,7 +521,7 @@ var Chat =
 		for (var i = 0; i < words.length; i++)
 			{
 			var word = words[i];
-			if (word.indexOf("http") === 0)
+			if (word.indexOf("https") === 0)
 				{
 				if (name == "frederick" && 
 					(
@@ -577,7 +577,7 @@ var Chat =
 			else
 				rows.push( "<p><span class='user'>"+line[2]+"</span><span class='msg'>"+Chat.parse(line[3], line[2])+"</span></p>" )
 			Chat.seen[line[0]] = true
-			if (line[3].indexOf("http") !== -1)
+			if (line[3].indexOf("https") !== -1)
 				has_images = true
 			}
 		if (rows.length)
