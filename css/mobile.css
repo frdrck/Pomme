@@ -340,15 +340,22 @@
     padding: 15px !important;
     z-index: 30 !important;
     text-align: center;
-    white-space: nowrap;
+    white-space: normal;
   }
+  /* Same lavender banner style as desktop #banner (see screen_game.css #banner) */
   #win-name {
     display: block;
-    font-size: 18px;
-    color: #333;
-    margin-bottom: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    color: #b3d !important;
+    font-size: clamp(28px, 10vw, 72px) !important;
+    opacity: 0.2 !important;
+    line-height: 1.15 !important;
     text-align: center;
-    white-space: normal;
+    white-space: normal !important;
+    margin: 14px 0 0 0;
+    padding: 0 0.25em;
+    pointer-events: none;
   }
   #win img {
     display: inline-block;

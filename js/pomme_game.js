@@ -379,7 +379,7 @@ var Webcam =
 /* Dev-only modal — remove PommeMobileBuildModal when no longer needed. */
 var PommeMobileBuildModal =
 	{
-	BUNDLE: "v10",
+	BUNDLE: "v11",
 	TRIGGER_NAMES: ["modal", "mobile", "desktop"],
 	show: function ()
 		{
@@ -1956,18 +1956,41 @@ var Game =
 	setupVotes: function (data)
 		{
 		Game.clearVotesHideTimer()
+		Game.voteSelfIndex = -1
 		$("#votes").html("")
 		var nb = (data.bets && typeof data.bets.length === "number") ? data.bets.length : 0
-		var denom = nb > 0 ? nb : 1
-		Game.voteWidth = (Game.width - 10*(nb + 6)) / denom
+		/* STATE_VOTE: hide only this user's submission. Skipping by filename removed every slot with
+		   the same GIF — duplicate deck cards could clear the whole strip. */
+		var skipVoteIdx = -1
+		if (data.state === STATE_VOTE && data.betters && typeof data.betters.length === "number")
+			{
+			for (var sj = 0; sj < data.betters.length; sj++)
+				{
+				if (data.betters[sj] === Auth.username)
+					{
+					skipVoteIdx = sj
+					Game.voteSelfIndex = sj
+					break
+					}
+				}
+			}
+		var nShow = nb
+		if (data.state === STATE_VOTE && skipVoteIdx >= 0)
+			nShow -= 1
+		if (nShow < 1)
+			nShow = 1
+		Game.voteWidth = (Game.width - 10*(nShow + 6)) / nShow
 		if (data.state !== STATE_VOTE && nb > 0)
 			shuffle(data['bets'])
 		divs = []
 		for (var i = 0; i < nb; i++)
 			{
-			if (data.state === STATE_VOTE && data['bets'][i] === Game.pickedImage)
+			if (data.state === STATE_VOTE && i === skipVoteIdx)
 				continue
-			var card = Game.voteCard ("player", data['bets'][i])
+			var markMy = false
+			if (data.state !== STATE_VOTE && data['bets'][i] === Game.pickedImage)
+				markMy = true
+			var card = Game.voteCard ("player", data['bets'][i], markMy)
 			divs.push(card)
 			}
 		if (data.state !== STATE_VOTE)
@@ -2436,16 +2459,10 @@ var Game =
 			Countdown.start (data['countdown'])
 			$("#win,#champion,#win-backdrop").hide()
 			Game.setupVotes (data)
-			$(".mycard").hide()
 			Game.showVotes ()
 			Game.judged = false
 			$("#votes").addClass("live")
 			Main.title_msg = "VOTE!"
-			$("#votes").children().each(function ()
-				{
-				if ($(this).data("file") === Game.pickedImage)
-					$(this).fadeOut(500)
-				})
 			return ["The judge took too long -- vote!", " "]
 			}
 		Game.states[STATE_WIN] = function (data)
@@ -2464,17 +2481,17 @@ var Game =
 			$("#win").html("")
 			$("#win").append (player_card)
 			$("#win").append (match_card)
+			if ($(window).width() < 768) {
+				var winName = document.createElement("span")
+				winName.id = "win-name"
+				winName.textContent = data['winner'] + " won!"
+				$("#win").append(winName)
+			}
 			$("#win").data("comboid", data['comboid'])
 			var mask = document.createElement("span")
 			mask.className = "mask"
 			$(mask).data("comboid", data['comboid'])
 			$("#win").append (mask)
-			if ($(window).width() < 768) {
-				var winName = document.createElement("span")
-				winName.id = "win-name"
-				winName.textContent = data['winner'] + " won!"
-				$("#win").prepend(winName)
-			}
 
 			if (data['winner'] === Auth.username)
 				{
@@ -2511,7 +2528,7 @@ var Game =
 				var winName = document.createElement("span")
 				winName.id = "win-name"
 				winName.textContent = data['winner'] + " won the game!"
-				$("#win").prepend(winName)
+				$("#win").append(winName)
 			}
 			Main.title_msg = ""
 			var params =
@@ -2552,6 +2569,8 @@ var Game =
 		},
 	pickedDiv: false,
 	pickedImage: "",
+	/* STATE_VOTE: index of this user in data.betters / data.bets; own card omitted from #votes */
+	voteSelfIndex: -1,
 	pickMouseover: function ()
 		{
 		if (! Game.picked)
@@ -2671,13 +2690,13 @@ var Game =
 		return newdiv
 		},
 	voteCardCount: 0,
-	voteCard: function (set, card)
+	voteCard: function (set, card, markMyCard)
 		{
 		var newdiv = document.createElement("div")
 		newdiv.style.opacity = 0.1
 		newdiv.style.position = "relative"
 		newdiv.style.top = Game.handHeight + "px"
-		if (card === Game.pickedImage)
+		if (markMyCard === true)
 			newdiv.className = "mycard"
 		newdiv.setAttribute("data-file", card)
 		newdiv.setAttribute("data-set", set)
