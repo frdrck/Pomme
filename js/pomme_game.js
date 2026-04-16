@@ -376,12 +376,15 @@ var Webcam =
 		}
 	}
 
-// On narrow viewports, focusing #chat-message opens the software keyboard and scrolls the
-// input into view — it reads as "chat opened" after taps on cards/votes. Desktop keeps focus.
+// Auto-focusing #chat-message after game actions opens the OS keyboard on phones/tablets.
+// Width-only checks fail in landscape (many phones are >=768px). Skip on touch-primary UIs.
 function focusChatInput ()
 	{
-	if ($(window).width() >= 768)
-		document.getElementById("chat-message").focus()
+	var el = document.getElementById("chat-message")
+	if (!el) return
+	if ($(window).width() < 768) return
+	if (window.matchMedia && window.matchMedia("(any-pointer: coarse)").matches) return
+	el.focus()
 	}
 
 var API =
