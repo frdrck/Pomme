@@ -379,7 +379,7 @@ var Webcam =
 /* Dev-only modal — remove PommeMobileBuildModal when no longer needed. */
 var PommeMobileBuildModal =
 	{
-	BUNDLE: "v18",
+	BUNDLE: "v19",
 	TRIGGER_NAMES: ["modal", "mobile", "desktop"],
 	show: function ()
 		{
@@ -1960,7 +1960,7 @@ var Game =
 	appendMatch: function ()
 		{
 		var card = Game.matchCard("main", Game.current_match)
-		$("#match").hide().html("")
+		$("#match").stop(true, true).hide().html("")
 		$("#match").append(card)
 		},
 	setupVotes: function (data)
@@ -2112,7 +2112,8 @@ var Game =
 			}
 			var oldHtml = $("#mobile-players").html()
 			$("#mobile-players").html(mp)
-			if (mp !== oldHtml) Main.layoutResize()
+			if (mp !== oldHtml)
+				Main.scheduleLayoutFromStrip()
 		}
 
 		Game.last_players = players
@@ -2685,16 +2686,19 @@ var Game =
 	matchCard: function (set, card)
 		{
 		var newdiv = document.createElement("div")
+		newdiv.className = "match-card-inner"
 		var mask = document.createElement("span")
 		mask.className = "mask"
 		var newimg = document.createElement("img")
+		newimg.setAttribute("decoding", "sync")
+		newimg.setAttribute("fetchpriority", "high")
 		newimg.onload = function ()
 			{
-			/* Avoid jQuery .animate(opacity) on the GIF wrapper — it can force extra paints per tick alongside GIF frames */
 			$(this).parent().css("opacity", 1)
-			$("#match").fadeIn(500)
+			/* No #match.fadeIn: animating container opacity vs GIF frames desyncs compositing (~500ms then flicker). */
+			$("#match").stop(true, true).css({ opacity: 1 }).show()
 			if (window.requestAnimationFrame)
-				requestAnimationFrame(function () { requestAnimationFrame(Placement.centerMatchDiv) })
+				requestAnimationFrame(Placement.centerMatchDiv)
 			else
 				setTimeout(Placement.centerMatchDiv, 0)
 			}
@@ -3040,6 +3044,17 @@ var Main =
 	title_toggle: false,
 	resizeTimer: null,
 	resizeDebounceMs: Math.round(1000 / 30),
+	stripLayoutTimer: null,
+	scheduleLayoutFromStrip: function ()
+		{
+		if (Main.stripLayoutTimer)
+			clearTimeout(Main.stripLayoutTimer)
+		Main.stripLayoutTimer = setTimeout(function ()
+			{
+			Main.stripLayoutTimer = null
+			Main.layoutResize()
+			}, 150)
+		},
 	applyGameImageLimits: function ()
 		{
 		function setMax (el, w, h)

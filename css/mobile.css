@@ -419,18 +419,30 @@
 }
 
 /*
- * Animated GIFs in #match: each frame can trigger repaints; if the GIF shares a layer
- * with other UI, siblings may repaint too (web.dev/speed-animated-gifs). Promoting
- * the match strip and image to their own stacking context / compositor layer reduces
- * visible flicker when layout or transforms change (common Safari/Chrome advice).
+ * Animated GIFs in #match: isolate paint boundaries + compositor layers. Avoid
+ * animating #match opacity (see pomme_game matchCard); that fights GIF decode timing.
  */
 #match {
   isolation: isolate;
 }
-#match img {
+#match > div.match-card-inner {
+  position: relative;
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+#match img {
+  display: block;
+  vertical-align: middle;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+#match .mask {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 /* Desktop: hide mobile-only elements */
