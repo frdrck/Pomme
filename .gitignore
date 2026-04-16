@@ -7,3 +7,10 @@ img/*
 httpdocs
 pomme_combo.sql
 *.pem
+.dh-diag
+img_/
+img_2023_09_17.zip
+pomme/cert.pem.old
+pomme/key.pem.old
+quarantine/
+rag/
