@@ -3060,6 +3060,18 @@ var Main =
 		$("#mobile-players").css({ "top": buttonsHeight + roomButtonsHeight })
 		var playerStripHeight = $("#mobile-players").outerHeight(true) || 0
 		var headerHeight = buttonsHeight + roomButtonsHeight + playerStripHeight
+		/* Timer sits in its own row under the username strip, centered; not over match/cards. */
+		$("#countdown").css({
+			"position": "absolute",
+			"top": headerHeight,
+			"left": 0,
+			"right": 0,
+			"width": "100%",
+			"margin": 0,
+			"text-align": "center",
+			"z-index": 88
+			})
+		var countdownRowHeight = $("#countdown").outerHeight(true) || 0
 		var toggleHeight = 40  // chat toggle bar
 		Game.cardHeight = Math.min(h * 0.15, 120)
 		Game.cardWidth = (w - 6 * p) / 5
@@ -3076,7 +3088,7 @@ var Main =
 		Game.voteWidth = Game.cardWidth
 		Game.matchRight = 4
 
-		Game.matchHeight = h - hh - headerHeight - toggleHeight - 2 * p
+		Game.matchHeight = h - hh - headerHeight - countdownRowHeight - toggleHeight - 2 * p
 		Game.matchWidth = w - 2 * p
 
 		Game.winHeight = h * 0.4
@@ -3099,7 +3111,7 @@ var Main =
 		$("#chat_bg").css({ "bottom": "", "left": "", "height": "", "width": "" })
 		$("#emoticons").css({ "top": "", "left": "", "bottom": "", "right": "", "width": "", "height": "" })
 
-		var matchTop = headerHeight + 4
+		var matchTop = headerHeight + countdownRowHeight
 		$("#match").css({ "top": matchTop, "bottom": "auto" })
 		var matchBottom = matchTop + ($("#match").outerHeight(true) || 0)
 		$("#orders").css({ "top": matchBottom + 15, })
@@ -3117,6 +3129,8 @@ var Main =
 		$("#win").css({ "bottom": hh + toggleHeight, })
 
 		} else {
+		/* Clear mobile inline countdown placement so screen_game.css rules apply. */
+		$("#countdown").css({ "top": "", "left": "", "right": "", "width": "", "margin": "", "text-align": "", "z-index": "", "position": "" })
 		// === DESKTOP LAYOUT (original) ===
 		var status_width = 320
 
