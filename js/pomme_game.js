@@ -376,17 +376,6 @@ var Webcam =
 		}
 	}
 
-// Auto-focusing #chat-message after game actions opens the OS keyboard on phones/tablets.
-// Width-only checks fail in landscape (many phones are >=768px). Skip on touch-primary UIs.
-function focusChatInput ()
-	{
-	var el = document.getElementById("chat-message")
-	if (!el) return
-	if ($(window).width() < 768) return
-	if (window.matchMedia && window.matchMedia("(any-pointer: coarse)").matches) return
-	el.focus()
-	}
-
 var API =
 	{
 	URL:
@@ -1814,7 +1803,6 @@ var Game =
 		$("#game").fadeIn(500)
 		// $("#beta").css({"left": $("h1").width() - $("#beta").width() + 15 })
 		$("#beta").css({"left": 55 })
-		focusChatInput ()
 		Game.setupCards (data)
 		Game.updateStatus (data)
 		Game.updateScores (data)
@@ -2468,7 +2456,6 @@ var Game =
 		Game.pickedDiv = this
 		Game.pickedImage = filename
 		setTimeout('$(Game.pickedDiv).parent().remove()', 2000)
-		focusChatInput ()
 		Game.picked = true
 		$("#hand").removeClass("live")
 		Game.hideCards ()
@@ -2495,7 +2482,6 @@ var Game =
 		Sound.click.play ()
 		Sound.ticking.stop ()
 		Game.pickedImage = filename
-		focusChatInput ()
 		Game.picked = true
 		$("#hand").removeClass("live")
 		Game.hideCards ()
@@ -2744,7 +2730,6 @@ var Game =
 				}
 			$.post(API.URL.vote, params, Game.judgeCallback, "json")
 			Game.judged = true
-			focusChatInput ()
 			}
 		else if (Game.is_judge)
 			{
@@ -2758,7 +2743,6 @@ var Game =
 				}
 			$.post(API.URL.judge, params, Game.judgeCallback, "json")
 			Game.judged = true
-			focusChatInput ()
 			Game.hideCards ()
 			}
 		},
@@ -2904,7 +2888,6 @@ var Main =
 		{
 		Main.focused = true
 		// Main.resize()
-		focusChatInput ()
 		/*
 		if (console)
 			{
