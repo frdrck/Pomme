@@ -2102,7 +2102,7 @@ var Game =
 			}
 			var oldHtml = $("#mobile-players").html()
 			$("#mobile-players").html(mp)
-			if (mp !== oldHtml) Main.resize()
+			if (mp !== oldHtml) Main.layoutResize()
 		}
 
 		Game.last_players = players
@@ -3025,6 +3025,62 @@ var Main =
 	blurred: false,
 	title_msg: "",
 	title_toggle: false,
+	resizeTimer: null,
+	resizeDebounceMs: Math.round(1000 / 30),
+	applyGameImageLimits: function ()
+		{
+		$("#match img").each(function ()
+			{
+			this.style.maxWidth = Game.matchWidth + "px"
+			this.style.maxHeight = Game.matchHeight + "px"
+			})
+		$("#hand img").each(function ()
+			{
+			this.style.maxWidth = Game.cardWidth + "px"
+			this.style.maxHeight = Game.cardHeight + "px"
+			})
+		$("#votes img").each(function ()
+			{
+			this.style.maxWidth = Game.voteWidth + "px"
+			this.style.maxHeight = Game.cardHeight + "px"
+			})
+		$("#win img").each(function ()
+			{
+			this.style.maxWidth = Game.winWidth + "px"
+			this.style.maxHeight = Game.winHeight + "px"
+			})
+		$("#discard-cards img").each(function ()
+			{
+			this.style.maxWidth = Game.cardWidth + "px"
+			this.style.maxHeight = Game.cardHeight + "px"
+			})
+		},
+	relayoutCardStacks: function ()
+		{
+		$("#hand").children().each(function ()
+			{
+			var divheight = $(this).height()
+			var offset = (Game.handHeight - divheight) / 2
+			$(this).css({ "top": offset })
+			})
+		$("#votes").children().each(function ()
+			{
+			var divheight = $(this).height()
+			var offset = (Game.handHeight - divheight) / 2
+			$(this).css({ "top": offset })
+			})
+		Placement.centerMatchDiv()
+		setTimeout(Placement.centerMatchDiv, 10)
+		if ($(window).width() >= 768)
+			{
+			var $h = $("#hand")
+			var $v = $("#votes")
+			if ($h.is(":visible"))
+				$h.css({ "margin-left": -1 * $h.width() / 2 })
+			if ($v.is(":visible"))
+				$v.css({ "margin-left": -1 * $v.width() / 2 })
+			}
+		},
 	focus: function ()
 		{
 		Main.focused = true
@@ -3067,6 +3123,16 @@ var Main =
 			document.title = "Pomme"
 		},
 	resize: function ()
+		{
+		if (Main.resizeTimer)
+			clearTimeout(Main.resizeTimer)
+		Main.resizeTimer = setTimeout(function ()
+			{
+			Main.resizeTimer = null
+			Main.layoutResize()
+			}, Main.resizeDebounceMs)
+		},
+	layoutResize: function ()
 		{
 		var w = $(window).width ()
 		var h = $(window).height ()
@@ -3140,6 +3206,11 @@ var Main =
 		var countdownBlockH = $("#countdown").outerHeight(true) || (24 * 1.25 + 2 * padHalfEm + 4)
 		var matchTop = countdownRowTop + countdownBlockH + padHalfEm
 		$("#match").css({ "top": matchTop, "bottom": "auto" })
+		$("#match img").each(function ()
+			{
+			this.style.maxWidth = Game.matchWidth + "px"
+			this.style.maxHeight = Game.matchHeight + "px"
+			})
 		var matchBottom = matchTop + ($("#match").outerHeight(true) || 0)
 		Game.matchHeight = Math.max(100, Math.min(Math.floor(h * 0.42), Game.handTop - matchTop - 90))
 		/* Orders sit just under the image; banner (lavender phrase) below orders — like desktop stack */
@@ -3243,6 +3314,7 @@ var Main =
 		} // end desktop
 
 		scrollToBottom("#chat_container")
+		Main.applyGameImageLimits()
 		if (Game.state === STATE_BET)
 			{
 			if (! Game.is_judge)
@@ -3253,13 +3325,14 @@ var Main =
 			}
 		else if (Game.state === STATE_JUDGE)
 			Game.showVotes ()
+		Main.relayoutCardStacks()
 		},
 	init: function ()
 		{
 		$(window).bind("resize", Main.resize)
 		$(window).bind("blur", Main.blur)
 		$(window).bind("focus", Main.focus)
-		Main.resize ()
+		Main.layoutResize ()
 		Auth.loginCallback = Game.load
 		Auth.logoutCallback = Game.unload
 		Game.init ()
